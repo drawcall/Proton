@@ -5,7 +5,7 @@ you can vist site : http://a-jie.github.io/Proton/   or   http://www.a-jie.cn/pr
 
 ## Features
 
-- Five kinds of renderer :canvas dom webgl easeljs pixijs
+- Five kinds of renderer :canvas dom webgl easeljs pixiel
 - Only ten lines code,you can achieve a very cool effect.Such as the demo of 71squared's ParticleDesigner
 - Can be applied to any game engine
 - Contains a variety of behaviours , you can easily achieve a variety of effects
