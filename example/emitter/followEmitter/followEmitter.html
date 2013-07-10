@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>proton.js-emitter-FlowEmitter</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#testCanvas {
+				background: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="testCanvas"></canvas>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var canvas;
+			var proton;
+			var renderer;
+			var stats;
+			
+			Main();
+			function Main() {
+				canvas = document.getElementById("testCanvas");
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				canvas.getContext('2d').globalCompositeOperation = "lighter";
+				addStats();
+
+				createProton();
+				tick();
+
+				window.onresize = function(e) {
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+					canvas.getContext('2d').globalCompositeOperation = "lighter";
+				}
+			}
+
+			function addStats() {
+				stats = new Stats();
+				stats.setMode(2);
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild(stats.domElement);
+			}
+
+			function createProton() {
+				proton = new Proton;
+				var emitter = new Proton.FollowEmitter();
+				emitter.rate = new Proton.Rate(new Proton.Span(0, 5));
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.Radius(3, 40));
+				emitter.addInitialize(new Proton.Life(1, 3));
+				emitter.addInitialize(new Proton.Velocity(new Proton.Span(-1, 1), new Proton.Span(-3, 0), 'vector'));
+				emitter.addBehaviour(new Proton.Gravity(9.8));
+				emitter.addBehaviour(new Proton.Color('random'));
+				emitter.addBehaviour(new Proton.RandomDrift(30, 0, .035));
+				emitter.emit();
+				proton.addEmitter(emitter);
+				renderer = new Proton.Renderer('canvas', proton, canvas);
+				renderer.start();
+			}
+
+			function tick() {
+				requestAnimationFrame(tick);
+
+				stats.begin();
+				proton.update();
+				stats.end();
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="user-scalable=no, width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1, maximum-scale=1" />
+		<title>Squirrel - Quark Framework Tutorials</title>
+
+		<style type="text/css">
+			body {
+				margin: 0;
+				padding: 0;
+				font-size: 12px;
+				background-color: #fff;
+			}
+		</style>
+
+		<script type="text/javascript" src="js/quark.base-1.0.0.min.js"></script>
+		<script type="text/javascript" src="js/Squirrel.js"></script>
+		<script type="text/javascript" src="js/Rain.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+	</head>
+
+	<body>
+
+		<div id="container" style="position:absolute;left:0;top:0;width:800px;height:600px;background:#eee;"></div>
+		<div id="fps" style="position:absolute;left:0;top:0;"></div>
+		<img id="bodyWalk" src="images/body_walk.png" style="display:none;" />
+		<img id="headIdle" src="images/head_idle.png" style="display:none;" />
+		<img id="rain" src="images/rain.png" style="display:none;" />
+
+		<script type="text/javascript">
+			window.onload = init;
+
+			var proton;
+			var emitter;
+			var quarkjsRender;
+			var frames = 0, fpsContainer = Quark.getDOM("fps");
+			var container, params, timer, stage, context, em, squirrel;
+			
+			Main();
+			function init() {
+				//初始化游戏场景容器，设定背景渐变样式
+				container = Q.getDOM("container");
+				container.style.background = "-moz-linear-gradient(top, #00889d, #94d7e1, #58B000)";
+				container.style.background = "-webkit-gradient(linear, 0 0, 0 bottom, from(#00889d), to(#58B000), color-stop(0.5,#94d7e1))";
+				container.style.background = "-o-linear-gradient(top, #00889d, #94d7e1, #58B000)";
+				container.style.filter = "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00889d, endColorstr=#94d7e1)";
+
+				//初始化渲染上下文，这里根据URL参数可选择是采用CanvasContext还是DOMContext
+				params = Q.getUrlParams();
+				if (params.canvas) {
+					var canvas = Quark.createDOM("canvas", {
+						width : 800,
+						height : 600,
+						style : {
+							position : "absolute",
+							backgroundColor : "#eee"
+						}
+					});
+					container.appendChild(canvas);
+					context = new Quark.CanvasContext({
+						canvas : canvas
+					});
+				} else {
+					context = new Q.DOMContext({
+						canvas : container
+					});
+				}
+
+				//初始化舞台
+				stage = new Q.Stage({
+					context : context,
+					width : 800,
+					height : 600,
+					update : function() {
+						if (proton)
+							proton.update();
+						frames++;
+					}
+				});
+
+				//初始化timer并启动
+				timer = new Q.Timer(1000 / 60);
+				timer.addListener(stage);
+				timer.start();
+
+				//注册舞台事件，使舞台上的元素能接收交互事件
+				em = new Q.EventManager();
+				var events = Q.supportTouch ? ["touchend"] : ["mouseup"];
+				em.registerStage(stage, events, true, true);
+
+				//创建一只松鼠，并添加到舞台
+				squirrelone = new Squirrel({
+					id : "squirrelone",
+					x : 330,
+					y : 450,
+					autoSize : true
+				});
+				stage.addChild(squirrelone);
+
+				//为松鼠添加touchend或mouseup事件侦听，控制其跳跃。
+				squirrelone.addEventListener(events[0], function(e) {
+					emitter.emit('once');
+					emitter.p.x = squirrelone.x + 10;
+					emitter.p.y = squirrelone.y;
+					squirrelone.jump(e);
+				});
+
+				//提示信息
+				var tip = Q.createDOM("span", {
+					id : "tip",
+					style : {
+						position : "absolute",
+						left : "340px",
+						top : "550px",
+						font : "bold 16px Arial",
+						color : "#fff"
+					}
+				});
+				tip.innerHTML = "Click me!";
+				container.appendChild(tip);
+			}
+
+			/////////////////////
+			function Main() {
+				//add proton engine
+				createProton();
+				createRain();
+				createRender();
+
+				setInterval(function() {
+					fpsContainer.innerHTML = "FPS:" + frames;
+					frames = 0;
+				}, 1000);
+			}
+
+			function createProton() {
+				proton = new Proton();
+				emitter = new Proton.Emitter();
+				emitter.rate = new Proton.Rate(Proton.getSpan(10, 20), Proton.getSpan(.2, .5));
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.ImageTarget(Squirrel));
+				emitter.addInitialize(new Proton.Life(1, 2));
+				emitter.addInitialize(new Proton.Velocity(Proton.getSpan(5, 9), Proton.getSpan(-20, 20), 'polar'));
+
+				emitter.addBehaviour(new Proton.Gravity(8));
+				emitter.addBehaviour(new Proton.Scale(Proton.getSpan(.5, 1), 0));
+				emitter.addBehaviour(new Proton.Alpha(1, 0.5));
+				emitter.addBehaviour(new Proton.Rotate(0, Proton.getSpan(-2, 2), 'add'));
+				proton.addEmitter(emitter);
+			}
+
+			function createRain() {
+				var rainEmitter = new Proton.Emitter();
+				rainEmitter.rate = new Proton.Rate(Proton.getSpan(5, 10), Proton.getSpan(.2, .5));
+				rainEmitter.addInitialize(new Proton.Mass(1));
+				rainEmitter.addInitialize(new Proton.ImageTarget(Rain));
+				rainEmitter.addInitialize(new Proton.Position(new Proton.LineZone(0, -40, 800, -40)));
+				rainEmitter.addInitialize(new Proton.Life(10, 12));
+
+				rainEmitter.addBehaviour(new Proton.Gravity(3));
+				rainEmitter.addBehaviour(new Proton.Scale(Proton.getSpan(.3, 1)));
+				rainEmitter.addBehaviour(new Proton.CrossZone(new Proton.LineZone(-150, 620, 900, 620, 'down'), 'dead'));
+				proton.addEmitter(rainEmitter);
+				rainEmitter.emit();
+			}
+
+			function createRender() {
+				var renderer = new Proton.Renderer('other', proton);
+				renderer.onProtonUpdate = function() {
+
+				};
+				renderer.onParticleCreated = function(particle) {
+					var squirrel = new particle.target({
+						id : "target" + particle.id,
+						x : particle.p.x,
+						y : particle.p.y,
+						autoSize : true
+					});
+					stage.addChild(squirrel);
+					stage.addChild(squirrelone);
+					transformSprite(squirrel, particle);
+					particle.sprite = squirrel;
+				};
+
+				renderer.onParticleUpdate = function(particle) {
+					transformSprite(particle.sprite, particle);
+				};
+
+				renderer.onParticleDead = function(particle) {
+					stage.removeChild(particle.sprite);
+				};
+				renderer.start();
+			}
+
+			function transformSprite(particleSprite, particle) {
+				particleSprite.x = particle.p.x;
+				particleSprite.y = particle.p.y;
+				particleSprite.regX = 0.5;
+				particleSprite.regY = 0.5;
+				particleSprite.scaleX = particle.scale;
+				particleSprite.scaleY = particle.scale;
+				particleSprite.alpha = particle.alpha;
+				particleSprite.rotation = particle.rotation;
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>proton.js-render-domrender</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #333333;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#container {
+				width: 1003px;
+				height: 610px;
+				margin-top: 50px;
+				margin-left: -501px;
+				left: 50%;
+				position: absolute;
+				background: #fff;
+				overflow: hidden;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="container">
+
+		</div>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var containerDIV;
+			var proton;
+			var renderer;
+			var stats;
+			
+			Main();
+			function Main() {
+				containerDIV = document.getElementById("container");
+				addStats();
+
+				createProton();
+				tick();
+			}
+
+			function addStats() {
+				stats = new Stats();
+				stats.setMode(2);
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
+				document.getElementById('container').appendChild(stats.domElement);
+			}
+
+			function createProton() {
+				proton = new Proton;
+				createImageEmitter();
+
+				renderer = new Proton.Renderer('dom', proton, containerDIV);
+				renderer.start();
+			}
+
+			function createImageEmitter() {
+				var emitter = new Proton.Emitter();
+				emitter.rate = new Proton.Rate(new Proton.Span(3, 8), new Proton.Span(.1));
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.Life(1, 3));
+
+				emitter.addInitialize(new Proton.ImageTarget(['image/8.png'], 360));
+				emitter.addInitialize(new Proton.Position(new Proton.LineZone(0, 700, 1003, 140)));
+				emitter.addInitialize(new Proton.Velocity(new Proton.Span(1, 3), new Proton.Span(0, 30, true), 'polar'));
+				emitter.addBehaviour(new Proton.Alpha(0, 1));
+				emitter.addBehaviour(new Proton.Scale(Proton.getSpan(.5), 0));
+				emitter.addBehaviour(new Proton.Force(-2, -1));
+				emitter.addBehaviour(new Proton.Rotate(new Proton.Span(0, 360), new Proton.Span(5), 'add'));
+				emitter.addBehaviour(new Proton.CrossZone(new Proton.LineZone(-100, -50, 1300, -20, 'up'), 'dead'));
+				emitter.emit();
+				proton.addEmitter(emitter);
+			}
+
+			function tick() {
+				requestAnimationFrame(tick);
+
+				stats.begin();
+				proton.update();
+				stats.end();
+			}
+		</script>
+	</body>
+</html>

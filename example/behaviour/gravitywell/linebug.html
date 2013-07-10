@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>proton.js-behaviour-attraction</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #333333;
+				margin: 0px;
+				overflow: hidden;
+				-moz-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				-khtml-user-select: none;
+				user-select: none;
+			}
+			#testCanvas {
+				background: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="testCanvas"></canvas>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var canvas;
+			var context;
+			var proton;
+			var renderer;
+			var emitter;
+			var stats;
+			var _mousedown = false;
+			var attractionBehaviour, crossZoneBehaviour;
+			
+			Main();
+			function Main() {
+				canvas = document.getElementById("testCanvas");
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				context = canvas.getContext('2d');
+				addStats();
+
+				createProton();
+				createRenderer();
+				tick();
+				canvas.addEventListener('mousedown', mousedownHandler, false);
+				canvas.addEventListener('mouseup', mouseupHandler, false);
+				canvas.addEventListener('mousemove', mousemoveHandler, false);
+				window.onresize = function(e) {
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+					crossZoneBehaviour.reset(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'cross');
+				}
+			}
+
+			function addStats() {
+				stats = new Stats();
+				stats.setMode(2);
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild(stats.domElement);
+			}
+
+			function createProton() {
+				proton = new Proton;
+				emitter = new Proton.Emitter();
+				emitter.damping = 0.008;
+				emitter.rate = new Proton.Rate(300);
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.Radius(4));
+				emitter.addInitialize(new Proton.Velocity(new Proton.Span(5), new Proton.Span(0, 360), 'polar'));
+
+				attractionBehaviour = new Proton.Attraction({
+					x : 1003 / 2,
+					y : 610 / 2
+				}, 0, 200);
+				addAttractionBehaviours();
+				crossZoneBehaviour = new Proton.CrossZone(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'bound');
+				emitter.addBehaviour(new Proton.Color('random'));
+				emitter.addBehaviour(attractionBehaviour);
+				emitter.addBehaviour(crossZoneBehaviour);
+				emitter.p.x = canvas.width / 2;
+				emitter.p.y = canvas.height / 2;
+				emitter.emit('once');
+				proton.addEmitter(emitter);
+			}
+
+			function addAttractionBehaviours() {
+				var total = 16;
+				var d = 360 / total;
+				var R = 230;
+				for (var i = 0; i < 360; i += d) {
+					var x = R * Math.cos(i * Math.PI / 180);
+					var y = R * Math.sin(i * Math.PI / 180);
+					emitter.addBehaviour(new Proton.GravityWell({
+						x : x + canvas.width / 2,
+						y : y + canvas.height / 2
+					}, 5000, 200));
+				}
+
+				emitter.addBehaviour(new Proton.Repulsion({
+					x : canvas.width / 2,
+					y : canvas.height / 2
+				}, 5, 200));
+			}
+
+			function mousedownHandler(e) {
+				_mousedown = true;
+			}
+
+			function mousemoveHandler(e) {
+				if (_mousedown) {
+					var _x, _y;
+					if (e.layerX || e.layerX == 0) {
+						_x = e.layerX;
+						_y = e.layerY;
+					} else if (e.offsetX || e.offsetX == 0) {
+						_x = e.offsetX;
+						_y = e.offsetY;
+					}
+
+					attractionBehaviour.reset({
+						x : _x,
+						y : _y
+					}, 10, 500);
+				}
+			}
+
+			function createRenderer() {
+				renderer = new Proton.Renderer('other', proton);
+				renderer.onProtonUpdate = function() {
+					context.fillStyle = "rgba(0, 0, 0, 0.05)";
+					context.fillRect(0, 0, canvas.width, canvas.height);
+				};
+
+				renderer.onParticleCreated = function(particle) {
+					particle.lineWidth = 1;
+					particle.tha = Math.random() * Math.PI;
+				};
+
+				renderer.onParticleUpdate = function(particle) {
+					particle.tha += 0.01;
+					particle.lineWidth = Math.abs(Math.sin(particle.tha)) * 2 + 0.1;
+					context.beginPath();
+					context.strokeStyle = particle.color;
+					context.lineWidth = particle.lineWidth;
+					context.moveTo(particle.old.p.x, particle.old.p.y);
+					context.lineTo(particle.p.x, particle.p.y);
+					context.closePath();
+					context.stroke();
+				};
+
+				renderer.start();
+			}
+
+			function mouseupHandler(e) {
+				_mousedown = false;
+				attractionBehaviour.reset({
+					x : 1003 / 2,
+					y : 610 / 2
+				}, 0, 200);
+			}
+
+			function tick() {
+				requestAnimationFrame(tick);
+
+				stats.begin();
+				proton.update();
+				stats.end();
+			}
+		</script>
+	</body>
+</html>

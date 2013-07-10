@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>proton.js-render-pixelrender</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #333333;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#container {
+				width: 1003px;
+				height: 610px;
+				margin-top: 50px;
+				margin-left: -501px;
+				left: 50%;
+				position: absolute;
+				background: #000;
+				overflow: hidden;
+			}
+
+			#tip {
+				position: absolute;
+				right: 20px;
+				top: 10px;
+				color: #999999;
+				z-index: 100;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<canvas id="testCanvas"></canvas>
+			<div id="tip"></div>
+		</div>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var proton;
+			var canvas;
+			var context;
+			var renderer;
+			var stats;
+			var mouseObj;
+			var tip;
+			
+			Main();
+			function Main() {
+				canvas = document.getElementById("testCanvas");
+				canvas.width = 1003;
+				canvas.height = 610;
+				context = canvas.getContext('2d');
+				addStats();
+				loadImage();
+				mouseObj = {
+					x : canvas.width / 2,
+					y : canvas.height / 2
+				};
+				tip = document.getElementById("tip");
+			}
+
+			function addStats() {
+				stats = new Stats();
+				stats.setMode(2);
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
+				document.getElementById('container').appendChild(stats.domElement);
+			}
+
+			function loadImage() {
+				var image = new Image()
+				image.onload = function(e) {
+					var rect = new Proton.Rectangle((canvas.width - e.target.width) / 2, (canvas.height - e.target.height) / 2, e.target.width, e.target.height);
+					context.drawImage(e.target, rect.x, rect.y);
+					createProton(rect);
+					tick();
+				}
+
+				image.src = 'image/glaxy.jpg';
+			}
+
+			function createProton(rectangle) {
+				proton = new Proton(4000);
+
+				createEmitter(50, canvas.height / 2, 0, '#D3AC17');
+				createEmitter(950, canvas.height / 2, 180, '#fc0000');
+				renderer = new Proton.Renderer('pixel', proton, canvas);
+				renderer.start();
+
+				canvas.addEventListener('mousemove', mousemoveHandler, false);
+			}
+
+			function createEmitter(x, y, angle, color) {
+				var emitter = new Proton.Emitter();
+				emitter.rate = new Proton.Rate(new Proton.Span(10, 30), new Proton.Span(0.1));
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.Life(3, 6));
+				emitter.addInitialize(new Proton.V(new Proton.Span(0.5, 1), new Proton.Span(90, 10, true), 'polar'));
+				emitter.addBehaviour(new Proton.Alpha(1, 0));
+				emitter.addBehaviour(new Proton.Color(color));
+				emitter.addBehaviour(new Proton.Attraction(mouseObj, 10, 500));
+				emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, 1003, 610), 'cross'));
+				emitter.p.x = x;
+				emitter.p.y = y;
+				emitter.emit();
+				emitter.rotation = angle;
+				proton.addEmitter(emitter);
+			}
+
+			function mousemoveHandler(e) {
+				if (e.layerX || e.layerX == 0) {
+					mouseObj.x += (e.layerX - mouseObj.x) * .5;
+					mouseObj.y += (e.layerY - mouseObj.y) * .5;
+				} else if (e.offsetX || e.offsetX == 0) {
+					mouseObj.x += (e.offsetX - mouseObj.x) * .5;
+					mouseObj.y += (e.offsetY - mouseObj.y) * .5;
+				}
+			};
+
+			function tick() {
+				requestAnimationFrame(tick);
+
+				stats.begin();
+				proton.update();
+				stats.end();
+
+				document.getElementById("tip").innerHTML = 'the total particles number is ' + proton.getParticleNumber();
+			}
+		</script>
+	</body>
+</html>
