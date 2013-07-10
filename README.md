@@ -1,9 +1,6 @@
 Proton
 ======
-Proton is a html5 particle engine.
-It include canvas,dom,webgl,easel and pixel five kinds of renderer.
-Of course you can customize your own renderer,it is very easy.
-It is very easy, flexible and powerful.You can learn to use it in five minutes.
+Proton is a html5 particle engine.It include canvas,dom,webgl,easel and pixel five kinds of renderer.Of course you can customize your own renderer,it is very easy!<br>
 site : http://a-jie.github.io/Proton/
 
 ## Features
