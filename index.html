@@ -1,79 +1,195 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+	<head>
+		<title>Proton</title>
+		<meta charset="utf-8">
+		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link href="css/Main.css" rel="stylesheet" media="screen">
+		<link href='http://www.google.com/fonts/#QuickUsePlace:quickUse/Family:Maven+Pro:400,500' rel='stylesheet' type='text/css'>
+		<link href="css/tomorrow-night-eighties.css" type="text/css" rel="stylesheet" />
+		<script src="js/highlight.pack.js"></script>
+		<script src="js/jquery-1.9.1.min.js"></script>
+		<script src="js/jquery.scrollTo.min.js"></script>
+		<script src="js/jquery.easing.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/Main.js"></script>
+	</head>
+	<body>
+		<div class='navbar transparent navbar-inverse navbar-fixed-top'>
+			<a href="https://github.com/a-jie"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+			<div class='navbar-inner'>
+				<div class='container'>
+					<a class="brand" href="index.html"><img src="image/logo.png"  width="149" height="34"> </a>
+					<div class="nav-collapse collapse">
+						<ul class="nav pull-right">
+							<li id='home'>
+								<a href="#home">Home</a>
+							</li>
+							<li id='examples'>
+								<a href="#example">Examples</a>
+							</li>
+							<li id='tutorials'>
+								<a href="./comesoon.html" target="_blank">Tutorials</a>
+							</li>
+							<li id='documents'>
+								<a href="./comesoon.html" target="_blank">Documents</a>
+							</li>
+							<li id='about'>
+								<a href="#about">About</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Proton : html5 particle engine" />
+		<div id="cta-content">
+			<div class="wrapped-content container">
+				<div class="span7">
+					<img src="image/macbook.png" width='566' height='329' />
+				</div>
+				<div class='span5 main_title'>
+					<h1>Proton</h1>
+					<h2>html5 particle engine</h2>
+					<div class="bottom clearfix">
+						<a href="./build/proton-1.0.0.min.js" target="_blank" class="button get-started orange-gradient">download</a>
+						<a id='demo2' href="#example" class="button get-started orange-gradient">demo</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+		<div class="container marketing">
+			<!-- Three columns of text below the carousel -->
+			<div class="row">
+				<div class="span4">
+					<img class="img-circle" src="image/t1.png">
+					<h4>Easy to use</h4>
+					<p>
+						Only ten lines code,you can achieve a very cool effect.Such as the demo of 71squared's ParticleDesigner
+					</p>
+				</div><!-- /.span4 -->
+				<div class="span4">
+					<img class="img-circle" src="image/t2.png">
+					<h4>Multiple renderer</h4>
+					<p>
+						Proton provides canvas,dom,webgl,easel and pixel five kinds of renderer.Of course you can customize your own renderer,It is very easy.
+					</p>
 
-    <title>Proton</title>
-  </head>
+				</div><!-- /.span4 -->
+				<div class="span4">
+					<img class="img-circle" src="image/t3.png">
+					<h4>Physics</h4>
+					<p>
+						Proton provide a variety of physics and collision. You can easily simulate the physical world.
+					</p>
 
-  <body>
+				</div><!-- /.span4 -->
+			</div><!-- /.row -->
+			<hr class="featurette-divider">
+		</div>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/a-jie/Proton">View on GitHub</a>
+		<div class="all-context container">
+			<div class="container">
+				<div class="row">
+					<div class="title span5">
+						<h1>Get started</h1>
+						<p class='zhengwen'>
+							it’s really easy, only a dozen lines!
+						</p>
+					</div>
+				</div>
 
-          <h1 id="project_title">Proton</h1>
-          <h2 id="project_tagline">html5 particle engine</h2>
+				<div class="row">
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/a-jie/Proton/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/a-jie/Proton/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+					<div class="span11">
+						<pre><code>var proton = new Proton();
+var emitter = new Proton.Emitter();
+//set Rate
+emitter.rate = new Proton.Rate(Proton.getSpan(10, 20), 0.1);
+//add Initialize
+emitter.addInitialize(new Proton.Radius(1, 12));
+emitter.addInitialize(new Proton.Life(2, 4));
+emitter.addInitialize(new Proton.Velocity(3, Proton.getSpan(0, 360), 'polar'));
+//add Behaviour
+emitter.addBehaviour(new Proton.Color('ff0000', 'random'));
+emitter.addBehaviour(new Proton.Alpha(1, 0));
+//set emitter position
+emitter.p.x = canvas.width / 2;
+emitter.p.y = canvas.height / 2;
+emitter.emit();
+//add emitter to the proton
+proton.addEmitter(emitter);
+// add canvas renderer
+var renderer = new Proton.Renderer('canvas', proton, canvas);
+renderer.start();
 </code></pre>
+						<p>
+							<a class="btn btn-link" href="#" style="padding-left: 0;">Check the full tutorial &raquo;</a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<hr class="featurette-divider">
+		</div>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+		<div class="container all-context">
+			<div class='container'>
+				<div class="span5 pull-left">
+					<img src="image/desktop.png">
+				</div>
+				<div class='span6 pull-right'>
+					<h1>Notice</h1>
+					<p class="zhengwen">
+						This version is not release version, so if you find bugs or errors in the process of using , please tell me, thank you!
+					</p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+					<p class="zhengwen">
+						In this version my velocity angle is not the default of JS,It is the same as clock's angle.If you don't like it, please email me.
+					</p>
+				</div>
+			</div>
+			<hr class="featurette-divider">
+		</div>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+		<div id='examples-page' class="all-context container">
+			<div class="container" id="demos">
+				<h1>Examples</h1>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+			</div>
+			<hr class="featurette-divider">
+		</div>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+		<div id='about-page' class="all-context">
+			<div class="container">
+				<div class="span4 about-img">
+					<img src="image/boy.png">
+				</div>
+				<div class='span7 about-txt'>
+					<h1>About</h1>
+					<p class="zhengwen2">
+						I am a chinese literary youth.I used to be a flash developer,I like math,hongkong comics,classical novels,and nan pai san shu.
+					</p>
+					<p></p>
+					<p class="zhengwen2">
+						You can follow my Weibo: <a href="http://weibo.com/ajiecn">http://weibo.com/ajiecn</a> or email to me <a href="mailto:ajie_2008@126.com">ajie_2008@126.com</a> Thank you!
+					</p>
+				</div>
+			</div>
+		</div>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Proton maintained by <a href="https://github.com/a-jie">a-jie</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
-  </body>
+		<!-- FOOTER -->
+		<footer>
+			<div class="footer-bottom container">
+				<div class="wrapped-content">
+					<div class="span5 pull-left">
+						&copy 2013 a-jie.cn <a href="http://www.a-jie.cn">Privacy</a>
+					</div>
+					<div class="span4 pull-right">
+						Piloted by <a href="http://www.a-jie.cn"><b>www.a-jie.cn</b></a> made in China
+					</div>
+				</div>
+			</div>
+		</footer>
+	</body>
 </html>

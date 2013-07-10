@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>proton.js-behaviour-RandomDirft2</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#testCanvas {
+				background: #000000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="testCanvas"></canvas>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var canvas;
+			var context;
+			var proton;
+			var renderer;
+			var emitter;
+			var stats;
+			
+			Main();
+			function Main() {
+				canvas = document.getElementById("testCanvas");
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				context = canvas.getContext('2d');
+				addStats();
+
+				createProton();
+				tick();
+			}
+
+			function addStats() {
+				stats = new Stats();
+				stats.setMode(2);
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild(stats.domElement);
+			}
+
+			function createProton() {
+				proton = new Proton;
+				emitter = new Proton.Emitter();
+				emitter.rate = new Proton.Rate(new Proton.Span(3, 6), new Proton.Span(1));
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.Radius(20));
+				emitter.addInitialize(new Proton.Life(1, 2));
+				emitter.addInitialize(new Proton.Velocity(new Proton.Span(.5, 1), new Proton.Span(-20, 20), 'polar'));
+				emitter.addBehaviour(new Proton.RandomDrift(30, 30, .05));
+				emitter.addBehaviour(new Proton.Scale(1, [.5, .3, 0]));
+				emitter.addBehaviour(new Proton.Color('#ffffff'));
+				emitter.p.x = canvas.width / 2;
+				emitter.p.y = canvas.height / 2;
+				emitter.emit(20);
+				proton.addEmitter(emitter);
+
+				renderer = new Proton.Renderer('canvas', proton, canvas);
+				renderer.setStroke('#ff0000');
+				renderer.onProtonUpdate = function() {
+				};
+				renderer.start();
+
+				var subemitter = new Proton.Emitter();
+				var radius = new Proton.Radius(10);
+				var velocity = new Proton.Velocity(new Proton.Span(1, 2), new Proton.Span(0, 45, true), 'polar');
+
+				subemitter.rate = new Proton.Rate(new Proton.Span(3, 5), 1);
+				subemitter.addInitialize(new Proton.Mass(1));
+				subemitter.addInitialize(radius);
+				subemitter.addInitialize(new Proton.Life(1));
+
+				subemitter.addInitialize(velocity);
+				subemitter.addBehaviour(new Proton.RandomDrift(30, 30, .05));
+				subemitter.addBehaviour(new Proton.Color('#ffffff'));
+				subemitter.addBehaviour(new Proton.Scale(1, 0));
+				proton.addEmitter(subemitter);
+
+				emitter.addEventListener(Proton.PARTICLE_DEAD, function(e) {
+					if (e.particle.radius > 0) {
+						var angle = e.particle.getDirection();
+						radius.reset(e.particle.radius);
+						velocity.reset(new Proton.Span(1, 2), new Proton.Span(angle, 45, true), 'polar');
+
+						subemitter.p.x = e.particle.p.x;
+						subemitter.p.y = e.particle.p.y;
+						subemitter.emit('once');
+					}
+				});
+
+				window.onresize = function(e) {
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+					emitter.p.x = canvas.width / 2;
+					emitter.p.y = canvas.height / 2;
+				}
+			}
+
+			function tick() {
+				requestAnimationFrame(tick);
+
+				stats.begin();
+				emitter.rotation += .5;
+				proton.update();
+				stats.end();
+			}
+		</script>
+	</body>
+</html>

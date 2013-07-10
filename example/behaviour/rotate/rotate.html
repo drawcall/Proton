@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>behaviour-rotate</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+				-moz-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				-khtml-user-select: none;
+				user-select: none;
+			}
+			#testCanvas {
+				background: #000;
+			}
+			#press {
+				top: 2px;
+				left: 10px;
+				position: absolute;
+				text-align: center;
+				color: #fff;
+				font-size: 24pt;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="testCanvas"></canvas>
+		<div id='press'>
+			arrow
+		</div>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var canvas;
+			var context;
+			var proton;
+			var renderer;
+			var emitter;
+
+			Main();
+			function Main() {
+				canvas = document.getElementById("testCanvas");
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				context = canvas.getContext('2d');
+
+				createProton();
+				tick();
+				canvas.addEventListener('mousemove', mousemoveHandler, false);
+			}
+
+			function createProton() {
+				proton = new Proton;
+				emitter = new Proton.Emitter();
+				emitter.rate = new Proton.Rate(new Proton.Span(8, 12), .02);
+				emitter.addInitialize(new Proton.ImageTarget('image/arrow.png', 28.6, 36.4));
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.Life(1.5, 2.2));
+				emitter.addInitialize(new Proton.Velocity(5, Proton.getSpan(0, 360), 'polar'));
+				emitter.addBehaviour(new Proton.Rotate());
+				emitter.addBehaviour(new Proton.Gravity(3));
+				emitter.addBehaviour(new Proton.Alpha(0.6, 1));
+				emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'bound'));
+				emitter.p.x = canvas.width / 2;
+				emitter.p.y = canvas.height / 2;
+				proton.addEmitter(emitter);
+				emitter.emit();
+
+				renderer = new Proton.Renderer('canvas', proton, canvas);
+				renderer.onProtonUpdate = function() {
+					context.fillStyle = "rgba(0, 0, 0, 0.08)";
+					context.fillRect(0, 0, canvas.width, canvas.height);
+				};
+				renderer.start();
+			}
+
+			function mousemoveHandler(e) {
+				if (e.layerX || e.layerX == 0) {
+					emitter.p.x = e.layerX;
+					emitter.p.y = e.layerY;
+				} else if (e.offsetX || e.offsetX == 0) {
+					emitter.p.x = e.offsetX;
+					emitter.p.y = e.offsetY;
+				}
+			}
+
+			function tick() {
+				requestAnimationFrame(tick);
+				proton.update();
+			}
+		</script>
+	</body>
+</html>

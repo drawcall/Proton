@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>sparks-bigfire</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#testCanvas {
+				background: #000000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="testCanvas"></canvas>
+		<script src="../../lib/stats.min.js"></script>
+		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script>
+			var canvas;
+			var context;
+			var proton;
+			var renderer;
+			var emitter;
+			var stats;
+			
+			Main();
+			function Main() {
+				canvas = document.getElementById("testCanvas");
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				context = canvas.getContext('2d');
+				context.globalCompositeOperation = "lighter";
+				addStats();
+				loadImage();
+			}
+
+			function addStats() {
+				stats = new Stats();
+				stats.setMode(2);
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild(stats.domElement);
+			}
+
+			function loadImage() {
+				var image = new Image()
+				image.onload = function(e) {
+					createProton(e.target);
+					tick();
+				}
+				image.src = 'image/fire.png';
+			}
+
+			function createProton(image) {
+				proton = new Proton;
+				emitter = new Proton.Emitter();
+				emitter.rate = new Proton.Rate(new Proton.Span(5, 13), .1);
+				emitter.addInitialize(new Proton.Mass(1));
+				emitter.addInitialize(new Proton.ImageTarget(image));
+				emitter.addInitialize(new Proton.Position(new Proton.CircleZone(canvas.width / 2, canvas.height / 2 + 200, 10)));
+				emitter.addInitialize(new Proton.Life(5, 7));
+				emitter.addInitialize(new Proton.V(new Proton.Span(2, 3), new Proton.Span(0, 30, true), 'polar'));
+				emitter.addBehaviour(new Proton.Scale(1, .2));
+				emitter.addBehaviour(new Proton.Alpha(1, .2));
+				emitter.emit();
+				proton.addEmitter(emitter);
+
+				renderer = new Proton.Renderer('canvas', proton, canvas);
+				renderer.start();
+			}
+
+			function tick() {
+				requestAnimationFrame(tick);
+
+				stats.begin();
+				proton.update();
+				stats.end();
+			}
+		</script>
+	</body>
+</html>
