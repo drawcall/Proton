@@ -1,6 +1,8 @@
 Proton
 ======
-Proton is a html5 particle engine.It include canvas,dom,webgl,easel and pixel five kinds of renderer.Of course you can customize your own renderer,it is very easy.
+Proton is a html5 particle engine.
+It include canvas,dom,webgl,easel and pixel five kinds of renderer.
+Of course you can customize your own renderer,it is very easy.
 It is very easy, flexible and powerful.You can learn to use it in five minutes.
 site : http://a-jie.github.io/Proton/
 
@@ -15,7 +17,7 @@ site : http://a-jie.github.io/Proton/
 ##Usage
 
 ```javascript
-  var proton = new Proton();
+var proton = new Proton();
 var emitter = new Proton.Emitter();
 //set Rate
 emitter.rate = new Proton.Rate(Proton.getSpan(10, 20), 0.1);
@@ -36,3 +38,7 @@ proton.addEmitter(emitter);
 var renderer = new Proton.Renderer('canvas', proton, canvas);
 renderer.start();
 ```
+
+## License
+
+LicenseFinder is released under the MIT License. http://www.opensource.org/licenses/mit-license
