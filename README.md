@@ -11,7 +11,7 @@ you can vist site : http://a-jie.github.io/Proton/   or   http://www.a-jie.cn/pr
 - Contains a variety of behaviours , you can easily achieve a variety of effects
 - Three kinds of emitter can simulate more physical effect
 
-##Usage
+## Usage
 
 ```javascript
 var proton = new Proton();
@@ -35,6 +35,16 @@ proton.addEmitter(emitter);
 var renderer = new Proton.Renderer('canvas', proton, canvas);
 renderer.start();
 ```
+
+## Building your Proton
+
+The script uses Node, so you need to install that first. The minification is done by UglifyJS which is included in the repo.
+
+First you need to get your own copy of the source files, by running the following in the terminal: git clone git://github.com/a-jie/Proton.git
+
+Then navigate to the build directory by running: cd ./build
+
+Finally run the build command: node build.js
 
 ## License
 
