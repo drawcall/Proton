@@ -38,13 +38,13 @@ renderer.start();
 
 ## Building your Proton
 
-The script uses Node, so you need to install that first. The minification is done by UglifyJS which is included in the repo.
-
-First you need to get your own copy of the source files, by running the following in the terminal: git clone git://github.com/a-jie/Proton.git
-
-Then navigate to the build directory by running: cd ./build
-
-Finally run the build command: node build.js
+The script uses Node, so you need to install that first.<br>
+First copy of the source files, by running the following in the terminal:
+`git clone git://github.com/a-jie/Proton.git`<br>
+Then navigate to the build directory by running:
+`cd ./build`<br>
+Finally run the build command:
+`node build.js`
 
 ## License
 
