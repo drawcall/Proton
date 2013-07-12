@@ -1,7 +1,16 @@
+@font-face {
+	font-family: "Maven Pro";
+	src: url(../font/CenturyGothic.TTF);
+	font-weight: 100;
+	-webkit-font-smoothing: antialiased;
+	-webkit-font-smoothing: antialiased !important;
+}
+
 body {
 	background: #fff;
 	font-family: 'Maven Pro', sans-serif;
 }
+
 ::-moz-selection {
 	background: #5eccf7;
 	color: white; /* Firefox */
