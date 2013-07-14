@@ -1,18 +1,21 @@
 Proton
 ======
-Proton is a html5 particle engine.It include canvas,dom,webgl,easel and pixel five kinds of renderer.Of course you can customize your own renderer,it is very easy!<br>
-you can vist site : http://a-jie.github.io/Proton/   or   http://www.a-jie.cn/proton/
+Proton is an easily customizable html5 particle engine including five different types of renderers. <br>
+Check out examples at http://a-jie.github.io/Proton/ or http://www.a-jie.cn/proton/
 
 ## Features
-
-- Five kinds of renderer :canvas dom webgl easeljs pixiel
-- Only ten lines code,you can achieve a very cool effect.Such as the demo of 71squared's ParticleDesigner
-- Can be applied to any game engine
-- Contains a variety of behaviours , you can easily achieve a variety of effects
-- Three kinds of emitter can simulate more physical effect
+- Five kinds of renderers
+  - canvas 
+  - dom 
+  - webgl 
+  - easeljs 
+  - pixel
+- Create cool effects like the demo of <a href="http://www.71squared.com/">71squared's ParticleDesigner</a> in 10 lines of code.
+- Integratable into any game engine
+- Veriety of behaviors
+- Three kinds of emitters which can simulate many different physical effects
 
 ## Usage
-
 ```javascript
 var proton = new Proton();
 var emitter = new Proton.Emitter();
@@ -36,16 +39,13 @@ var renderer = new Proton.Renderer('canvas', proton, canvas);
 renderer.start();
 ```
 
-## Building your Proton
-
-The script uses Node, so you need to install that first.<br>
-First run the following in the terminal:
+## Building Proton
+Node is a dependency, use terminal to install it with with:<br>
 `git clone git://github.com/a-jie/Proton.git`<br>
-Then navigate to the build directory by running:
+Then navigate to the build directory by running:<br>
 `cd ./build`<br>
-Finally run the build command:
+Finally run the build command:<br>
 `node build.js`
 
 ## License
-
 LicenseFinder is released under the MIT License. http://www.opensource.org/licenses/mit-license
