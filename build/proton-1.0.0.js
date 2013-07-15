@@ -548,6 +548,7 @@
 			element.width = $width;
 			element.height = $height;
 			element.style.position = position;
+			element.style.opacity = 0;
 			this.transformDom(element, -500, -500, 0, 0);
 			return element;
 		},
