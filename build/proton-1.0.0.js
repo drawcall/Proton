@@ -1,10 +1,10 @@
 /*!
  * Proton v1.0.0
- * https://github.com/a-jie
+ * https://github.com/a-jie/Proton
  *
  * Copyright 2011-2013, A-JIE
  * Licensed under the MIT license
- * https://github.com/a-jie/license
+ * http://www.opensource.org/licenses/mit-license
  *
  */
 
@@ -548,6 +548,7 @@
 			element.width = $width;
 			element.height = $height;
 			element.style.position = position;
+			this.transformDom(element, -500, -500, 0, 0);
 			return element;
 		},
 
