@@ -166,7 +166,7 @@ $(document).ready(function() {
 		var time = $time ? $time : 500;
 		$btn.click(function() {
 			$.scrollTo($target, time, {
-				easing : 'easeOutQuad'
+				easing : 'easeInOutQuad'
 			});
 		});
 	}
