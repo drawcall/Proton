@@ -3,6 +3,10 @@
 	<head>
 		<title>proton.js-behaviour-custom</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
 		<style type="text/css">
 			body {
 				background-color: #fff;
@@ -19,9 +23,11 @@
 		</style>
 	</head>
 	<body>
-		<div id="container">
-
+		<div id="viewporter">
+			<div id="container">
+			</div>
 		</div>
+		<script src="js/viewporter.js"></script>
 		<script src="../../../build/proton-1.0.0.min.js"></script>
 		<script src="js/collie.min.js"></script>
 		<script>
