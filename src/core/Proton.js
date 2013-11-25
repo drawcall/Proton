@@ -110,16 +110,18 @@
 			}
 		},
 
-		getParticleNumber : function() {
+		getCount : function() {
 			var total = 0;
-			for (var i = 0; i < this.emitters.length; i++) {
+			var length = this.emitters.length;
+			for (var i = 0; i < length; i++) {
 				total += this.emitters[i].particles.length;
 			}
 			return total;
 		},
 
 		destory : function() {
-			for (var i = 0; i < this.emitters.length; i++) {
+			var length = this.emitters.length;
+			for (var i = 0; i < length; i++) {
 				this.emitters[i].destory();
 				delete this.emitters[i];
 			}
