@@ -1,5 +1,5 @@
 /*!
- * Proton v1.0.1
+ * Proton v1.0.0
  * https://github.com/a-jie/Proton
  *
  * Copyright 2011-2013, A-JIE
@@ -216,28 +216,18 @@
 		}
 	};
 
-	p.dispatchEvent = function(eventObj, target) {
+	p.dispatchEvent = function(eventObj) {
 		var ret = false, listeners = this._listeners;
 		if (eventObj && listeners) {
-			if ( typeof eventObj == "string") {
-				eventObj = {
-					type : eventObj
-				};
-			}
 			var arr = listeners[eventObj.type];
-			if (!arr) {
+			if (!arr)
 				return ret;
-			}
-			eventObj.target = target || this;
+				
 			arr = arr.slice();
 			// to avoid issues with items being removed or added during the dispatch
 			for (var i = 0, l = arr.length; i < l; i++) {
 				var o = arr[i];
-				if (o.handleEvent) {
-					ret = ret || o.handleEvent(eventObj);
-				} else {
-					ret = ret || o(eventObj);
-				}
+				ret = ret || o(eventObj);
 			}
 		}
 		return !!ret;
@@ -258,12 +248,6 @@
 		this.particle = pObj['particle'];
 		this.emitter = pObj['emitter'];
 	}
-
-
-	Event.PARTICLE_CREATED = Proton.PARTICLE_CREATED;
-	Event.PARTICLE_UPDATA = Proton.PARTICLE_UPDATA;
-	Event.PARTICLE_SLEEP = Proton.PARTICLE_SLEEP;
-	Event.PARTICLE_DEAD = Proton.PARTICLE_DEAD;
 
 	Proton.Event = Event;
 
@@ -1633,16 +1617,6 @@
 
 
 
-	/**
-	 * Set the particle's life.
-	 *
-	 * @class Proton.Life
-	 * @constructor
-	 * @param {Number} a the min value of life.
-	 * @param {Number} b the max value of life.
-	 * @param {Boolean} c whether it is floating around;
-	 * for example: emitter.addInitialize(new Proton.Life(2, 3));
-	 */
 	function Life(a, b, c) {
 		Life._super_.call(this);
 		this.lifePan = Proton.Util.setSpanValue(a, b, c);
@@ -1650,12 +1624,6 @@
 
 
 	Proton.Util.inherits(Life, Proton.Initialize);
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
 	Life.prototype.initialize = function(target) {
 		if (this.lifePan.a == Infinity)
 			target.life = Infinity;
@@ -1667,14 +1635,6 @@
 
 
 
-	/**
-	 * Set the particle's birth position.
-	 *
-	 * @class Proton.Position
-	 * @constructor
-	 * @param {Proton.Zone} zone set a zone of this position.
-	 * for example: emitter.addInitialize(new Proton.Position(new Proton.CircleZone(50, 200, 100)));;
-	 */
 	function Position(zone) {
 		Position._super_.call(this);
 		this.zone = Proton.Util.initValue(zone, new Proton.PointZone());
@@ -1682,21 +1642,10 @@
 
 
 	Proton.Util.inherits(Position, Proton.Initialize);
-	/**
-	 * Reset this Position's all parameters
-	 *
-	 * @method reset
-	 * @param {Proton.Zone} zone set a zone of this position.
-	 */
 	Position.prototype.reset = function(zone) {
 		this.zone = Proton.Util.initValue(zone, new Proton.PointZone());
 	};
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Position.prototype.initialize = function(target) {
 		this.zone.getPosition();
 		target.p.x = this.zone.vector.x;
@@ -1708,16 +1657,7 @@
 
 
 
-	/**
-	 * Set the particle's initialization velocity.
-	 *
-	 * @class Proton.Velocity
-	 * @constructor
-	 * @param {String} rpan the Min velocity vector (vector mode) or the velocity value scalar (polar mode);
-	 * @param {String} thapan the Max velocity vector (vector mode) or the velocity's angle (polar mode);
-	 * @param {Number} type set the velocity mode (vector mode or polar mode);
-	 * for example: emitter.addInitialize(new Proton.Velocity(new Proton.Span(1, 1.5), new Proton.Span(180, 2, true), 'polar'));
-	 */
+	//radius and tha
 	function Velocity(rpan, thapan, type) {
 		Velocity._super_.call(this);
 		this.rPan = Proton.Util.setSpanValue(rpan);
@@ -1727,14 +1667,7 @@
 
 
 	Proton.Util.inherits(Velocity, Proton.Initialize);
-	/**
-	 * Reset this Velocity's all parameters
-	 *
-	 * @method reset
-	 * @param {String} rpan the Min velocity vector (vector mode) or the velocity value scalar (polar mode);
-	 * @param {String} thapan the Max velocity vector (vector mode) or the velocity's angle (polar mode);
-	 * @param {Number} type set the velocity mode (vector mode or polar mode);
-	 */
+
 	Velocity.prototype.reset = function(rpan, thapan, type) {
 		this.rPan = Proton.Util.setSpanValue(rpan);
 		this.thaPan = Proton.Util.setSpanValue(thapan);
@@ -1744,12 +1677,7 @@
 	Velocity.prototype.normalizeVelocity = function(vr) {
 		return vr * Proton.MEASURE;
 	}
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Velocity.prototype.initialize = function(target) {
 		if (this.type == 'p' || this.type == 'P' || this.type == 'polar') {
 			var polar2d = new Proton.Polar2D(this.normalizeVelocity(this.rPan.getValue()), this.thaPan.getValue() * Math.PI / 180);
@@ -1766,16 +1694,6 @@
 
 
 
-	/**
-	 * Set the particle's Mass.
-	 *
-	 * @class Proton.Mass
-	 * @constructor
-	 * @param {Number} a the min value of mass.
-	 * @param {Number} b the max value of mass.
-	 * @param {Boolean} c whether it is floating around;
-	 * for example: emitter.addInitialize(new Proton.Mass(1));
-	 */
 	function Mass(a, b, c) {
 		Mass._super_.call(this);
 		this.massPan = Proton.Util.setSpanValue(a, b, c);
@@ -1783,12 +1701,6 @@
 
 
 	Proton.Util.inherits(Mass, Proton.Initialize);
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
 	Mass.prototype.initialize = function(target) {
 		target.mass = this.massPan.getValue();
 	};
@@ -1797,16 +1709,6 @@
 
 
 
-	/**
-	 * Set the particle's radius.
-	 *
-	 * @class Proton.Radius
-	 * @constructor
-	 * @param {Number} a the min value of radius.
-	 * @param {Number} b the max value of radius.
-	 * @param {Boolean} c whether it is floating around;
-	 * for example: emitter.addInitialize(new Proton.Radius(1, 12));
-	 */
 	function Radius(a, b, c) {
 		Radius._super_.call(this);
 		this.radius = Proton.Util.setSpanValue(a, b, c);
@@ -1814,23 +1716,10 @@
 
 
 	Proton.Util.inherits(Radius, Proton.Initialize);
-	/**
-	 * Reset this Radius's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} a the min value of radius.
-	 * @param {Number} b the max value of radius.
-	 * @param {Boolean} c whether it is floating around;
-	 */
 	Radius.prototype.reset = function(a, b, c) {
 		this.radius = Proton.Util.setSpanValue(a, b, c);
 	};
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Radius.prototype.initialize = function(particle) {
 		particle.radius = this.radius.getValue();
 		particle.transform.oldRadius = particle.radius;
@@ -1840,16 +1729,6 @@
 
 
 
-	/**
-	 * Set the particle's image texture.
-	 *
-	 * @class Proton.ImageTarget
-	 * @constructor
-	 * @param {String or Image} image the url of image or Image object;
-	 * @param {Number} w the image's width (src mode);
-	 * @param {Number} h the image's height (src mode);
-	 * for example: emitter.addInitialize(new Proton.ImageTarget(['image/fox.png','image/chrome.png'], 100, 100));
-	 */
 	function ImageTarget(image, w, h) {
 		ImageTarget._super_.call(this);
 		this.image = this.setSpanValue(image);
@@ -1859,12 +1738,6 @@
 
 
 	Proton.Util.inherits(ImageTarget, Proton.Initialize);
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
 	ImageTarget.prototype.initialize = function(particle) {
 		var imagetarget = this.image.getValue();
 		if ( typeof (imagetarget) == 'string') {
@@ -1890,52 +1763,20 @@
 
 
 
-	/**
-	 * The Force Class can add a fixed force to particles 
-	 *
-	 * @class Proton.Force
-	 * @constructor
-	 * @param {Number} fx the horizontal component force;
-	 * @param {Number} fy the vertical component force;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Force(3,-5));
-	 */
 	function Force(fx, fy, life, easing) {
 		Force._super_.call(this, life, easing);
 		this.force = this.normalizeForce(new Proton.Vector2D(fx, fy));
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Force";
 	}
 
 
 	Proton.Util.inherits(Force, Proton.Behaviour);
-	/**
-	 * Reset this Force's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} fx the horizontal component force;
-	 * @param {Number} fy the vertical component force;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Force.prototype.reset = function(fx, fy, life, easing) {
 		this.force = this.normalizeForce(new Proton.Vector2D(fx, fy));
 		if (life)
 			Force._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Force.prototype.applyBehaviour = function(particle, time, index) {
 		Force._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.a.add(this.force);
@@ -1946,18 +1787,6 @@
 
 
 
-	/**
-	 * The Attraction Class can add a attraction force to particles
-	 *
-	 * @class Proton.Attraction
-	 * @constructor
-	 * @param {Object} targetPosition the center point of attraction;
-	 * @param {Number} force the attraction force value;
-	 * @param {Number} radius the sphere of attraction action radius;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Attraction({x:550,y:500},100,500));
-	 */
 	function Attraction(targetPosition, force, radius, life, easing) {
 		Attraction._super_.call(this, life, easing);
 		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
@@ -1966,25 +1795,11 @@
 		this.radiusSq = this.radius * this.radius
 		this.attractionForce = new Proton.Vector2D();
 		this.lengthSq = 0;
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Attraction";
 	}
 
 
 	Proton.Util.inherits(Attraction, Proton.Behaviour);
-	/**
-	 * Reset this Force's all parameters
-	 *
-	 * @param {Object} targetPosition the center point of attraction;
-	 * @param {Number} force the attraction force value;
-	 * @param {Number} radius the sphere of attraction action radius;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Attraction.prototype.reset = function(targetPosition, force, radius, life, easing) {
 		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
 		this.radius = Proton.Util.initValue(radius, 1000);
@@ -1995,14 +1810,7 @@
 		if (life)
 			Attraction._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Attraction.prototype.applyBehaviour = function(particle, time, index) {
 		Attraction._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		this.attractionForce.copy(this.targetPosition);
@@ -2021,42 +1829,15 @@
 
 
 
-	/**
-	 * The RandomDrift Class can add a random force to particles
-	 *
-	 * @class Proton.RandomDrift
-	 * @constructor
-	 * @param {Number} driftX the horizontal component RandomDrift;
-	 * @param {Number} driftY the vertical component RandomDrift;
-	 * @param {Number} delay the RandomDrift change interval time;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.RandomDrift(30,30,0.05));
-	 */
 	function RandomDrift(driftX, driftY, delay, life, easing) {
 		RandomDrift._super_.call(this, life, easing);
 		this.reset(driftX, driftY, delay);
 		this.time = 0;
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "RandomDrift";
 	}
 
 
 	Proton.Util.inherits(RandomDrift, Proton.Behaviour);
-	/**
-	 * Reset this RandomDrift's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} driftX the horizontal component RandomDrift;
-	 * @param {Number} driftY the vertical component RandomDrift;
-	 * @param {Number} delay the RandomDrift change interval time;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	RandomDrift.prototype.reset = function(driftX, driftY, delay, life, easing) {
 		this.panFoce = new Proton.Vector2D(driftX, driftY);
 		this.panFoce = this.normalizeForce(this.panFoce);
@@ -2064,19 +1845,12 @@
 		if (life)
 			RandomDrift._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	RandomDrift.prototype.applyBehaviour = function(particle, time, index) {
 		RandomDrift._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		this.time += time;
 		if (this.time >= this.delay) {
-
+			
 			particle.a.addXY(Proton.MathUtils.randomAToB(-this.panFoce.x, this.panFoce.x), Proton.MathUtils.randomAToB(-this.panFoce.y, this.panFoce.y));
 			this.time = 0;
 		};
@@ -2086,40 +1860,14 @@
 
 
 
-	/**
-	 * The Repulsion Class can add a attraction force to particles
-	 *
-	 * @class Proton.Repulsion
-	 * @constructor
-	 * @param {Object} targetPosition the center point of Repulsion;
-	 * @param {Number} force the Repulsion force value;
-	 * @param {Number} radius the sphere of Repulsion action radius;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Repulsion({x:550,y:500},100,500));
-	 */
 	function Repulsion(targetPosition, force, radius, life, easing) {
 		Repulsion._super_.call(this, targetPosition, force, radius, life, easing);
 		this.force *= -1;
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Repulsion";
 	}
 
 
 	Proton.Util.inherits(Repulsion, Proton.Attraction);
-	/**
-	 * Reset this Force's all parameters
-	 *
-	 * @param {Object} targetPosition the center point of Repulsion;
-	 * @param {Number} force the Repulsion force value;
-	 * @param {Number} radius the sphere of Repulsion action radius;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Repulsion.prototype.reset = function(targetPosition, force, radius, life, easing) {
 		Repulsion._super_.prototype.reset.call(this, targetPosition, force, radius, life, easing);
 		this.force *= -1;
@@ -2129,36 +1877,13 @@
 
 
 
-	/**
-	 * The Gravity class can simulate a gravity.
-	 *
-	 * @class Proton.Gravity
-	 * @constructor
-	 * @param {Number} g the gravity force value;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Gravity(9.8));
-	 */
 	function Gravity(g, life, easing) {
 		Gravity._super_.call(this, 0, g, life, easing);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Gravity";
 	}
 
 
 	Proton.Util.inherits(Gravity, Proton.Force);
-	/**
-	 * Reset this Gravity's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} g the gravity force value;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Gravity.prototype.reset = function(g, life, easing) {
 		Gravity._super_.prototype.reset.call(this, 0, g, life, easing);
 	}
@@ -2167,41 +1892,15 @@
 
 
 
-	/**
-	 * The Collision Class provides a simple collision in proton system.
-	 *
-	 * @class Proton.Collision
-	 * @constructor
-	 * @param {Proton.Emitter} emitter the collision's parent Emitter;
-	 * @param {Number} mass the mass of colliding objects;
-	 * @param {Function} the end of the callback function collision;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Collision(emitter));
-	 */
+	//can use Collision(emitter,true,function(){}) or Collision();
 	function Collision(emitter, mass, callback, life, easing) {
 		Collision._super_.call(this, life, easing);
 		this.reset(emitter, mass, callback);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Collision";
 	}
 
 
 	Proton.Util.inherits(Collision, Proton.Behaviour);
-	/**
-	 * Reset this Scale's all parameters
-	 *
-	 * @method reset
-	 * @param {Proton.Emitter} emitter the collision's parent Emitter;
-	 * @param {Number} mass the mass of colliding objects;
-	 * @param {Function} the end of the callback function collision;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Collision.prototype.reset = function(emitter, mass, callback, life, easing) {
 		this.emitter = Proton.Util.initValue(emitter, null);
 		this.mass = Proton.Util.initValue(mass, true);
@@ -2211,14 +1910,7 @@
 		if (life)
 			Collision._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Collision.prototype.applyBehaviour = function(particle, time, index) {
 		var newPool = this.emitter ? this.emitter.particles.slice(index) : this.pool.slice(index);
 		var otherParticle;
@@ -2254,52 +1946,22 @@
 
 
 
-	/**
-	 * The CrossZone Class is to handle particle birth or activities region zones.
-	 *
-	 * @class Proton.CrossZone
-	 * @constructor
-	 * @param {Proton.Zone} zone the zone of this CrossZone;
-	 * @param {String} crossType the type of control include 'bound' ,'cross' ,'dead' three methord;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, 550, 400), 'bound'));
-	 */
 	function CrossZone(zone, crossType, life, easing) {
 		CrossZone._super_.call(this, life, easing);
 		this.reset(zone, crossType);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
+		///dead /bound /cross
 		this.name = "CrossZone";
 	}
 
 
 	Proton.Util.inherits(CrossZone, Proton.Behaviour);
-	/**
-	 * Reset this CrossZone's all parameters
-	 *
-	 * @param {Proton.Zone} zone the zone of this CrossZone;
-	 * @param {String} crossType the type of control include 'bound' ,'cross' ,'dead' three methord;
-	 * @param {Number} life the Force Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	CrossZone.prototype.reset = function(zone, crossType, life, easing) {
 		this.zone = zone;
 		this.zone.crossType = Proton.Util.initValue(crossType, "dead");
 		if (life)
 			CrossZone._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	CrossZone.prototype.applyBehaviour = function(particle, time, index) {
 		CrossZone._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		this.zone.crossing(particle);
@@ -2309,17 +1971,6 @@
 
 
 
-	/**
-	 * Use the Alpha Class you can change the particles's alpha property easily
-	 *
-	 * @class Proton.Alpha
-	 * @constructor
-	 * @param {Number} a the initial alpha value;
-	 * @param {Number} b the final alpha value(can be null);
-	 * @param {Number} life the Alpha Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Alpha(0, 1, Infinity, Proton.easeOutCubic));
-	 */
 	function Alpha(a, b, life, easing) {
 		Alpha._super_.call(this, life, easing);
 		this.reset(a, b);
@@ -2333,15 +1984,6 @@
 
 
 	Proton.Util.inherits(Alpha, Proton.Behaviour);
-	/**
-	 * Reset this Alpha's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} a the initial alpha value;
-	 * @param {Number} b the final alpha value(can be null);
-	 * @param {Number} this behaviour's life
-	 * @param {String} this behaviour's easing
-	 */
 	Alpha.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -2352,12 +1994,7 @@
 		if (life)
 			Alpha._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Alpha.prototype.initialize = function(particle) {
 		particle.transform.alphaA = this.a.getValue();
 		if (this.same)
@@ -2365,14 +2002,7 @@
 		else
 			particle.transform.alphaB = this.b.getValue();
 	};
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Alpha.prototype.applyBehaviour = function(particle, time, index) {
 		Alpha._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.alpha = particle.transform.alphaB + (particle.transform.alphaA - particle.transform.alphaB) * this.energy;
@@ -2384,39 +2014,14 @@
 
 
 
-	/**
-	 * Use the Scale Class you can change the particles's scale property easily
-	 *
-	 * @class Proton.Scale
-	 * @constructor
-	 * @param {Number} a the initial scale value;
-	 * @param {Number} b the final scale value(can be null);
-	 * @param {Number} life the Scale Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Scale(1 ,0.001 , Infinity, Proton.easeOutCubic));
-	 */
 	function Scale(a, b, life, easing) {
 		Scale._super_.call(this, life, easing);
 		this.reset(a, b);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Scale";
 	}
 
 
 	Proton.Util.inherits(Scale, Proton.Behaviour);
-	/**
-	 * Reset this Scale's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} a the initial scale value;
-	 * @param {Number} b the final scale value(can be null);
-	 * @param {Number} life the Scale Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Scale.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -2427,12 +2032,7 @@
 		if (life)
 			Scale._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Scale.prototype.initialize = function(particle) {
 		particle.transform.scaleA = this.a.getValue();
 		particle.transform.oldRadius = particle.radius;
@@ -2442,14 +2042,7 @@
 			particle.transform.scaleB = this.b.getValue();
 
 	};
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Scale.prototype.applyBehaviour = function(particle, time, index) {
 		Scale._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.scale = particle.transform.scaleB + (particle.transform.scaleA - particle.transform.scaleB) * this.energy;
@@ -2462,39 +2055,14 @@
 
 
 
-	/**
-	 * Use the Rotate Class you can change the particles's rotation property easily
-	 *
-	 * @class Proton.Rotate
-	 * @constructor
-	 * @param {Number} a the initial rotation value;
-	 * @param {Number} b the final rotation value, or a value of added(can be null);
-	 * @param {Number} life the Rotate Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Rotate(0,Proton.getSpan(-5, 5),'add'));
-	 */
 	function Rotate(a, b, style, life, easing) {
 		Rotate._super_.call(this, life, easing);
 		this.reset(a, b, style);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Rotate";
 	}
 
 
 	Proton.Util.inherits(Rotate, Proton.Behaviour);
-	/**
-	 * Reset this Rotate's all parameters
-	 *
-	 * @method reset
-	 * @param {Number} a the initial rotation value;
-	 * @param {Number} b the final rotation value, or a value of added(can be null);
-	 * @param {Number} life the Rotate Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Rotate.prototype.reset = function(a, b, style, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -2506,26 +2074,14 @@
 		if (life)
 			Rotate._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Rotate.prototype.initialize = function(particle) {
 		particle.rotation = this.a.getValue();
 		particle.transform.rotationA = this.a.getValue();
 		if (!this.same)
 			particle.transform.rotationB = this.b.getValue();
 	};
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Rotate.prototype.applyBehaviour = function(particle, time, index) {
 		Rotate._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		if (!this.same) {
@@ -2544,51 +2100,21 @@
 
 
 
-	/**
-	 * Use the Color Class you can change the particles's color property easily
-	 *
-	 * @class Proton.Color
-	 * @constructor
-	 * @param {String} color1 the initial color value;
-	 * @param {String} color2 the final color value(can be null);
-	 * @param {Number} life the Color Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 * for example: emitter.addBehaviour(new Proton.Color('random', '#ffcc00'));
-	 */
 	function Color(color1, color2, life, easing) {
 		Color._super_.call(this, life, easing);
 		this.reset(color1, color2);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Color";
 	}
 
 
 	Proton.Util.inherits(Color, Proton.Behaviour);
-	/**
-	 * Reset this Color's all parameters
-	 *
-	 * @method reset
-	 * @param {String} color1 the initial color value;
-	 * @param {String} color2 the final color value(can be null);
-	 * @param {Number} life the Color Behaviour's life time;
-	 * @param {String} easing The behaviour's decaying trend;
-	 */
 	Color.prototype.reset = function(color1, color2, life, easing) {
 		this.color1 = this.setSpanValue(color1);
 		this.color2 = this.setSpanValue(color2);
 		if (life)
 			Color._super_.prototype.reset.call(this, life, easing);
 	}
-	/**
-	 * Initialize each particle
-	 *
-	 * @method initialize
-	 * @param {Proton.Particle} particle
-	 */
+
 	Color.prototype.initialize = function(particle) {
 		particle.color = this.color1.getValue();
 		particle.transform.beginRGB = Proton.Util.hexToRGB(particle.color);
@@ -2596,14 +2122,7 @@
 		if (this.color2)
 			particle.transform.endRGB = Proton.Util.hexToRGB(this.color2.getValue());
 	};
-	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @method applyBehaviour
-	 * @param {Proton.Particle} particle
-	 * @param {Number} the integrate time 1/ms
-	 * @param {Int} the particle index
-	 */
+
 	Color.prototype.applyBehaviour = function(particle, time, index) {
 		if (this.color2) {
 			Color._super_.prototype.applyBehaviour.call(this, particle, time, index);
@@ -3324,6 +2843,7 @@
 	
 
 
+//the own renderer
 
 	function Renderer(type, proton, element) {
 		///element dom/div canvas/canvas easeljs/cantainer(or stage)
@@ -3515,14 +3035,6 @@
 
 
 
-	/**
-	 * Use the Alpha Class you can change the particles's alpha property easily
-	 *
-	 * @class Proton.DomRender
-	 * @constructor
-	 * @param {Proton} proton ;
-	 * @param {Element} element the dom element of this renderer(Such as DIV);
-	 */
 	function DomRender(proton, element) {
 		DomRender._super_.call(this, proton, element);
 		this.stroke = null;
