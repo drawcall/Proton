@@ -120,16 +120,18 @@
 			}
 		},
 
-		getParticleNumber : function() {
+		getCount : function() {
 			var total = 0;
-			for (var i = 0; i < this.emitters.length; i++) {
+			var length = this.emitters.length;
+			for (var i = 0; i < length; i++) {
 				total += this.emitters[i].particles.length;
 			}
 			return total;
 		},
 
 		destory : function() {
-			for (var i = 0; i < this.emitters.length; i++) {
+			var length = this.emitters.length;
+			for (var i = 0; i < length; i++) {
 				this.emitters[i].destory();
 				delete this.emitters[i];
 			}
@@ -214,28 +216,18 @@
 		}
 	};
 
-	p.dispatchEvent = function(eventObj, target) {
+	p.dispatchEvent = function(eventObj) {
 		var ret = false, listeners = this._listeners;
 		if (eventObj && listeners) {
-			if ( typeof eventObj == "string") {
-				eventObj = {
-					type : eventObj
-				};
-			}
 			var arr = listeners[eventObj.type];
-			if (!arr) {
+			if (!arr)
 				return ret;
-			}
-			eventObj.target = target || this;
+				
 			arr = arr.slice();
 			// to avoid issues with items being removed or added during the dispatch
 			for (var i = 0, l = arr.length; i < l; i++) {
 				var o = arr[i];
-				if (o.handleEvent) {
-					ret = ret || o.handleEvent(eventObj);
-				} else {
-					ret = ret || o(eventObj);
-				}
+				ret = ret || o(eventObj);
 			}
 		}
 		return !!ret;
@@ -252,17 +244,10 @@
 
 
 	function Event(pObj) {
-		this.type = 'null';
-		this.particle = null;
-		this.emitter = null;
-		this.particles = [];
-		Proton.Util.setPrototypeByObject(this, pObj);
+		this.type = pObj['type'];
+		this.particle = pObj['particle'];
+		this.emitter = pObj['emitter'];
 	}
-	
-	Event.PARTICLE_CREATED = Proton.PARTICLE_CREATED;
-	Event.PARTICLE_UPDATA = Proton.PARTICLE_UPDATA;
-	Event.PARTICLE_SLEEP = Proton.PARTICLE_SLEEP;
-	Event.PARTICLE_DEAD = Proton.PARTICLE_DEAD;
 
 	Proton.Event = Event;
 

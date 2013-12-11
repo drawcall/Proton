@@ -33,7 +33,7 @@
 			var stats;
 			var pixiStage;
 			var pixiRender;
-		
+
 			Main();
 			function Main() {
 				addStats();
@@ -55,7 +55,7 @@
 				var texture = new PIXI.Texture.fromImage("image/bunny.png");
 				proton = new Proton();
 				emitter = new Proton.BehaviourEmitter();
-				emitter.rate = new Proton.Rate(new Proton.Span(15, 30), new Proton.Span(.2, .5));
+				emitter.rate = new Proton.Rate(new Proton.Span(75, 110), new Proton.Span(.2, .5));
 				emitter.addInitialize(new Proton.Mass(1));
 				emitter.addInitialize(new Proton.ImageTarget(texture));
 				emitter.addInitialize(new Proton.Life(2, 3));
@@ -107,7 +107,7 @@
 				particleSprite.anchor.x = 0.5;
 				particleSprite.anchor.y = 0.5;
 				particleSprite.alpha = particle.alpha;
-				particleSprite.rotation = particle.rotation*Math.PI/180;
+				particleSprite.rotation = particle.rotation * Math.PI / 180;
 			}
 
 			function tick() {
