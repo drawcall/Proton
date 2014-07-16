@@ -1,0 +1,40 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@1.2.32
+3 info using node@v0.10.12
+4 verbose publish [ '.' ]
+5 verbose read json /Users/a-jie/Desktop/js_library/My_library/proton/github/package.json
+6 verbose cache add [ '.', null ]
+7 verbose cache add name=undefined spec="." args=[".",null]
+8 verbose parsed url { protocol: null,
+8 verbose parsed url   slashes: null,
+8 verbose parsed url   auth: null,
+8 verbose parsed url   host: null,
+8 verbose parsed url   port: null,
+8 verbose parsed url   hostname: null,
+8 verbose parsed url   hash: null,
+8 verbose parsed url   search: null,
+8 verbose parsed url   query: null,
+8 verbose parsed url   pathname: '.',
+8 verbose parsed url   path: '.',
+8 verbose parsed url   href: '.' }
+9 silly lockFile 3a52ce78- .
+10 verbose lock . /Users/a-jie/.npm/3a52ce78-.lock
+11 verbose read json package.json
+12 silly lockFile 3a52ce78- .
+13 silly lockFile 3a52ce78- .
+14 error addLocal Could not install .
+15 error Error: ENOENT, open 'package.json'
+16 error If you need help, you may report this log at:
+16 error     <http://github.com/isaacs/npm/issues>
+16 error or email it to:
+16 error     <npm-@googlegroups.com>
+17 error System Darwin 13.0.0
+18 error command "node" "/usr/local/bin/npm" "publish"
+19 error cwd /Users/a-jie/Desktop/js_library/My_library/proton/github
+20 error node -v v0.10.12
+21 error npm -v 1.2.32
+22 error path package.json
+23 error code ENOENT
+24 error errno 34
+25 verbose exit [ 34, true ]

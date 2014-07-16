@@ -133,7 +133,7 @@
 				//console.log(subClass,superClass);
 				subClass.prototype = Object.create(superClass.prototype, {
 					constructor : {
-						value : superClass
+						value : subClass
 					}
 				});
 			} else {
