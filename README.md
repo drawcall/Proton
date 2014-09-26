@@ -48,4 +48,4 @@ Finally run the build command:<br>
 `node build.js`
 
 ## License
-LicenseFinder is released under the MIT License. http://www.opensource.org/licenses/mit-license
+Proton is released under the MIT License. http://www.opensource.org/licenses/mit-license
