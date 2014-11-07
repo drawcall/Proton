@@ -24,7 +24,7 @@ version = /^version = (.*)$/m.exec(config)[1],
 source_dir = /^source_dir = (.*)$/m.exec(config)[1],
 output_full = /^output_full = (.*)$/m.exec(config)[1].replace("{version}", version),
 output_min = /^output_min = (.*)$/m.exec(config)[1].replace("{version}", version),
-head = /head\s-----\s([\s\S]*?)-----\s/g.exec(config)[1].replace("{version}", version).replace("{year}", "2011-" + (new Date()).getFullYear()),
+head = '';///head\s-----\s([\s\S]*?)-----\s/g.exec(config)[1].replace("{version}", version).replace("{year}", "2011-" + (new Date()).getFullYear()),
 filenames = /files\s-----\s([\s\S]*?)\s-----/g.exec(config)[1].split(/\s/);
 foot = /foot\s-----\s([\s\S]*?)\s-----/g.exec(config)[1].split(/\s/);
 numFiles = filenames.length;
