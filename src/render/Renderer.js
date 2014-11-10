@@ -49,6 +49,10 @@
 		},
 		getRenderer : function() {
 			switch(this.type) {
+				case 'pixi':
+					return new Proton.PixiRender(this.proton, this.element);
+					break;
+
 				case 'dom':
 					return new Proton.DomRender(this.proton, this.element);
 					break;
