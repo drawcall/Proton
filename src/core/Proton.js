@@ -122,6 +122,7 @@
 		destory : function() {
 			var length = this.emitters.length;
 			for (var i = 0; i < length; i++) {
+				if (this.emitters[i] == "undefined") continue;
 				this.emitters[i].destory();
 				delete this.emitters[i];
 			}
