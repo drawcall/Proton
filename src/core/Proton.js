@@ -94,7 +94,7 @@
 			this.oldTime = time;
 			if (this.elapsed > 0) {
 				for (var i = 0; i < this.emitters.length; i++) {
-					this.emitters[i].update(this.elapsed);
+					if (this.emitters[i]) this.emitters[i].update(this.elapsed);
 				}
 			}
 
@@ -122,8 +122,7 @@
 		destory : function() {
 			var length = this.emitters.length;
 			for (var i = 0; i < length; i++) {
-				this.emitters[i].destory();
-				delete this.emitters[i];
+				if (this.emitters[i]) {this.emitters[i].destory(); delete this.emitters[i];}
 			}
 
 			this.emitters = [];
