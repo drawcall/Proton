@@ -41,8 +41,8 @@
 		},
 		release : function() {
 			for (var i = 0; i < this.poolList.length; i++) {
-				if (this.poolList[i]['destory'])
-					this.poolList[i].destory();
+				if (this.poolList[i]['destroy'])
+					this.poolList[i].destroy();
 				delete this.poolList[i];
 			}
 			this.poolList = [];

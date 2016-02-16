@@ -63,7 +63,7 @@
 	};
 	/**
 	 * Destory this Emitter
-	 * @method destory
+	 * @method destroy
 	 */
 	FollowEmitter.prototype.destroy = function() {
 		FollowEmitter._super_.prototype.destroy.call(this);

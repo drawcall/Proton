@@ -119,10 +119,10 @@
 			return total;
 		},
 
-		destory : function() {
+		destroy : function() {
 			var length = this.emitters.length;
 			for (var i = 0; i < length; i++) {
-				this.emitters[i].destory();
+				this.emitters[i].destroy();
 				delete this.emitters[i];
 			}
 

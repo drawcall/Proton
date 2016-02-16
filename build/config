@@ -1,4 +1,4 @@
-version = 1.0.1
+version = 1.0.0
 source_dir = ../src/
 output_full = proton-{version}.js
 output_min = proton-{version}.min.js

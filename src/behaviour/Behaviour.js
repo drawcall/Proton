@@ -98,7 +98,7 @@
 			if (this.age >= this.life || this.dead) {
 				this.energy = 0;
 				this.dead = true;
-				this.destory();
+				this.destroy();
 			} else {
 				var scale = this.easing(particle.age / particle.life);
 				this.energy = Math.max(1 - scale, 0);
@@ -107,9 +107,9 @@
 		
 		/**
 		 * Destory this behaviour
-		 * @method destory
+		 * @method destroy
 		 */
-		destory : function() {
+		destroy : function() {
 			var index;
 			var length = this.parents.length, i;
 			for ( i = 0; i < length; i++) {

@@ -2,7 +2,7 @@
  * Proton v1.0.0
  * https://github.com/a-jie/Proton
  *
- * Copyright 2011-2013, A-JIE
+ * Copyright 2011-2016, A-JIE
  * Licensed under the MIT license
  * http://www.opensource.org/licenses/mit-license
  *
@@ -129,10 +129,10 @@
 			return total;
 		},
 
-		destory : function() {
+		destroy : function() {
 			var length = this.emitters.length;
 			for (var i = 0; i < length; i++) {
-				this.emitters[i].destory();
+				this.emitters[i].destroy();
 				delete this.emitters[i];
 			}
 
@@ -248,6 +248,12 @@
 		this.particle = pObj['particle'];
 		this.emitter = pObj['emitter'];
 	}
+
+
+	Event.PARTICLE_CREATED = Proton.PARTICLE_CREATED;
+	Event.PARTICLE_UPDATA = Proton.PARTICLE_UPDATA;
+	Event.PARTICLE_SLEEP = Proton.PARTICLE_SLEEP;
+	Event.PARTICLE_DEAD = Proton.PARTICLE_DEAD;
 
 	Proton.Event = Event;
 
@@ -387,7 +393,7 @@
 				//console.log(subClass,superClass);
 				subClass.prototype = Object.create(superClass.prototype, {
 					constructor : {
-						value : superClass
+						value : subClass
 					}
 				});
 			} else {
@@ -675,7 +681,7 @@
 			}
 
 			if (this.age >= this.life) {
-				this.destory();
+				this.destroy();
 			} else {
 				var scale = this.easing(this.age / this.life);
 				this.energy = Math.max(1 - scale, 0);
@@ -710,9 +716,9 @@
 		},
 		/**
 		 * Destory this particle
-		 * @method destory
+		 * @method destroy
 		 */
-		destory : function() {
+		destroy : function() {
 			this.removeAllBehaviours();
 			this.energy = 0;
 			this.dead = true;
@@ -766,8 +772,8 @@
 		},
 		release : function() {
 			for (var i = 0; i < this.poolList.length; i++) {
-				if (this.poolList[i]['destory'])
-					this.poolList[i].destory();
+				if (this.poolList[i]['destroy'])
+					this.poolList[i].destroy();
 				delete this.poolList[i];
 			}
 			this.poolList = [];
@@ -1484,7 +1490,7 @@
 			if (this.age >= this.life || this.dead) {
 				this.energy = 0;
 				this.dead = true;
-				this.destory();
+				this.destroy();
 			} else {
 				var scale = this.easing(particle.age / particle.life);
 				this.energy = Math.max(1 - scale, 0);
@@ -1493,9 +1499,9 @@
 		
 		/**
 		 * Destory this behaviour
-		 * @method destory
+		 * @method destroy
 		 */
-		destory : function() {
+		destroy : function() {
 			var index;
 			var length = this.parents.length, i;
 			for ( i = 0; i < length; i++) {
@@ -2459,7 +2465,7 @@
 
 	/**
 	 * Destory this Emitter
-	 * @method destory
+	 * @method destroy
 	 */
 	Emitter.prototype.destroy = function() {
 		this.dead = true;
@@ -2594,7 +2600,7 @@
 	};
 	/**
 	 * Destory this Emitter
-	 * @method destory
+	 * @method destroy
 	 */
 	FollowEmitter.prototype.destroy = function() {
 		FollowEmitter._super_.prototype.destroy.call(this);
@@ -2894,6 +2900,10 @@
 		},
 		getRenderer : function() {
 			switch(this.type) {
+				case 'pixi':
+					return new Proton.PixiRender(this.proton, this.element);
+					break;
+
 				case 'dom':
 					return new Proton.DomRender(this.proton, this.element);
 					break;

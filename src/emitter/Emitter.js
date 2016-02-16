@@ -266,7 +266,7 @@
 
 	/**
 	 * Destory this Emitter
-	 * @method destory
+	 * @method destroy
 	 */
 	Emitter.prototype.destroy = function() {
 		this.dead = true;
