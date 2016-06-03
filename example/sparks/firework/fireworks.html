@@ -71,11 +71,11 @@
 				renderer.start();
 
 				////NOTICE :you can only use two emitters do this effect.In this demo I use more emitters want to test the emtter's life
-				emitter.addEventListener(Proton.PARTICLE_DEAD, function(e) {
+				emitter.addEventListener(Proton.PARTICLE_DEAD, function(particle) {
 					if (Math.random() < .7)
-						createFirstEmitter(e.particle);
+						createFirstEmitter(particle);
 					else
-						createSecendEmitter(e.particle);
+						createSecendEmitter(particle);
 				});
 			}
 
