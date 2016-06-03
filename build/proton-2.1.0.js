@@ -1,149 +1,144 @@
 /*!
- * Proton v1.0.0
+ * Proton v2.1.0
  * https://github.com/a-jie/Proton
  *
- * Copyright 2011-2013, A-JIE
+ * Copyright 2011-2016, A-JIE
  * Licensed under the MIT license
  * http://www.opensource.org/licenses/mit-license
  *
  */
 
 (function(window, undefined) {
-	//the max particle number in pool
-	Proton.POOL_MAX = 1000;
-	Proton.TIME_STEP = 60;
-	//1:100
-	Proton.MEASURE = 100;
-	Proton.EULER = 'euler';
-	Proton.RK2 = 'runge-kutta2';
-	Proton.RK4 = 'runge-kutta4';
-	Proton.VERLET = 'verlet';
+    //the max particle number in pool
+    Proton.POOL_MAX = 1000;
+    Proton.TIME_STEP = 60;
+    Proton.USE_CLOCK = false;
+    //1:100
+    Proton.MEASURE = 100;
+    Proton.EULER = 'euler';
+    Proton.RK2 = 'runge-kutta2';
+    Proton.RK4 = 'runge-kutta4';
+    Proton.VERLET = 'verlet';
 
-	Proton.PARTICLE_CREATED = 'partilcleCreated';
-	Proton.PARTICLE_UPDATE = 'partilcleUpdate';
-	Proton.PARTICLE_SLEEP = 'particleSleep';
-	Proton.PARTICLE_DEAD = 'partilcleDead';
-	Proton.PROTON_UPDATE = 'protonUpdate';
-	Proton.PROTON_UPDATE_AFTER = 'protonUpdateAfter';
-	Proton.EMITTER_ADDED = 'emitterAdded';
-	Proton.EMITTER_REMOVED = 'emitterRemoved';
+    Proton.PARTICLE_CREATED = 'partilcleCreated';
+    Proton.PARTICLE_UPDATE = 'partilcleUpdate';
+    Proton.PARTICLE_SLEEP = 'particleSleep';
+    Proton.PARTICLE_DEAD = 'partilcleDead';
+    Proton.PROTON_UPDATE = 'protonUpdate';
+    Proton.PROTON_UPDATE_AFTER = 'protonUpdateAfter';
+    Proton.EMITTER_ADDED = 'emitterAdded';
+    Proton.EMITTER_REMOVED = 'emitterRemoved';
 
-	Proton.amendChangeTabsBug = true;
-	Proton.TextureBuffer = {};
-	Proton.TextureCanvasBuffer = {};
+    Proton.amendChangeTabsBug = true;
+    Proton.TextureBuffer = {};
+    Proton.TextureCanvasBuffer = {};
 
-	/**
-	 * Proton is a html5 particle engine
-	 *
-	 * @class Proton
-	 * @constructor
-	 */
-	function Proton(proParticleCount, integrationType) {
-		this.proParticleCount = Proton.Util.initValue(proParticleCount, Proton.POOL_MAX);
-		this.integrationType = Proton.Util.initValue(integrationType, Proton.EULER);
-		this.emitters = [];
-		this.renderers = [];
-		this.time = 0;
-		this.oldTime = 0;
+    /**
+     * Proton is a html5 particle engine
+     *
+     * @class Proton
+     * @constructor
+     */
+    function Proton(proParticleCount, integrationType) {
+        this.integrationType = Proton.Util.initValue(integrationType, Proton.EULER);
+        this.emitters = [];
+        this.renderers = [];
+        this.time = 0;
+        this.oldTime = 0;
 
-		Proton.pool = new Proton.ParticlePool(this.proParticleCount);
-		Proton.integrator = new Proton.NumericalIntegration(this.integrationType);
-	}
+        Proton.pool = new Proton.Pool(100);
+        Proton.integrator = new Proton.NumericalIntegration(this.integrationType);
+    }
 
 
-	Proton.prototype = {
-		/**
-		 * add a type of Renderer
-		 *
-		 * @method addRender
-		 * @param {Renderer} render
-		 */
-		addRender : function(render) {
-			render.proton = this;
-			this.renderers.push(render.proton);
-		},
-		/**
-		 * add the Emitter
-		 *
-		 * @method addEmitter
-		 * @param {Emitter} emitter
-		 */
-		addEmitter : function(emitter) {
-			this.emitters.push(emitter);
-			emitter.parent = this;
+    Proton.prototype = {
+        /**
+         * add a type of Renderer
+         *
+         * @method addRender
+         * @param {Renderer} render
+         */
+        addRender: function(render) {
+            render.proton = this;
+            this.renderers.push(render.proton);
+        },
+        /**
+         * add the Emitter
+         *
+         * @method addEmitter
+         * @param {Emitter} emitter
+         */
+        addEmitter: function(emitter) {
+            this.emitters.push(emitter);
+            emitter.parent = this;
 
-			this.dispatchEvent(new Proton.Event({
-				type : Proton.EMITTER_ADDED,
-				emitter : emitter
-			}));
-		},
+            this.dispatchEvent(Proton.EMITTER_ADDED, emitter);
+        },
 
-		removeEmitter : function(emitter) {
-			var index = this.emitters.indexOf(emitter);
-			this.emitters.splice(index, 1);
-			emitter.parent = null;
+        removeEmitter: function(emitter) {
+            var index = this.emitters.indexOf(emitter);
+            this.emitters.splice(index, 1);
+            emitter.parent = null;
 
-			this.dispatchEvent(new Proton.Event({
-				type : Proton.EMITTER_REMOVED,
-				emitter : emitter
-			}));
-		},
+            this.dispatchEvent(Proton.EMITTER_REMOVED, emitter);
+        },
 
-		update : function() {
-			this.dispatchEvent(new Proton.Event({
-				type : Proton.PROTON_UPDATE
-			}));
+        update: function() {
+            this.dispatchEvent(Proton.PROTON_UPDATE);
 
-			if (!this.oldTime)
-				this.oldTime = new Date().getTime();
+            if (Proton.USE_CLOCK) {
+                if (!this.oldTime)
+                    this.oldTime = new Date().getTime();
 
-			var time = new Date().getTime();
-			this.elapsed = (time - this.oldTime) / 1000;
-			if (Proton.amendChangeTabsBug)
-				this.amendChangeTabsBug();
-			this.oldTime = time;
-			if (this.elapsed > 0) {
-				for (var i = 0; i < this.emitters.length; i++) {
-					this.emitters[i].update(this.elapsed);
-				}
-			}
+                var time = new Date().getTime();
+                this.elapsed = (time - this.oldTime) / 1000;
+                if (Proton.amendChangeTabsBug)
+                    this.amendChangeTabsBug();
+                this.oldTime = time;
+            } else {
+                this.elapsed = 0.0167;
+            }
 
-			this.dispatchEvent(new Proton.Event({
-				type : Proton.PROTON_UPDATE_AFTER
-			}));
-		},
+            if (this.elapsed > 0) {
+                for (var i = 0; i < this.emitters.length; i++) {
+                    this.emitters[i].update(this.elapsed);
+                }
+            }
 
-		amendChangeTabsBug : function() {
-			if (this.elapsed > .5) {
-				this.oldTime = new Date().getTime();
-				this.elapsed = 0;
-			}
-		},
+            this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+        },
 
-		getCount : function() {
-			var total = 0;
-			var length = this.emitters.length;
-			for (var i = 0; i < length; i++) {
-				total += this.emitters[i].particles.length;
-			}
-			return total;
-		},
+        amendChangeTabsBug: function() {
+            if (this.elapsed > .5) {
+                this.oldTime = new Date().getTime();
+                this.elapsed = 0;
+            }
+        },
 
-		destory : function() {
-			var length = this.emitters.length;
-			for (var i = 0; i < length; i++) {
-				this.emitters[i].destory();
-				delete this.emitters[i];
-			}
+        getCount: function() {
+            var total = 0;
+            var length = this.emitters.length;
+            for (var i = 0; i < length; i++) {
+                total += this.emitters[i].particles.length;
+            }
+            return total;
+        },
 
-			this.emitters = [];
-			this.time = 0;
-			this.oldTime = 0;
-			Proton.pool.release();
-		}
-	};
+        destroy: function() {
+            var length = this.emitters.length;
+            for (var i = 0; i < length; i++) {
+                this.emitters[i].destroy();
+                delete this.emitters[i];
+            }
 
-	window.Proton = Proton;
+            this.emitters = [];
+            this.time = 0;
+            this.oldTime = 0;
+            Proton.pool.release();
+        }
+    };
+
+    window.Proton = Proton;
 
 
 /*
@@ -152,324 +147,344 @@
  *
  **/
 
-	function EventDispatcher() {
-		this.initialize();
-	};
 
-	var p = EventDispatcher.prototype;
+    function EventDispatcher() {
+        this.initialize();
+    };
 
-	EventDispatcher.initialize = function(target) {
-		target.addEventListener = p.addEventListener;
-		target.removeEventListener = p.removeEventListener;
-		target.removeAllEventListeners = p.removeAllEventListeners;
-		target.hasEventListener = p.hasEventListener;
-		target.dispatchEvent = p.dispatchEvent;
-	};
+    EventDispatcher.initialize = function(target) {
+        target.addEventListener = p.addEventListener;
+        target.removeEventListener = p.removeEventListener;
+        target.removeAllEventListeners = p.removeAllEventListeners;
+        target.hasEventListener = p.hasEventListener;
+        target.dispatchEvent = p.dispatchEvent;
+    };
 
-	p._listeners = null;
+    var p = EventDispatcher.prototype;
 
-	p.initialize = function() {
-	};
+    p._listeners = null;
 
-	p.addEventListener = function(type, listener) {
-		var listeners = this._listeners;
-		if (!listeners) {
-			listeners = this._listeners = {};
-		} else {
-			this.removeEventListener(type, listener);
-		}
-		var arr = listeners[type];
-		if (!arr) {
-			arr = listeners[type] = [];
-		}
-		arr.push(listener);
-		return listener;
-	};
+    p.initialize = function() {};
+    p.addEventListener = function(type, listener) {
+        if (!this._listeners) {
+            this._listeners = {};
+        } else {
+            this.removeEventListener(type, listener);
+        }
 
-	p.removeEventListener = function(type, listener) {
-		var listeners = this._listeners;
-		if (!listeners) {
-			return;
-		}
-		var arr = listeners[type];
-		if (!arr) {
-			return;
-		}
-		for (var i = 0, l = arr.length; i < l; i++) {
-			if (arr[i] == listener) {
-				if (l == 1) {
-					delete (listeners[type]);
-				}// allows for faster checks.
-				else {
-					arr.splice(i, 1);
-				}
-				break;
-			}
-		}
-	};
+        if (!this._listeners[type]) this._listeners[type] = []
+        this._listeners[type].push(listener);
 
-	p.removeAllEventListeners = function(type) {
-		if (!type) {
-			this._listeners = null;
-		} else if (this._listeners) {
-			delete (this._listeners[type]);
-		}
-	};
+        return listener;
+    };
 
-	p.dispatchEvent = function(eventObj) {
-		var ret = false, listeners = this._listeners;
-		if (eventObj && listeners) {
-			var arr = listeners[eventObj.type];
-			if (!arr)
-				return ret;
-				
-			arr = arr.slice();
-			// to avoid issues with items being removed or added during the dispatch
-			for (var i = 0, l = arr.length; i < l; i++) {
-				var o = arr[i];
-				ret = ret || o(eventObj);
-			}
-		}
-		return !!ret;
-	};
+    p.removeEventListener = function(type, listener) {
+        if (!this._listeners) return;
+        if (!this._listeners[type]) return;
 
-	p.hasEventListener = function(type) {
-		var listeners = this._listeners;
-		return !!(listeners && listeners[type]);
-	};
+        var arr = this._listeners[type];
+        for (var i = 0, l = arr.length; i < l; i++) {
+            if (arr[i] == listener) {
+                if (l == 1) {
+                    delete(this._listeners[type]);
+                }
+                // allows for faster checks.
+                else {
+                    arr.splice(i, 1);
+                }
+                break;
+            }
+        }
+    };
 
-	Proton.EventDispatcher = EventDispatcher;
-	Proton.EventDispatcher.initialize(Proton.prototype);
+    p.removeAllEventListeners = function(type) {
+        if (!type)
+            this._listeners = null;
+        else if (this._listeners)
+            delete(this._listeners[type]);
+    };
+
+    p.dispatchEvent = function(eventName, eventTarget) {
+        var ret = false,
+            listeners = this._listeners;
+
+        if (eventName && listeners) {
+            var arr = listeners[eventName];
+            if (!arr) return ret;
+
+            arr = arr.slice();
+            // to avoid issues with items being removed or added during the dispatch
+
+            var handler, i = arr.length;
+            while (i--) {
+                var handler = arr[i];
+                ret = ret || handler(eventTarget);
+            }
+            
+        }
+
+        return !!ret;
+    };
+
+    p.hasEventListener = function(type) {
+        var listeners = this._listeners;
+        return !!(listeners && listeners[type]);
+    };
+
+    EventDispatcher.initialize(Proton.prototype);
+    Proton.EventDispatcher = EventDispatcher;
 
 
 
-	function Event(pObj) {
-		this.type = pObj['type'];
-		this.particle = pObj['particle'];
-		this.emitter = pObj['emitter'];
-	}
+    var Util = Util || {
+        initValue: function(value, defaults) {
+            var value = (value != null && value != undefined) ? value : defaults;
+            return value;
+        },
 
-	Proton.Event = Event;
+        isArray: function(value) {
+            return typeof value === 'object' && value.hasOwnProperty('length');
+        },
+
+        destroyArray: function(array) {
+            array.length = 0;
+        },
+
+        destroyObject: function(obj) {
+            for (var o in obj)
+                delete obj[o];
+        },
+
+        getVector2D: function(postionOrX, y) {
+            if (typeof(postionOrX) == 'object') {
+                return postionOrX;
+            } else {
+                var vector2d = new Proton.Vector2D(postionOrX, y);
+                return vector2d;
+            }
+        },
+
+        classApply: function(constructor, argArray) {
+            if (!argArray) return new constructor;
+
+            var args = [null].concat(argArray);
+            var factoryFunction = constructor.bind.apply(constructor, args);
+            return new factoryFunction();
+        },
+
+        judgeVector2D: function(pOBJ) {
+            var result = '';
+            if (pOBJ.hasOwnProperty('x') || pOBJ.hasOwnProperty('y') || pOBJ.hasOwnProperty('p') || pOBJ.hasOwnProperty('position'))
+                result += 'p';
+            if (pOBJ.hasOwnProperty('vx') || pOBJ.hasOwnProperty('vx') || pOBJ.hasOwnProperty('v') || pOBJ.hasOwnProperty('velocity'))
+                result += 'v';
+            if (pOBJ.hasOwnProperty('ax') || pOBJ.hasOwnProperty('ax') || pOBJ.hasOwnProperty('a') || pOBJ.hasOwnProperty('accelerate'))
+                result += 'a';
+
+            return result;
+        },
+
+        setVector2DByObject: function(target, pOBJ) {
+            if (pOBJ.hasOwnProperty('x'))
+                target.p.x = pOBJ['x'];
+
+            if (pOBJ.hasOwnProperty('y'))
+                target.p.y = pOBJ['y'];
+
+            if (pOBJ.hasOwnProperty('vx'))
+                target.v.x = pOBJ['vx'];
+
+            if (pOBJ.hasOwnProperty('vy'))
+                target.v.y = pOBJ['vy'];
+
+            if (pOBJ.hasOwnProperty('ax'))
+                target.a.x = pOBJ['ax'];
+
+            if (pOBJ.hasOwnProperty('ay'))
+                target.a.y = pOBJ['ay'];
+
+            if (pOBJ.hasOwnProperty('p'))
+                particle.p.copy(pOBJ['p']);
+
+            if (pOBJ.hasOwnProperty('v'))
+                particle.v.copy(pOBJ['v']);
+
+            if (pOBJ.hasOwnProperty('a'))
+                particle.a.copy(pOBJ['a']);
+
+            if (pOBJ.hasOwnProperty('position'))
+                particle.p.copy(pOBJ['position']);
+
+            if (pOBJ.hasOwnProperty('velocity'))
+                particle.v.copy(pOBJ['velocity']);
+
+            if (pOBJ.hasOwnProperty('accelerate'))
+                particle.a.copy(pOBJ['accelerate']);
+        },
+        //强行添加属性
+        addPrototypeByObject: function(target, prototypeObject, filters) {
+            for (var singlePrototype in prototypeObject) {
+                if (filters) {
+                    if (filters.indexOf(singlePrototype) < 0)
+                        target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
+                } else {
+                    target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
+                }
+            }
+
+            return target;
+        },
+        //set prototype
+        setPrototypeByObject: function(target, prototypeObject, filters) {
+            for (var singlePrototype in prototypeObject) {
+                if (target.hasOwnProperty(singlePrototype)) {
+                    if (filters) {
+                        if (filters.indexOf(singlePrototype) < 0)
+                            target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
+                    } else {
+                        target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
+                    }
+                }
+            }
+
+            return target;
+        },
+
+        setSpanValue: function(a, b, c) {
+            if (a instanceof Proton.Span) {
+                return a;
+            } else {
+                if (!b) {
+                    return new Proton.Span(a);
+                } else {
+                    if (!c)
+                        return new Proton.Span(a, b);
+                    else
+                        return new Proton.Span(a, b, c);
+                }
+            }
+        },
+
+        getSpanValue: function(pan) {
+            if (pan instanceof Proton.Span)
+                return pan.getValue();
+            else
+                return pan;
+        },
+
+        inherits: function(subClass, superClass) {
+            subClass._super_ = superClass;
+            if (Object['create']) {
+                //console.log(subClass,superClass);
+                subClass.prototype = Object.create(superClass.prototype, {
+                    constructor: {
+                        value: subClass
+                    }
+                });
+            } else {
+                var F = function() {};
+                F.prototype = superClass.prototype;
+                subClass.prototype = new F();
+                subClass.prototype.constructor = subClass;
+            }
+        },
+
+        getImageData: function(context, image, rect) {
+            context.drawImage(image, rect.x, rect.y);
+            var imagedata = context.getImageData(rect.x, rect.y, rect.width, rect.height);
+            context.clearRect(rect.x, rect.y, rect.width, rect.height);
+            return imagedata;
+        },
+
+        getImage: function(img, particle, drawCanvas, fun) {
+            if (typeof(img) == 'string') {
+                this.loadAndSetImage(img, particle, drawCanvas, fun);
+            } else if (typeof(img) == 'object') {
+                this.loadAndSetImage(img.src, particle, drawCanvas, fun);
+            } else if (img instanceof Image) {
+                this.loadedImage(img.src, particle, drawCanvas, fun, img);
+            }
+        },
+
+        loadedImage: function(src, particle, drawCanvas, fun, target) {
+            particle.target = target;
+            particle.transform.src = src;
+            if (!Proton.TextureBuffer[src])
+                Proton.TextureBuffer[src] = particle.target;
+            if (drawCanvas) {
+                if (Proton.TextureCanvasBuffer[src]) {
+                    particle.transform.canvas = Proton.TextureCanvasBuffer[src];
+                } else {
+                    var _width = Proton.WebGLUtil.nhpot(particle.target.width);
+                    var _height = Proton.WebGLUtil.nhpot(particle.target.height);
+                    particle.transform.canvas = Proton.DomUtil.createCanvas('canvas' + src, _width, _height);
+                    var context = particle.transform.canvas.getContext('2d');
+                    context.drawImage(particle.target, 0, 0, particle.target.width, particle.target.height);
+                    Proton.TextureCanvasBuffer[src] = particle.transform.canvas;
+                }
+            }
+            if (fun)
+                fun(particle);
+        },
+
+        loadAndSetImage: function(src, particle, drawCanvas, fun) {
+            if (Proton.TextureBuffer[src]) {
+                this.loadedImage(src, particle, drawCanvas, fun, Proton.TextureBuffer[src]);
+            } else {
+                var self = this;
+                var myImage = new Image();
+                myImage.onload = function(e) {
+                    self.loadedImage(src, particle, drawCanvas, fun, e.target);
+                }
+                myImage.src = src;
+            }
+        },
+
+        hexToRGB: function(h) {
+            var hex16 = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
+            var r = parseInt(hex16.substring(0, 2), 16);
+            var g = parseInt(hex16.substring(2, 4), 16);
+            var b = parseInt(hex16.substring(4, 6), 16);
+
+            return {
+                r: r,
+                g: g,
+                b: b
+            }
+        },
+
+        rgbToHex: function(rbg) {
+            return 'rgb(' + rbg.r + ', ' + rbg.g + ', ' + rbg.b + ')';
+        }
+    };
+
+    Proton.Util = Util;
 
 
 
-	var Util = Util || {
-		initValue : function(value, defaults) {
-			var value = (value != null && value != undefined) ? value : defaults;
-			return value;
-		},
+///bind
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function(oThis) {
+        if (typeof this !== "function") {
+            // closest thing possible to the ECMAScript 5
+            // internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+        }
 
-		isArray : function(value) {
-			return typeof value === 'object' && value.hasOwnProperty('length');
-		},
+        var aArgs = Array.prototype.slice.call(arguments, 1),
+            fToBind = this,
+            fNOP = function() {},
+            fBound = function() {
+                return fToBind.apply(this instanceof fNOP ? this : oThis || this,
+                    aArgs.concat(Array.prototype.slice.call(arguments)));
+            };
 
-		destroyArray : function(array) {
-			array.length = 0;
-		},
+        fNOP.prototype = this.prototype;
+        fBound.prototype = new fNOP();
 
-		destroyObject : function(obj) {
-			for (var o in obj)
-			delete obj[o];
-		},
-
-		getVector2D : function(postionOrX, y) {
-			if ( typeof (postionOrX) == 'object') {
-				return postionOrX;
-			} else {
-				var vector2d = new Proton.Vector2D(postionOrX, y);
-				return vector2d;
-			}
-		},
-
-		judgeVector2D : function(pOBJ) {
-			var result = '';
-			if (pOBJ.hasOwnProperty('x') || pOBJ.hasOwnProperty('y') || pOBJ.hasOwnProperty('p') || pOBJ.hasOwnProperty('position'))
-				result += 'p';
-			if (pOBJ.hasOwnProperty('vx') || pOBJ.hasOwnProperty('vx') || pOBJ.hasOwnProperty('v') || pOBJ.hasOwnProperty('velocity'))
-				result += 'v';
-			if (pOBJ.hasOwnProperty('ax') || pOBJ.hasOwnProperty('ax') || pOBJ.hasOwnProperty('a') || pOBJ.hasOwnProperty('accelerate'))
-				result += 'a';
-
-			return result;
-		},
-
-		setVector2DByObject : function(target, pOBJ) {
-			if (pOBJ.hasOwnProperty('x'))
-				target.p.x = pOBJ['x'];
-
-			if (pOBJ.hasOwnProperty('y'))
-				target.p.y = pOBJ['y'];
-
-			if (pOBJ.hasOwnProperty('vx'))
-				target.v.x = pOBJ['vx'];
-
-			if (pOBJ.hasOwnProperty('vy'))
-				target.v.y = pOBJ['vy'];
-
-			if (pOBJ.hasOwnProperty('ax'))
-				target.a.x = pOBJ['ax'];
-
-			if (pOBJ.hasOwnProperty('ay'))
-				target.a.y = pOBJ['ay'];
-
-			if (pOBJ.hasOwnProperty('p'))
-				particle.p.copy(pOBJ['p']);
-
-			if (pOBJ.hasOwnProperty('v'))
-				particle.v.copy(pOBJ['v']);
-
-			if (pOBJ.hasOwnProperty('a'))
-				particle.a.copy(pOBJ['a']);
-
-			if (pOBJ.hasOwnProperty('position'))
-				particle.p.copy(pOBJ['position']);
-
-			if (pOBJ.hasOwnProperty('velocity'))
-				particle.v.copy(pOBJ['velocity']);
-
-			if (pOBJ.hasOwnProperty('accelerate'))
-				particle.a.copy(pOBJ['accelerate']);
-		},
-		//强行添加属性
-		addPrototypeByObject : function(target, prototypeObject, filters) {
-			for (var singlePrototype in prototypeObject ) {
-				if (filters) {
-					if (filters.indexOf(singlePrototype) < 0)
-						target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
-				} else {
-					target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
-				}
-			}
-
-			return target;
-		},
-		//set prototype
-		setPrototypeByObject : function(target, prototypeObject, filters) {
-			for (var singlePrototype in prototypeObject ) {
-				if (target.hasOwnProperty(singlePrototype)) {
-					if (filters) {
-						if (filters.indexOf(singlePrototype) < 0)
-							target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
-					} else {
-						target[singlePrototype] = Proton.Util.getSpanValue(prototypeObject[singlePrototype]);
-					}
-				}
-			}
-
-			return target;
-		},
-
-		setSpanValue : function(a, b, c) {
-			if ( a instanceof Proton.Span) {
-				return a;
-			} else {
-				if (!b) {
-					return new Proton.Span(a);
-				} else {
-					if (!c)
-						return new Proton.Span(a, b);
-					else
-						return new Proton.Span(a, b, c);
-				}
-			}
-		},
-
-		getSpanValue : function(pan) {
-			if ( pan instanceof Proton.Span)
-				return pan.getValue();
-			else
-				return pan;
-		},
-
-		inherits : function(subClass, superClass) {
-			subClass._super_ = superClass;
-			if (Object['create']) {
-				//console.log(subClass,superClass);
-				subClass.prototype = Object.create(superClass.prototype, {
-					constructor : {
-						value : superClass
-					}
-				});
-			} else {
-				var F = function() {
-				};
-				F.prototype = superClass.prototype;
-				subClass.prototype = new F();
-				subClass.prototype.constructor = subClass;
-			}
-		},
-
-		getImageData : function(context, image, rect) {
-			context.drawImage(image, rect.x, rect.y);
-			var imagedata = context.getImageData(rect.x, rect.y, rect.width, rect.height);
-			context.clearRect(rect.x, rect.y, rect.width, rect.height);
-			return imagedata;
-		},
-
-		getImage : function(img, particle, drawCanvas, fun) {
-			if ( typeof (img) == 'string') {
-				this.loadAndSetImage(img, particle, drawCanvas, fun);
-			} else if ( typeof (img) == 'object') {
-				this.loadAndSetImage(img.src, particle, drawCanvas, fun);
-			} else if ( img instanceof Image) {
-				this.loadedImage(img.src, particle, drawCanvas, fun, img);
-			}
-		},
-
-		loadedImage : function(src, particle, drawCanvas, fun, target) {
-			particle.target = target;
-			particle.transform.src = src;
-			if (!Proton.TextureBuffer[src])
-				Proton.TextureBuffer[src] = particle.target;
-			if (drawCanvas) {
-				if (Proton.TextureCanvasBuffer[src]) {
-					particle.transform.canvas = Proton.TextureCanvasBuffer[src];
-				} else {
-					var _width = Proton.WebGLUtil.nhpot(particle.target.width);
-					var _height = Proton.WebGLUtil.nhpot(particle.target.height);
-					particle.transform.canvas = Proton.DomUtil.createCanvas('canvas' + src, _width, _height);
-					var context = particle.transform.canvas.getContext('2d');
-					context.drawImage(particle.target, 0, 0, particle.target.width, particle.target.height);
-					Proton.TextureCanvasBuffer[src] = particle.transform.canvas;
-				}
-			}
-			if (fun)
-				fun(particle);
-		},
-
-		loadAndSetImage : function(src, particle, drawCanvas, fun) {
-			if (Proton.TextureBuffer[src]) {
-				this.loadedImage(src, particle, drawCanvas, fun, Proton.TextureBuffer[src]);
-			} else {
-				var self = this;
-				var myImage = new Image();
-				myImage.onload = function(e) {
-					self.loadedImage(src, particle, drawCanvas, fun, e.target);
-				}
-				myImage.src = src;
-			}
-		},
-
-		hexToRGB : function(h) {
-			var hex16 = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
-			var r = parseInt(hex16.substring(0, 2), 16);
-			var g = parseInt(hex16.substring(2, 4), 16);
-			var b = parseInt(hex16.substring(4, 6), 16);
-
-			return {
-				r : r,
-				g : g,
-				b : b
-			}
-		},
-
-		rgbToHex : function(rbg) {
-			return 'rgb(' + rbg.r + ', ' + rbg.g + ', ' + rbg.b + ')';
-		}
-	};
-
-	Proton.Util = Util;
-
+        return fBound;
+    };
+}
 
 
 	var WebGLUtil = WebGLUtil || {
@@ -675,7 +690,7 @@
 			}
 
 			if (this.age >= this.life) {
-				this.destory();
+				this.destroy();
 			} else {
 				var scale = this.easing(this.age / this.life);
 				this.energy = Math.max(1 - scale, 0);
@@ -710,9 +725,9 @@
 		},
 		/**
 		 * Destory this particle
-		 * @method destory
+		 * @method destroy
 		 */
-		destory : function() {
+		destroy : function() {
 			this.removeAllBehaviours();
 			this.energy = 0;
 			this.dead = true;
@@ -725,56 +740,77 @@
 
 
 
-	function ParticlePool(num, releaseTime) {
-		this.proParticleCount = Proton.Util.initValue(num, 0);
-		this.releaseTime = Proton.Util.initValue(releaseTime, -1);
-		this.poolList = [];
-		this.timeoutID = 0;
-		for (var i = 0; i < this.proParticleCount; i++) {
-			this.add();
-		}
-		//////////////////////////////
-		if (this.releaseTime > 0)
-			this.timeoutID = setTimeout(this.release, this.releaseTime / 1000);
-	}
+    function Pool() {
+        this.cID = 0;
+        this.list = {};
+    }
+    
+    Pool.prototype = {
+        create: function(obj, params) {
+            this.cID++;
+   
+            if (typeof obj == "function")
+                return Proton.Util.classApply(obj, params);
+            else
+                return obj.clone();
+        },
 
+        getCount: function() {
+            var count = 0;
+            for (var id in this.list)
+                count += this.list[id].length;
 
-	ParticlePool.prototype = {
-		create : function(newTypeParticleClass) {
-			if (newTypeParticleClass)
-				return new newTypeParticle;
-			else
-				return new Proton.Particle;
-		},
-		getCount : function() {
-			return this.poolList.length;
-		},
-		add : function() {
-			return this.poolList.push(this.create());
-		},
-		get : function() {
-			if (this.poolList.length === 0) {
-				return this.create();
-			} else {
-				return this.poolList.pop().reset();
-			}
+            return count++;;
+        },
 
-		},
-		set : function(particle) {
-			if (this.poolList.length < Proton.POOL_MAX)
-				return this.poolList.push(particle);
-		},
-		release : function() {
-			for (var i = 0; i < this.poolList.length; i++) {
-				if (this.poolList[i]['destory'])
-					this.poolList[i].destory();
-				delete this.poolList[i];
-			}
-			this.poolList = [];
-		}
-	}
+        get: function(obj, params) {
+            var p, puid = obj.__puid || PUID.id(obj);
+            if (this.list[puid] && this.list[puid].length > 0)
+                p = this.list[puid].pop();
+            else
+                p = this.create(obj, params);
 
-	Proton.ParticlePool = ParticlePool;
+            p.__puid = obj.__puid || puid;
+            return p;
+        },
+
+        set: function(obj) {
+            return this._getList(obj.__puid).push(obj);
+        },
+
+        destroy: function() {
+            for (var id in this.list) {
+                this.list[id].length = 0;
+                delete this.list[id];
+            }
+        },
+
+        _getList: function(uid) {
+            uid = uid || "default";
+            if (!this.list[uid]) this.list[uid] = [];
+            return this.list[uid];
+        }
+    }
+
+    Proton.Pool = Pool;
+
+    var PUID = {
+        _id: 0,
+        _uids: {},
+        id: function(obj) {
+            for (var id in this._uids) {
+                if (this._uids[id] == obj) return id;
+            }
+
+            var nid = "PUID_" + (this._id++);
+            this._uids[nid] = obj;
+            return nid;
+        },
+
+        hash: function(str) {
+            return;
+        }
+    }
 
 
 
@@ -1484,7 +1520,7 @@
 			if (this.age >= this.life || this.dead) {
 				this.energy = 0;
 				this.dead = true;
-				this.destory();
+				this.destroy();
 			} else {
 				var scale = this.easing(particle.age / particle.life);
 				this.energy = Math.max(1 - scale, 0);
@@ -1493,9 +1529,9 @@
 		
 		/**
 		 * Destory this behaviour
-		 * @method destory
+		 * @method destroy
 		 */
-		destory : function() {
+		destroy : function() {
 			var index;
 			var length = this.parents.length, i;
 			for ( i = 0; i < length; i++) {
@@ -2291,12 +2327,10 @@
 	 * @method removeAllParticles
 	 */
 	Emitter.prototype.createParticle = function(initialize, behaviour) {
-		var particle = Proton.pool.get();
+		var particle = Proton.pool.get(Proton.Particle);
 		this.setupParticle(particle, initialize, behaviour);
-		this.dispatchEvent(new Proton.Event({
-			type : Proton.PARTICLE_CREATED,
-			particle : particle
-		}));
+		this.dispatchEvent(Proton.PARTICLE_CREATED, particle);
+
 		return particle;
 	};
 	/**
@@ -2384,10 +2418,7 @@
 			particle.update(time, i);
 			Proton.integrator.integrate(particle, time, damping);
 
-			this.dispatchEvent(new Proton.Event({
-				type : Proton.PARTICLE_UPDATE,
-				particle : particle
-			}));
+			this.dispatchEvent(Proton.PARTICLE_UPDATE, particle);
 		}
 	};
 
@@ -2423,12 +2454,10 @@
 		for ( k = length - 1; k >= 0; k--) {
 			particle = this.particles[k];
 			if (particle.dead) {
+				this.dispatchEvent(Proton.PARTICLE_DEAD , particle);
+
 				Proton.pool.set(particle);
 				this.particles.splice(k, 1);
-				this.dispatchEvent(new Proton.Event({
-					type : Proton.PARTICLE_DEAD,
-					particle : particle
-				}));
 			}
 		}
 	};
@@ -2451,6 +2480,7 @@
 				behaviours = [behaviour];
 		}
 
+		particle.reset();
 		Proton.InitializeUtil.initialize(this, particle, initializes);
 		particle.addBehaviours(behaviours);
 		particle.parent = this;
@@ -2459,7 +2489,7 @@
 
 	/**
 	 * Destory this Emitter
-	 * @method destory
+	 * @method destroy
 	 */
 	Emitter.prototype.destroy = function() {
 		this.dead = true;
@@ -2594,7 +2624,7 @@
 	};
 	/**
 	 * Destory this Emitter
-	 * @method destory
+	 * @method destroy
 	 */
 	FollowEmitter.prototype.destroy = function() {
 		FollowEmitter._super_.prototype.destroy.call(this);
@@ -2894,6 +2924,10 @@
 		},
 		getRenderer : function() {
 			switch(this.type) {
+				case 'pixi':
+					return new Proton.PixiRender(this.proton, this.element);
+					break;
+
 				case 'dom':
 					return new Proton.DomRender(this.proton, this.element);
 					break;
@@ -2948,26 +2982,27 @@
 		this.proton = proton;
 		this.element = element;
 		this.stroke = stroke;
+		this.pool = new Proton.Pool();
 	}
 
 
 	BaseRender.prototype = {
 		start : function() {
 			var self = this;
-			this.proton.addEventListener(Proton.PROTON_UPDATE, function(e) {
+			this.proton.addEventListener(Proton.PROTON_UPDATE, function() {
 				self.onProtonUpdate.call(self);
 			});
 
-			this.proton.addEventListener(Proton.PROTON_UPDATE_AFTER, function(e) {
+			this.proton.addEventListener(Proton.PROTON_UPDATE_AFTER, function() {
 				self.onProtonUpdateAfter.call(self);
 			});
 
-			this.proton.addEventListener(Proton.EMITTER_ADDED, function(e) {
-				self.onEmitterAdded.call(self, e.emitter);
+			this.proton.addEventListener(Proton.EMITTER_ADDED, function(emitter) {
+				self.onEmitterAdded.call(self, emitter);
 			});
 
-			this.proton.addEventListener(Proton.EMITTER_REMOVED, function(e) {
-				self.onEmitterRemoved.call(self, e.emitter);
+			this.proton.addEventListener(Proton.EMITTER_REMOVED, function(emitter) {
+				self.onEmitterRemoved.call(self, emitter);
 			});
 
 			var length = this.proton.emitters.length, i;
@@ -2982,14 +3017,14 @@
 
 		addEmitterListener : function(emitter) {
 			var self = this;
-			emitter.addEventListener(Proton.PARTICLE_CREATED, function(e) {
-				self.onParticleCreated.call(self, e.particle);
+			emitter.addEventListener(Proton.PARTICLE_CREATED, function(particle) {
+				self.onParticleCreated.call(self, particle);
 			});
-			emitter.addEventListener(Proton.PARTICLE_UPDATE, function(e) {
-				self.onParticleUpdate.call(self, e.particle);
+			emitter.addEventListener(Proton.PARTICLE_UPDATE, function(particle) {
+				self.onParticleUpdate.call(self, particle);
 			});
-			emitter.addEventListener(Proton.PARTICLE_DEAD, function(e) {
-				self.onParticleDead.call(self, e.particle);
+			emitter.addEventListener(Proton.PARTICLE_DEAD, function(particle) {
+				self.onParticleDead.call(self, particle);
 			});
 		},
 
@@ -3126,69 +3161,70 @@
 
 
 
-	function EaselRender(proton, element, stroke) {
-		EaselRender._super_.call(this, proton, element);
-		this.stroke = stroke;
-	}
+    function EaselRender(proton, element, stroke) {
+        EaselRender._super_.call(this, proton, element);
+        this.stroke = stroke;
+    }
 
 
-	Proton.Util.inherits(EaselRender, Proton.BaseRender);
-	EaselRender.prototype.resize = function(width, height) {
+    Proton.Util.inherits(EaselRender, Proton.BaseRender);
+    EaselRender.prototype.resize = function(width, height) {
 
-	}
-	EaselRender.prototype.start = function() {
-		EaselRender._super_.prototype.start.call(this);
-	};
+    }
+    EaselRender.prototype.start = function() {
+        EaselRender._super_.prototype.start.call(this);
+    };
 
-	EaselRender.prototype.onProtonUpdate = function() {
+    EaselRender.prototype.onProtonUpdate = function() {
 
-	}
+    }
 
-	EaselRender.prototype.onParticleCreated = function(particle) {
-		if (particle.target) {
-			particle.target = particle.target.clone();
-			if (!particle.target.parent) {
-				if (!!particle.target['image']) {
-					particle.target.regX = particle.target.image.width / 2;
-					particle.target.regY = particle.target.image.height / 2;
-				}
-				this.element.addChild(particle.target);
-			}
-		} else {
-			var graphics = new createjs.Graphics();
-			if (this.stroke) {
-				if (this.stroke == true) {
-					graphics.beginStroke('#000000');
-				} else if (this.stroke instanceof String) {
-					graphics.beginStroke(this.stroke);
-				}
-			}
+    EaselRender.prototype.onParticleCreated = function(particle) {
+        if (particle.target) {
+            particle.target = this.pool.get(particle.target);
+            if (!particle.target.parent) {
+                if (!!particle.target['image']) {
+                    particle.target.regX = particle.target.image.width / 2;
+                    particle.target.regY = particle.target.image.height / 2;
+                }
+                this.element.addChild(particle.target);
+            }
+        } else {
+            var graphics = this.pool.get(createjs.Graphics);
+            if (this.stroke) {
+                if (this.stroke == true) {
+                    graphics.beginStroke('#000000');
+                } else if (this.stroke instanceof String) {
+                    graphics.beginStroke(this.stroke);
+                }
+            }
 
-			graphics.beginFill(particle.color).drawCircle(0, 0, particle.radius);
-			var shape = new createjs.Shape(graphics);
-			particle.target = shape;
-			this.element.addChild(particle.target);
-		}
-	}
+            graphics.beginFill(particle.color).drawCircle(0, 0, particle.radius);
+            var shape = new createjs.Shape(graphics);
+            particle.target = shape;
+            this.element.addChild(particle.target);
+        }
+    }
 
-	EaselRender.prototype.onParticleUpdate = function(particle) {
-		if (particle.target) {
-			particle.target.x = particle.p.x;
-			particle.target.y = particle.p.y;
-			particle.target.alpha = particle.alpha;
-			particle.target.scaleX = particle.target.scaleY = particle.scale;
-			particle.target.rotation = particle.rotation;
-		}
-	}
+    EaselRender.prototype.onParticleUpdate = function(particle) {
+        if (particle.target) {
+            particle.target.x = particle.p.x;
+            particle.target.y = particle.p.y;
+            particle.target.alpha = particle.alpha;
+            particle.target.scaleX = particle.target.scaleY = particle.scale;
+            particle.target.rotation = particle.rotation;
+        }
+    }
 
-	EaselRender.prototype.onParticleDead = function(particle) {
-		if (particle.target) {
-			if (particle.target.parent)
-				particle.target.parent.removeChild(particle.target);
-		}
-	}
+    EaselRender.prototype.onParticleDead = function(particle) {
+        if (particle.target) {
+            particle.target.parent && particle.target.parent.removeChild(particle.target);
+            this.pool.set(particle.target);
+            particle.target = null;
+        }
+    }
 
-	Proton.EaselRender = EaselRender;
+    Proton.EaselRender = EaselRender;
 
 
 
@@ -4018,7 +4054,7 @@
 
 	var Debug = Debug || {
 		addEventListener : function(proton, fun) {
-			proton.addEventListener(Proton.PROTON_UPDATE, function(e) {
+			proton.addEventListener(Proton.PROTON_UPDATE, function() {
 				fun();
 			});
 		},
