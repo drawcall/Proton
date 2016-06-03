@@ -37,6 +37,9 @@ proton.addEmitter(emitter);
 // add canvas renderer
 var renderer = new Proton.Renderer('canvas', proton, canvas);
 renderer.start();
+
+//use Euler integration calculation is more accurate (default false)
+Proton.USE_CLOCK = false or true;
 ```
 
 ## Building Proton
