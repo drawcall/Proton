@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 	var Debug = Debug || {
 		addEventListener : function(proton, fun) {
-			proton.addEventListener(Proton.PROTON_UPDATE, function(e) {
+			proton.addEventListener(Proton.PROTON_UPDATE, function() {
 				fun();
 			});
 		},

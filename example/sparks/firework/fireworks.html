@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>proton.js-game-fireworks</title>
+		<meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -18,7 +19,7 @@
 	<body>
 		<canvas id="testCanvas"></canvas>
 		<script src="../../lib/stats.min.js"></script>
-		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script src="../../../build/proton-2.1.0.min.js"></script>
 		<script>
 			var canvas;
 			var context;
@@ -71,11 +72,11 @@
 				renderer.start();
 
 				////NOTICE :you can only use two emitters do this effect.In this demo I use more emitters want to test the emtter's life
-				emitter.addEventListener(Proton.PARTICLE_DEAD, function(e) {
+				emitter.addEventListener(Proton.PARTICLE_DEAD, function(particle) {
 					if (Math.random() < .7)
-						createFirstEmitter(e.particle);
+						createFirstEmitter(particle);
 					else
-						createSecendEmitter(e.particle);
+						createSecendEmitter(particle);
 				});
 			}
 

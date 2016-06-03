@@ -98,12 +98,10 @@
 	 * @method removeAllParticles
 	 */
 	Emitter.prototype.createParticle = function(initialize, behaviour) {
-		var particle = Proton.pool.get();
+		var particle = Proton.pool.get(Proton.Particle);
 		this.setupParticle(particle, initialize, behaviour);
-		this.dispatchEvent(new Proton.Event({
-			type : Proton.PARTICLE_CREATED,
-			particle : particle
-		}));
+		this.dispatchEvent(Proton.PARTICLE_CREATED, particle);
+
 		return particle;
 	};
 	/**
@@ -191,10 +189,7 @@
 			particle.update(time, i);
 			Proton.integrator.integrate(particle, time, damping);
 
-			this.dispatchEvent(new Proton.Event({
-				type : Proton.PARTICLE_UPDATE,
-				particle : particle
-			}));
+			this.dispatchEvent(Proton.PARTICLE_UPDATE, particle);
 		}
 	};
 
@@ -230,12 +225,10 @@
 		for ( k = length - 1; k >= 0; k--) {
 			particle = this.particles[k];
 			if (particle.dead) {
+				this.dispatchEvent(Proton.PARTICLE_DEAD , particle);
+
 				Proton.pool.set(particle);
 				this.particles.splice(k, 1);
-				this.dispatchEvent(new Proton.Event({
-					type : Proton.PARTICLE_DEAD,
-					particle : particle
-				}));
 			}
 		}
 	};
@@ -258,6 +251,7 @@
 				behaviours = [behaviour];
 		}
 
+		particle.reset();
 		Proton.InitializeUtil.initialize(this, particle, initializes);
 		particle.addBehaviours(behaviours);
 		particle.parent = this;

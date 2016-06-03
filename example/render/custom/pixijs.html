@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>proton.js-render-custom-pixi.js</title>
+		<meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -23,13 +24,14 @@
 
 		</div>
 		<script src="../../lib/stats.min.js"></script>
-		<script src="../../../build/proton-1.0.0.min.js"></script>
+		<script src="../../../build/proton-2.1.0.min.js"></script>
 		<script src="pixi.js"></script>
 		<script>
 			var canvas;
 			var context;
 			var proton;
 			var emitter;
+			var pool;
 			var stats;
 			var pixiStage;
 			var pixiRender;
@@ -73,6 +75,8 @@
 				emitter.addSelfBehaviour(new Proton.Gravity(5));
 				emitter.addSelfBehaviour(new Proton.RandomDrift(30, 30, .1));
 				emitter.addSelfBehaviour(new Proton.CrossZone(new Proton.RectZone(50, 0, 953, 610), 'bound'));
+
+				pool = new Proton.Pool();
 			}
 
 			function createRender() {
@@ -84,7 +88,7 @@
 
 				};
 				renderer.onParticleCreated = function(particle) {
-					var particleSprite = new PIXI.Sprite(particle.target);
+					var particleSprite = pool.get(PIXI.Sprite,[particle.target]);
 					particle.sprite = particleSprite;
 					pixiStage.addChild(particle.sprite);
 				};
@@ -95,6 +99,9 @@
 
 				renderer.onParticleDead = function(particle) {
 					pixiStage.removeChild(particle.sprite);
+					pool.set(particle.sprite);
+					particle.sprite=null;
+					particle.taregt=null;
 				};
 				renderer.start();
 			}

@@ -1,4 +1,4 @@
-version = 1.0.0
+version = 2.1.0
 source_dir = ../src/
 output_full = proton-{version}.js
 output_min = proton-{version}.min.js
@@ -20,13 +20,12 @@ files
 -----
 core/Proton.js
 events/EventDispatcher.js
-events/Event.js
 utils/Util.js
 utils/WebGLUtil.js
 utils/DomUtil.js
 utils/MStack.js
 core/Particle.js
-core/ParticlePool.js
+core/Pool.js
 math/MathUtils.js
 math/NumericalIntegration.js
 math/Vector2D.js

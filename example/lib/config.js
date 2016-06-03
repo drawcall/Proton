@@ -6,13 +6,12 @@ var shim = {};
 var paths = {
 	"Proton" : "core/Proton",
 	"EventDispatcher" : "events/EventDispatcher",
-	"Event" : "events/Event",
 	"Util" : "utils/Util",
 	"WebGLUtil" : "utils/WebGLUtil",
 	"DomUtil" : "utils/DomUtil",
 	"MStack" : "utils/MStack",
 	"Particle" : "core/Particle",
-	"ParticlePool" : "core/ParticlePool",
+	"Pool" : "core/Pool",
 
 	"MathUtils" : "math/MathUtils",
 	"NumericalIntegration" : "math/NumericalIntegration",

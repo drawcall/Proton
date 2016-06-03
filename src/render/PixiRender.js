@@ -26,7 +26,7 @@
 	 */
 	PixiRender.prototype.onParticleCreated = function ( particle ) {
 		if ( particle.target ) {
-			particle.target = new PIXI.Sprite( particle.target );
+			particle.target = this.pool.get(PIXI.Sprite,[particle.target]);
 			particle.target.anchor.x = 0.5;
 			particle.target.anchor.y = 0.5;
 			this.element.addChild( particle.target );
@@ -67,6 +67,8 @@
 	PixiRender.prototype.onParticleDead = function ( particle ) {
 		if ( particle.target ) {
 			this.element.removeChild( particle.target );
+			this.pool.set(particle.target);
+			particle.target=null;
 		}
 	};
 
