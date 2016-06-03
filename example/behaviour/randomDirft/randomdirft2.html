@@ -49,6 +49,7 @@
 			}
 
 			function createProton() {
+				Proton.USE_CLOCK = true;
 				proton = new Proton;
 				emitter = new Proton.Emitter();
 				emitter.rate = new Proton.Rate(new Proton.Span(3, 6), new Proton.Span(1));
