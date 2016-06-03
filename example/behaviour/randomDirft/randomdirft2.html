@@ -85,14 +85,14 @@
 				subemitter.addBehaviour(new Proton.Scale(1, 0));
 				proton.addEmitter(subemitter);
 
-				emitter.addEventListener(Proton.PARTICLE_DEAD, function(e) {
-					if (e.particle.radius > 0) {
-						var angle = e.particle.getDirection();
-						radius.reset(e.particle.radius);
+				emitter.addEventListener(Proton.PARTICLE_DEAD, function(particle) {
+					if (particle.radius > 0) {
+						var angle = particle.getDirection();
+						radius.reset(particle.radius);
 						velocity.reset(new Proton.Span(1, 2), new Proton.Span(angle, 45, true), 'polar');
 
-						subemitter.p.x = e.particle.p.x;
-						subemitter.p.y = e.particle.p.y;
+						subemitter.p.x = particle.p.x;
+						subemitter.p.y = particle.p.y;
 						subemitter.emit('once');
 					}
 				});
