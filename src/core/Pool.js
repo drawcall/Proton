@@ -38,7 +38,7 @@
             return this._getList(obj.__puid).push(obj);
         },
 
-        destroy: function() {
+        release: function() {
             for (var id in this.list) {
                 this.list[id].length = 0;
                 delete this.list[id];
