@@ -216,8 +216,13 @@
             }
         },
 
-        rgbToHex: function(rbg) {
-            return 'rgb(' + rbg.r + ', ' + rbg.g + ', ' + rbg.b + ')';
+        rgbToHex: function(rgb) {
+            return "#" + this.componentToHex(rgb.r) + this.componentToHex(rgb.g) + this.componentToHex(rgb.b);
+        },
+
+        componentToHex: function(c) {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
         }
     };
 
