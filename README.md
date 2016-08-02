@@ -1,15 +1,16 @@
 Proton
 ======
-Proton is an easily customizable html5 particle engine including five different types of renderers. <br>
+Proton is an easily customizable html5 particle engine including six different types of renderers. <br>
 Check out examples at http://a-jie.github.io/Proton/ or http://www.a-jie.cn/proton/
 
 ## Features
-- Five kinds of renderers
+- Six kinds of renderers
   - canvas 
   - dom 
   - webgl 
   - easeljs 
   - pixel
+  - pixijs
 - Create cool effects like the demo of <a href="http://www.71squared.com/">71squared's ParticleDesigner</a> in 10 lines of code.
 - Integratable into any game engine
 - Veriety of behaviors
