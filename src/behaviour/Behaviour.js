@@ -1,45 +1,34 @@
 (function(Proton, undefined) {
 	Behaviour.id = 0;
+
 	/**
 	 * The Behaviour class is the base for the other Behaviour
 	 *
-	 * @class Behaviour
+	 * @namespace
+	 * @memberof! Proton#
 	 * @constructor
+	 * @alias Proton.Behaviour
+	 *
+	 * @param {Number} life 	the behaviours life
+	 * @param {String} easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
+	 *
+	 * @property {String}  id 		The behaviours id
+	 * @property {Number}  life 	The behaviours life
+	 * @property {String}  easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
+	 * @property {Number}  age=0 	How long the particle should be 'alife'
+	 * @property {Number}  energy=1
+	 * @property {Boolean} dead=false The particle is dead at first
+	 * @property {Array}   parents 	The behaviour's parents array
+	 * @property {String}  name 	The behaviour name
 	 */
 	function Behaviour(life, easing) {
-		/**
-		 * The behaviour's id;
-		 * @property id
-		 * @type {String} id
-		 */
 		this.id = 'Behaviour_' + Behaviour.id++;
 		this.life = Proton.Util.initValue(life, Infinity);
-		/**
-		 * The behaviour's decaying trend, for example Proton.easeOutQuart;
-		 * @property easing
-		 * @type {String}
-		 * @default Proton.easeLinear
-		 */
 		this.easing = Proton.ease.setEasingByName(easing);
 		this.age = 0;
 		this.energy = 1;
-		/**
-		 * The behaviour is Dead;
-		 * @property dead
-		 * @type {Boolean}
-		 */
 		this.dead = false;
-		/**
-		 * The behaviour's parents array;
-		 * @property parents
-		 * @type {Array}
-		 */
 		this.parents = [];
-		/**
-		 * The behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = 'Behaviour';
 	}
 
@@ -49,6 +38,9 @@
 		 * Reset this behaviour's parameters
 		 *
 		 * @method reset
+		 * @memberof Proton#Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Number} this behaviour's life
 		 * @param {String} this behaviour's easing
 		 */
@@ -60,6 +52,9 @@
 		 * Normalize a force by 1:100;
 		 *
 		 * @method normalizeForce
+		 * @memberof Proton#Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Proton.Vector2D} force 
 		 */
 		normalizeForce : function(force) {
@@ -70,6 +65,9 @@
 		 * Normalize a value by 1:100;
 		 *
 		 * @method normalizeValue
+		 * @memberof Proton#Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Number} value
 		 */
 		normalizeValue : function(value) {
@@ -80,6 +78,9 @@
 		 * Initialize the behaviour's parameters for all particles
 		 *
 		 * @method initialize
+		 * @memberof Proton#Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Proton.Particle} particle
 		 */
 		initialize : function(particle) {
@@ -89,6 +90,9 @@
 		 * Apply this behaviour for all particles every time
 		 *
 		 * @method applyBehaviour
+		 * @memberof Proton#Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Proton.Particle} particle
 		 * @param {Number} the integrate time 1/ms
 		 * @param {Int} the particle index
@@ -107,7 +111,10 @@
 		
 		/**
 		 * Destory this behaviour
+		 *
 		 * @method destroy
+		 * @memberof Proton#Proton.Behaviour
+		 * @instance
 		 */
 		destroy : function() {
 			var index;

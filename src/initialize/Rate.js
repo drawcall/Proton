@@ -1,10 +1,13 @@
 (function(Proton, undefined) {
 	/**
 	 * The number of particles per second emission (a [particle]/b [s]);
-	 * @class Proton.Rate
+	 * @namespace
+	 * @memberof! Proton#
 	 * @constructor
-	 * @param {Array or Number or Proton.Span} numpan the number of each emission;
-	 * @param {Array or Number or Proton.Span} timepan the time of each emission;
+	 * @alias Proton.Rate
+	 *
+	 * @param {Array | Number | Proton.Span} numpan the number of each emission;
+	 * @param {Array | Number | Proton.Span} timepan the time of each emission;
 	 * for example: new Proton.Rate(new Proton.Span(10, 20), new Proton.Span(.1, .25));
 	 */
 	function Rate(numpan, timepan) {
@@ -19,6 +22,11 @@
 
 
 	Rate.prototype = {
+		/**
+		 * @method init
+		 * @memberof Proton#Proton.Rate
+		 * @instance
+		 */
 		init : function() {
 			this.startTime = 0;
 			this.nextTime = this.timePan.getValue();

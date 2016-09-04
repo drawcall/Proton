@@ -1,0 +1,14 @@
+{
+  "source": {
+    "include": ["readme.md", "src"],
+    "includePattern": ".+\\.js(doc)?$"
+  },
+  "opts": {
+    "recurse": true,
+    "destination": "./build/docs",
+    "template": "node_modules/minami"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ]
+}

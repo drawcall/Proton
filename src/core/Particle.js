@@ -13,7 +13,7 @@
 		/**
 		 * The particle's id;
 		 * @property id
-		 * @type {String} id
+		 * @type {string}
 		 */
 		this.id = 'particle_' + Particle.ID++;
 		this.reset(true);
