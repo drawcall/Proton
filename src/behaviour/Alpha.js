@@ -1,17 +1,42 @@
 (function(Proton, undefined) {
+
+	/**
+	 * @namespace
+	 * @memberof! Proton#
+	 * @augments Behaviour
+	 * @constructor
+	 * @alias Proton.Alpha
+	 *
+	 * @todo add description for 'a' and 'b'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {Number} life 	this behaviour's life
+	 * @param {String} easing 	this behaviour's easing
+	 *
+	 * @property {String} The Behaviour name
+	 */
 	function Alpha(a, b, life, easing) {
 		Alpha._super_.call(this, life, easing);
 		this.reset(a, b);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Alpha";
 	}
 
 
 	Proton.Util.inherits(Alpha, Proton.Behaviour);
+
+	/**
+	 * @method reset
+	 * @memberof Proton#Proton.Alpha
+	 * @instance
+	 *
+	 * @todo add description for 'a' and 'b'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {Number} life 	this behaviour's life
+	 * @param {String} easing 	this behaviour's easing
+	 */
 	Alpha.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -23,6 +48,15 @@
 			Alpha._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Sets the new alpha value of the particle
+	 *
+	 * @method initialize
+	 * @memberof Proton#Proton.Alpha
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle A single Proton generated particle
+	 */
 	Alpha.prototype.initialize = function(particle) {
 		particle.transform.alphaA = this.a.getValue();
 		if (this.same)
@@ -31,6 +65,17 @@
 			particle.transform.alphaB = this.b.getValue();
 	};
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @memberof Proton#Proton.Alpha
+	 * @method applyBehaviour
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	Alpha.prototype.applyBehaviour = function(particle, time, index) {
 		Alpha._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.alpha = particle.transform.alphaB + (particle.transform.alphaA - particle.transform.alphaB) * this.energy;

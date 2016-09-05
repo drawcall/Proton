@@ -1,23 +1,76 @@
 (function(Proton, undefined) {
+
+    /**
+     * @namespace
+     * @memberof! Proton#
+     * @alias Proton.Util
+     */
     var Util = Util || {
+
+        /**
+         * Returns the default if the value is null or undefined
+         *
+         * @memberof Proton#Proton.Util
+         * @method initValue
+         *
+         * @param {Mixed} value a specific value, could be everything but null or undefined
+         * @param {Mixed} defaults the default if the value is null or undefined
+         */
         initValue: function(value, defaults) {
             var value = (value != null && value != undefined) ? value : defaults;
             return value;
         },
 
+        /**
+         * Checks if the value is a valid array
+         *
+         * @memberof Proton#Proton.Util
+         * @method isArray
+         *
+         * @param {Array} value Any array
+         *
+         * @returns {Boolean} 
+         */
         isArray: function(value) {
             return typeof value === 'object' && value.hasOwnProperty('length');
         },
 
+        /**
+         * Destroyes the given array
+         *
+         * @memberof Proton#Proton.Util
+         * @method destroyArray
+         *
+         * @param {Array} array Any array
+         */
         destroyArray: function(array) {
             array.length = 0;
         },
 
+        /**
+         * Destroyes the given object
+         *
+         * @memberof Proton#Proton.Util
+         * @method destroyObject
+         *
+         * @param {Object} obj Any object
+         */
         destroyObject: function(obj) {
             for (var o in obj)
                 delete obj[o];
         },
 
+        /**
+         * Returns the Vector2D - or creates a new one
+         *
+         * @memberof Proton#Proton.Util
+         * @method getVector2D
+         *
+         * @param {Proton.Vector2D | Number} postionOrX
+         * @param {Number} [y] just valid if 'postionOrX' is not an object
+         *
+         * @return {Proton.Vector2D}
+         */
         getVector2D: function(postionOrX, y) {
             if (typeof(postionOrX) == 'object') {
                 return postionOrX;
@@ -27,6 +80,17 @@
             }
         },
 
+        /**
+         * Makes an instance of a class and binds the given array
+         *
+         * @memberof Proton#Proton.Util
+         * @method classApply
+         *
+         * @param {Function} constructor A class to make an instance from
+         * @param {Array} [argArray] Any array to bind it to the constructor
+         *
+         * @return {Object} The instance of constructor, optionally bind with argArray
+         */
         classApply: function(constructor, argArray) {
             if (!argArray) return new constructor;
 

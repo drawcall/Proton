@@ -44,7 +44,7 @@
 		/**
 		 * The emitter's id;
 		 * @property id
-		 * @type {String} id
+		 * @type {string}
 		 */
 		this.id = 'emitter_' + Emitter.ID++;
 	};

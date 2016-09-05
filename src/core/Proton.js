@@ -26,7 +26,7 @@
     /**
      * Proton is a html5 particle engine
      *
-     * @class Proton
+     * @namespace Proton
      * @constructor
      */
     function Proton(proParticleCount, integrationType) {
