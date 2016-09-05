@@ -16,6 +16,9 @@ Check out examples at http://a-jie.github.io/Proton/ or http://www.a-jie.cn/prot
 - Veriety of behaviors
 - Three kinds of emitters which can simulate many different physical effects
 
+## Document
+- http://proton.jpeer.at/index.html
+
 ## Usage
 ```javascript
 var proton = new Proton();
