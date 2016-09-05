@@ -6,15 +6,15 @@
 	 *
 	 * @namespace
 	 * @memberof! Proton#
-	 * @constructor
+	 * @interface
 	 * @alias Proton.Behaviour
 	 *
 	 * @param {Number} life 	the behaviours life
 	 * @param {String} easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
 	 *
 	 * @property {String}  id 		The behaviours id
-	 * @property {Number}  life 	The behaviours life
-	 * @property {String}  easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 * @property {Number}  age=0 	How long the particle should be 'alife'
 	 * @property {Number}  energy=1
 	 * @property {Boolean} dead=false The particle is dead at first
@@ -41,8 +41,8 @@
 		 * @memberof Proton#Proton.Behaviour
 		 * @instance
 		 *
-		 * @param {Number} this behaviour's life
-		 * @param {String} this behaviour's easing
+		 * @param {Number} [life=Infinity] 		this behaviour's life
+		 * @param {String} [easing=easeLinear] 	this behaviour's easing
 		 */
 		reset : function(life, easing) {
 			this.life = Proton.Util.initValue(life, Infinity);
@@ -94,8 +94,8 @@
 		 * @instance
 		 *
 		 * @param {Proton.Particle} particle
-		 * @param {Number} the integrate time 1/ms
-		 * @param {Int} the particle index
+		 * @param {Number} 			time the integrate time 1/ms
+		 * @param {Int} 			index the particle index
 		 */
 		applyBehaviour : function(particle, time, index) {
 			this.age += time;

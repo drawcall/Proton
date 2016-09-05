@@ -3,7 +3,7 @@
 	/**
 	 * @namespace
 	 * @memberof! Proton#
-	 * @augments Behaviour
+	 * @augments Proton#Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Alpha
 	 *
@@ -11,8 +11,8 @@
 	 *
 	 * @param {Number} a
 	 * @param {String} b
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {String} The Behaviour name
 	 */
@@ -26,6 +26,8 @@
 	Proton.Util.inherits(Alpha, Proton.Behaviour);
 
 	/**
+	 * Reset this behaviour's parameters
+	 *
 	 * @method reset
 	 * @memberof Proton#Proton.Alpha
 	 * @instance
@@ -34,8 +36,8 @@
 	 *
 	 * @param {Number} a
 	 * @param {String} b
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 */
 	Alpha.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)

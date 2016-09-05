@@ -1,8 +1,10 @@
 (function(Proton, undefined) {
 	/**
+	 * This behaviour let the particles follow one specific Proton.Vector2D
+	 *
 	 * @namespace
 	 * @memberof! Proton#
-	 * @augments Behaviour
+	 * @augments Proton#Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Attraction
 	 *
@@ -11,8 +13,8 @@
 	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
 	 * @param {Number} force
 	 * @param {Number} radius
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {Proton.Vector2D} targetPosition
 	 * @property {Number} radius
@@ -38,6 +40,8 @@
 	Proton.Util.inherits(Attraction, Proton.Behaviour);
 
 	/**
+	 * Reset this behaviour's parameters
+	 *
 	 * @method reset
 	 * @memberof Proton#Proton.Attraction
 	 * @instance
@@ -47,8 +51,8 @@
 	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
 	 * @param {Number} force
 	 * @param {Number} radius
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 */
 	Attraction.prototype.reset = function(targetPosition, force, radius, life, easing) {
 		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
