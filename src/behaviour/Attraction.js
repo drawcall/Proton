@@ -2,17 +2,16 @@
 	/**
 	 * This behaviour let the particles follow one specific Proton.Vector2D
 	 *
-	 * @namespace
-	 * @memberof! Proton#
-	 * @augments Proton#Proton.Behaviour
+	 * @memberof! #
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Attraction
 	 *
 	 * @todo add description for 'force' and 'radius'
 	 *
 	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-	 * @param {Number} force
-	 * @param {Number} radius
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
 	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
@@ -22,7 +21,7 @@
 	 * @property {Number} radiusSq
 	 * @property {Proton.Vector2D} attractionForce
 	 * @property {Number} lengthSq
-	 * @property {String} name
+	 * @property {String} name The Behaviour name
 	 */
 	function Attraction(targetPosition, force, radius, life, easing) {
 		Attraction._super_.call(this, life, easing);
@@ -43,14 +42,14 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof Proton#Proton.Attraction
+	 * @memberof #Proton.Attraction
 	 * @instance
 	 *
 	 * @todo add description for 'force' and 'radius'
 	 *
 	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-	 * @param {Number} force
-	 * @param {Number} radius
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
 	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 */
@@ -68,7 +67,7 @@
 	/**
 	 * Apply this behaviour for all particles every time
 	 *
-	 * @memberof Proton#Proton.Attraction
+	 * @memberof #Proton.Attraction
 	 * @method applyBehaviour
 	 * @instance
 	 *

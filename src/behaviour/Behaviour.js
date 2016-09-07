@@ -4,8 +4,7 @@
 	/**
 	 * The Behaviour class is the base for the other Behaviour
 	 *
-	 * @namespace
-	 * @memberof! Proton#
+	 * @memberof! -
 	 * @interface
 	 * @alias Proton.Behaviour
 	 *
@@ -38,7 +37,7 @@
 		 * Reset this behaviour's parameters
 		 *
 		 * @method reset
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Number} [life=Infinity] 		this behaviour's life
@@ -52,7 +51,7 @@
 		 * Normalize a force by 1:100;
 		 *
 		 * @method normalizeForce
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Proton.Vector2D} force 
@@ -65,7 +64,7 @@
 		 * Normalize a value by 1:100;
 		 *
 		 * @method normalizeValue
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Number} value
@@ -78,7 +77,7 @@
 		 * Initialize the behaviour's parameters for all particles
 		 *
 		 * @method initialize
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Proton.Particle} particle
@@ -90,7 +89,7 @@
 		 * Apply this behaviour for all particles every time
 		 *
 		 * @method applyBehaviour
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Proton.Particle} particle
@@ -113,7 +112,7 @@
 		 * Destory this behaviour
 		 *
 		 * @method destroy
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 */
 		destroy : function() {

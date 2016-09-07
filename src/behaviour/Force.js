@@ -1,9 +1,8 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @namespace
-	 * @memberof! Proton#
-	 * @augments Proton#Proton.Behaviour
+	 * @memberof! #
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Force
 	 *
@@ -12,7 +11,7 @@
 	 * @param {Number} [life=Infinity] 			this behaviour's life
 	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
-	 * @property {String} The Behaviour name
+	 * @property {String} name The Behaviour name
 	 */
 	function Force(fx, fy, life, easing) {
 		Force._super_.call(this, life, easing);
@@ -27,7 +26,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof Proton#Proton.Force
+	 * @memberof #Proton.Force
 	 * @instance
 	 *
 	 * @param {Number} fx
@@ -45,7 +44,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof Proton#Proton.Force
+	 * @memberof #Proton.Force
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

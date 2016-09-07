@@ -10,9 +10,8 @@
 	 * @param {Proton.Paritcle} otherParticle
 	 */
 	/**
-	 * @namespace
-	 * @memberof! Proton#
-	 * @augments Proton#Proton.Behaviour
+	 * @memberof! #
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Collision
 	 *
@@ -24,7 +23,7 @@
 	 * @param {Number} [life=Infinity] 				this behaviour's life
 	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
-	 * @property {String} name
+	 * @property {String} name The Behaviour name
 	 */
 	function Collision(emitter, mass, callback, life, easing) {
 		Collision._super_.call(this, life, easing);
@@ -38,7 +37,7 @@
 	/**
 	 * Reset this behaviour's parameters
 	 *
-	 * @memberof Proton#Proton.Collision
+	 * @memberof #Proton.Collision
 	 * @method reset
 	 * @instance
 	 *
@@ -63,7 +62,7 @@
 	/**
 	 * Apply this behaviour for all particles every time
 	 *
-	 * @memberof Proton#Proton.Collision
+	 * @memberof #Proton.Collision
 	 * @method applyBehaviour
 	 * @instance
 	 *

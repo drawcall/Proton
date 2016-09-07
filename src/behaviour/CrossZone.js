@@ -3,9 +3,8 @@
 	/**
 	 * Defines what happens if the particles come to the end of the specified zone
 	 *
-	 * @namespace
-	 * @memberof! Proton#
-	 * @augments Proton#Proton.Behaviour
+	 * @memberof! #
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.CrossZone
 	 *
@@ -14,7 +13,7 @@
 	 * @param {Number} 		[life=Infinity] 			this behaviour's life
 	 * @param {String} 		[easing=Proton.easeLinear] 	this behaviour's easing
 	 *
-	 * @property {String} The Behaviour name
+	 * @property {String} name The Behaviour name
 	 */
 	function CrossZone(zone, crossType, life, easing) {
 		CrossZone._super_.call(this, life, easing);
@@ -28,7 +27,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof Proton#Proton.CrossZone
+	 * @memberof #Proton.CrossZone
 	 * @instance
 	 *
 	 * @param {Proton.Zone} zone 				can be any Proton.Zone - e.g. Proton.RectZone()
@@ -47,7 +46,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof Proton#Proton.CrossZone
+	 * @memberof #Proton.CrossZone
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

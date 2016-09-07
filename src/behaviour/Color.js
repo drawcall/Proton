@@ -1,9 +1,8 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @namespace
-	 * @memberof! Proton#
-	 * @augments Proton#Proton.Behaviour
+	 * @memberof! #
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Color
 	 *
@@ -12,7 +11,7 @@
 	 * @param {Number} [life=Infinity] 	this behaviour's life
 	 * @param {String} [easing=easeLinear] 	this behaviour's easing
 	 *
-	 * @property {String} The Behaviour name
+	 * @property {String} name The Behaviour name
 	 */
 	function Color(color1, color2, life, easing) {
 		Color._super_.call(this, life, easing);
@@ -27,7 +26,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof Proton#Proton.Color
+	 * @memberof #Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.ColorSpan | String} color1 the string should be a hex e.g. #000000 for black
@@ -46,7 +45,7 @@
 	 * Initialize the behaviour's parameters for all particles
 	 *
 	 * @method initialize
-	 * @memberof Proton#Proton.Color
+	 * @memberof #Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
@@ -63,7 +62,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof Proton#Proton.Color
+	 * @memberof #Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
@@ -91,7 +90,7 @@
 	 * Make sure that the color is an instance of Proton.ColorSpan, if not it makes a new instance
 	 *
 	 * @method setSpanValue
-	 * @memberof Proton#Proton.Color
+	 * @memberof #Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
