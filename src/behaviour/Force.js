@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Force
@@ -26,7 +26,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Force
+	 * @memberof Proton#Proton.Force
 	 * @instance
 	 *
 	 * @param {Number} fx
@@ -44,7 +44,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.Force
+	 * @memberof Proton#Proton.Force
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

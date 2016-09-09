@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.RandomDrift
@@ -28,7 +28,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.RandomDrift
+	 * @memberof Proton#Proton.RandomDrift
 	 * @instance
 	 *
 	 * @param {Number} driftX 				X value of the new Proton.Vector2D
@@ -49,7 +49,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.RandomDrift
+	 * @memberof Proton#Proton.RandomDrift
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

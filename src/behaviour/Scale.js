@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Scale
@@ -28,7 +28,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Scale
+	 * @memberof Proton#Proton.Scale
 	 * @instance
 	 *
 	 * @param {Number} a
@@ -51,7 +51,7 @@
 	 * Initialize the behaviour's parameters for all particles
 	 *
 	 * @method initialize
-	 * @memberof #Proton.Scale
+	 * @memberof Proton#Proton.Scale
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
@@ -70,7 +70,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.Scale
+	 * @memberof Proton#Proton.Scale
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Alpha
@@ -28,7 +28,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Alpha
+	 * @memberof Proton#Proton.Alpha
 	 * @instance
 	 *
 	 * @todo add description for 'a' and 'b'
@@ -53,7 +53,7 @@
 	 * Sets the new alpha value of the particle
 	 *
 	 * @method initialize
-	 * @memberof #Proton.Alpha
+	 * @memberof Proton#Proton.Alpha
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle A single Proton generated particle
@@ -68,7 +68,7 @@
 
 	/**
 	 * @method applyBehaviour
-	 * @memberof #Proton.Alpha
+	 * @memberof Proton#Proton.Alpha
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

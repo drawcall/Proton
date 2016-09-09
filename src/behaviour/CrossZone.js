@@ -3,7 +3,7 @@
 	/**
 	 * Defines what happens if the particles come to the end of the specified zone
 	 *
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.CrossZone
@@ -27,7 +27,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.CrossZone
+	 * @memberof Proton#Proton.CrossZone
 	 * @instance
 	 *
 	 * @param {Proton.Zone} zone 				can be any Proton.Zone - e.g. Proton.RectZone()
@@ -46,7 +46,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.CrossZone
+	 * @memberof Proton#Proton.CrossZone
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

@@ -3,8 +3,8 @@
 	/**
 	 * The oppisite of Proton.Attraction - turns the force
 	 *
-	 * @memberof! #
-	 * @augments Proton.Attraction
+	 * @memberof! Proton#
+	 * @augments Proton#Proton.Attraction
 	 * @constructor
 	 * @alias Proton.Repulsion
 	 *
@@ -31,7 +31,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Repulsion
+	 * @memberof Proton#Proton.Repulsion
 	 * @instance
 	 *
 	 * @todo add description for 'force' and 'radius'

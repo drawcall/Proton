@@ -2,7 +2,7 @@
 	/**
 	 * This behaviour let the particles follow one specific Proton.Vector2D
 	 *
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Attraction
@@ -42,7 +42,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Attraction
+	 * @memberof Proton#Proton.Attraction
 	 * @instance
 	 *
 	 * @todo add description for 'force' and 'radius'
@@ -67,7 +67,7 @@
 	/**
 	 * Apply this behaviour for all particles every time
 	 *
-	 * @memberof #Proton.Attraction
+	 * @memberof Proton#Proton.Attraction
 	 * @method applyBehaviour
 	 * @instance
 	 *

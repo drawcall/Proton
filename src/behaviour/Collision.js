@@ -10,7 +10,7 @@
 	 * @param {Proton.Paritcle} otherParticle
 	 */
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Collision
@@ -37,7 +37,7 @@
 	/**
 	 * Reset this behaviour's parameters
 	 *
-	 * @memberof #Proton.Collision
+	 * @memberof Proton#Proton.Collision
 	 * @method reset
 	 * @instance
 	 *
@@ -62,7 +62,7 @@
 	/**
 	 * Apply this behaviour for all particles every time
 	 *
-	 * @memberof #Proton.Collision
+	 * @memberof Proton#Proton.Collision
 	 * @method applyBehaviour
 	 * @instance
 	 *

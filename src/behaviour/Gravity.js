@@ -1,8 +1,8 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
-	 * @augments Proton.Force
+	 * @memberof! Proton#
+	 * @augments Proton#Proton.Force
 	 * @constructor
 	 * @alias Proton.Gravity
 	 *
@@ -23,7 +23,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Gravity
+	 * @memberof Proton#Proton.Gravity
 	 * @instance
 	 *
 	 * @param {Number} g 							Gravity

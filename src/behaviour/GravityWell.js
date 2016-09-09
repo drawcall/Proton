@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.GravityWell
@@ -27,7 +27,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.GravityWell
+	 * @memberof Proton#Proton.GravityWell
 	 * @instance
 	 *
 	 * @param {Proton.Vector2D} [centerPoint=new Proton.Vector2D] The point in the center
@@ -54,7 +54,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.GravityWell
+	 * @memberof Proton#Proton.GravityWell
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

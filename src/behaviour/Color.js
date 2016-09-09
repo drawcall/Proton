@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Color
@@ -26,7 +26,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Color
+	 * @memberof Proton#Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.ColorSpan | String} color1 the string should be a hex e.g. #000000 for black
@@ -45,7 +45,7 @@
 	 * Initialize the behaviour's parameters for all particles
 	 *
 	 * @method initialize
-	 * @memberof #Proton.Color
+	 * @memberof Proton#Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
@@ -62,7 +62,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.Color
+	 * @memberof Proton#Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
@@ -90,7 +90,7 @@
 	 * Make sure that the color is an instance of Proton.ColorSpan, if not it makes a new instance
 	 *
 	 * @method setSpanValue
-	 * @memberof #Proton.Color
+	 * @memberof Proton#Proton.Color
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle

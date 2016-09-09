@@ -1,7 +1,7 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @memberof! #
+	 * @memberof! Proton#
 	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Rotate
@@ -28,7 +28,7 @@
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof #Proton.Rotate
+	 * @memberof Proton#Proton.Rotate
 	 * @instance
 	 *
 	 * @todo add description for 'a', 'b' and 'style'
@@ -55,7 +55,7 @@
 	 * Initialize the behaviour's parameters for all particles
 	 *
 	 * @method initialize
-	 * @memberof #Proton.Rotate
+	 * @memberof Proton#Proton.Rotate
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
@@ -71,7 +71,7 @@
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof #Proton.Rotate
+	 * @memberof Proton#Proton.Rotate
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
