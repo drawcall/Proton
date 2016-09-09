@@ -24,10 +24,52 @@
     Proton.TextureCanvasBuffer = {};
 
     /**
-     * Proton is a html5 particle engine
+     * Here you can see all addable behaviours
      *
-     * @namespace Proton
-     * @constructor
+     * The list:
+     *
+     * - [Proton.Alpha]{@link Proton#Proton.Alpha}
+     * - [Proton.Attraction]{@link Proton#Proton.Attraction}
+     * - [Proton.Collision]{@link Proton#Proton.Collision}
+     * - [Proton.Color]{@link Proton#Proton.Color}
+     * - [Proton.CrossZone]{@link Proton#Proton.CrossZone}
+     * - [Proton.Force]{@link Proton#Proton.Force}
+     * - [Proton.Gravity]{@link Proton#Proton.Gravity}
+     * - [Proton.GravityWell]{@link Proton#Proton.GravityWell}
+     * - [Proton.RandomDrift]{@link Proton#Proton.RandomDrift}
+     * - [Proton.Repulsion]{@link Proton#Proton.Repulsion}
+     * - [Proton.Rotate]{@link Proton#Proton.Rotate}
+     * - [Proton.Scale]{@link Proton#Proton.Scale}
+     *
+     * @namespace Behaviour
+     *
+     * @example
+     * // this example shows how to add a specific behaviour to the Proton instance
+     * var proton  = new Proton;
+     * var emitter = new Proton.Emitter();
+     * var attractionBehaviour = new.Proton.Attraction(new Proton.Vector2D())
+     *
+     * emitter.addBehaviour(attractionBehaviour);
+     * emitter.emit('once');
+     * proton.addEmmiter(emitter);
+     */
+
+    /**
+     * The constructor to add emitters 
+     *
+     * @constructor Proton
+     *
+     * @todo proParticleCount is not in use
+     * @todo add more documentation of the single properties and parameters
+     *
+     * @param {Number} [proParticleCount] not in use?
+     * @param {Number} [integrationType=Proton.EULER]
+     *
+     * @property {String} [integrationType=Proton.EULER]
+     * @property {Array} emitters   All added emitter
+     * @property {Array} renderers  All added renderer
+     * @property {Number} time      The active time
+     * @property {Number} oldtime   The old time
      */
     function Proton(proParticleCount, integrationType) {
         this.integrationType = Proton.Util.initValue(integrationType, Proton.EULER);
@@ -46,16 +88,21 @@
          * add a type of Renderer
          *
          * @method addRender
+         * @memberof Proton
+         *
          * @param {Renderer} render
          */
         addRender: function(render) {
             render.proton = this;
             this.renderers.push(render.proton);
         },
+
         /**
          * add the Emitter
          *
          * @method addEmitter
+         * @memberof Proton
+         *
          * @param {Emitter} emitter
          */
         addEmitter: function(emitter) {
@@ -65,6 +112,14 @@
             this.dispatchEvent(Proton.EMITTER_ADDED, emitter);
         },
 
+        /**
+         * Removes an Emitter
+         *
+         * @method removeEmitter
+         * @memberof Proton
+         *
+         * @param {Proton.Emitter} emitter
+         */
         removeEmitter: function(emitter) {
             var index = this.emitters.indexOf(emitter);
             this.emitters.splice(index, 1);
@@ -73,6 +128,12 @@
             this.dispatchEvent(Proton.EMITTER_REMOVED, emitter);
         },
 
+        /**
+         * Updates all added emitters
+         *
+         * @method update
+         * @memberof Proton
+         */
         update: function() {
             this.dispatchEvent(Proton.PROTON_UPDATE);
 
@@ -98,6 +159,12 @@
             this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
         },
 
+        /**
+         * @todo add description
+         *
+         * @method amendChangeTabsBug
+         * @memberof Proton 
+         */
         amendChangeTabsBug: function() {
             if (this.elapsed > .5) {
                 this.oldTime = new Date().getTime();
@@ -105,6 +172,12 @@
             }
         },
 
+        /**
+         * Counts all particles from all emitters
+         *
+         * @method getCount
+         * @memberof Proton 
+         */
         getCount: function() {
             var total = 0;
             var length = this.emitters.length;
@@ -114,6 +187,12 @@
             return total;
         },
 
+        /**
+         * Destroys everything related to this Proton instance. This includes all emitters, and all properties
+         *
+         * @method destroy
+         * @memberof Proton 
+         */
         destroy: function() {
             var length = this.emitters.length;
             for (var i = 0; i < length; i++) {
