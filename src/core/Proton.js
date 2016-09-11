@@ -24,38 +24,7 @@
     Proton.TextureCanvasBuffer = {};
 
     /**
-     * Here you can see all addable behaviours
-     *
-     * The list:
-     *
-     * - [Proton.Alpha]{@link Proton#Proton.Alpha}
-     * - [Proton.Attraction]{@link Proton#Proton.Attraction}
-     * - [Proton.Collision]{@link Proton#Proton.Collision}
-     * - [Proton.Color]{@link Proton#Proton.Color}
-     * - [Proton.CrossZone]{@link Proton#Proton.CrossZone}
-     * - [Proton.Force]{@link Proton#Proton.Force}
-     * - [Proton.Gravity]{@link Proton#Proton.Gravity}
-     * - [Proton.GravityWell]{@link Proton#Proton.GravityWell}
-     * - [Proton.RandomDrift]{@link Proton#Proton.RandomDrift}
-     * - [Proton.Repulsion]{@link Proton#Proton.Repulsion}
-     * - [Proton.Rotate]{@link Proton#Proton.Rotate}
-     * - [Proton.Scale]{@link Proton#Proton.Scale}
-     *
-     * @namespace Behaviour
-     *
-     * @example
-     * // this example shows how to add a specific behaviour to the Proton instance
-     * var proton  = new Proton;
-     * var emitter = new Proton.Emitter();
-     * var attractionBehaviour = new.Proton.Attraction(new Proton.Vector2D())
-     *
-     * emitter.addBehaviour(attractionBehaviour);
-     * emitter.emit('once');
-     * proton.addEmmiter(emitter);
-     */
-
-    /**
-     * The constructor to add emitters 
+     * The constructor to add emitters
      *
      * @constructor Proton
      *
@@ -89,6 +58,7 @@
          *
          * @method addRender
          * @memberof Proton
+         * @instance
          *
          * @param {Renderer} render
          */
@@ -102,6 +72,7 @@
          *
          * @method addEmitter
          * @memberof Proton
+         * @instance
          *
          * @param {Emitter} emitter
          */
@@ -117,6 +88,7 @@
          *
          * @method removeEmitter
          * @memberof Proton
+         * @instance
          *
          * @param {Proton.Emitter} emitter
          */
@@ -133,6 +105,7 @@
          *
          * @method update
          * @memberof Proton
+         * @instance
          */
         update: function() {
             this.dispatchEvent(Proton.PROTON_UPDATE);
@@ -163,7 +136,8 @@
          * @todo add description
          *
          * @method amendChangeTabsBug
-         * @memberof Proton 
+         * @memberof Proton
+         * @instance
          */
         amendChangeTabsBug: function() {
             if (this.elapsed > .5) {
@@ -176,7 +150,8 @@
          * Counts all particles from all emitters
          *
          * @method getCount
-         * @memberof Proton 
+         * @memberof Proton
+         * @instance
          */
         getCount: function() {
             var total = 0;
@@ -191,7 +166,8 @@
          * Destroys everything related to this Proton instance. This includes all emitters, and all properties
          *
          * @method destroy
-         * @memberof Proton 
+         * @memberof Proton
+         * @instance
          */
         destroy: function() {
             var length = this.emitters.length;
