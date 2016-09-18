@@ -4,17 +4,16 @@
 	/**
 	 * The Behaviour class is the base for the other Behaviour
 	 *
-	 * @namespace
-	 * @memberof! Proton#
-	 * @constructor
+	 * @memberof! -
+	 * @interface
 	 * @alias Proton.Behaviour
 	 *
 	 * @param {Number} life 	the behaviours life
 	 * @param {String} easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
 	 *
 	 * @property {String}  id 		The behaviours id
-	 * @property {Number}  life 	The behaviours life
-	 * @property {String}  easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 * @property {Number}  age=0 	How long the particle should be 'alife'
 	 * @property {Number}  energy=1
 	 * @property {Boolean} dead=false The particle is dead at first
@@ -38,11 +37,11 @@
 		 * Reset this behaviour's parameters
 		 *
 		 * @method reset
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
-		 * @param {Number} this behaviour's life
-		 * @param {String} this behaviour's easing
+		 * @param {Number} [life=Infinity] 		this behaviour's life
+		 * @param {String} [easing=easeLinear] 	this behaviour's easing
 		 */
 		reset : function(life, easing) {
 			this.life = Proton.Util.initValue(life, Infinity);
@@ -52,7 +51,7 @@
 		 * Normalize a force by 1:100;
 		 *
 		 * @method normalizeForce
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Proton.Vector2D} force 
@@ -65,7 +64,7 @@
 		 * Normalize a value by 1:100;
 		 *
 		 * @method normalizeValue
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Number} value
@@ -78,7 +77,7 @@
 		 * Initialize the behaviour's parameters for all particles
 		 *
 		 * @method initialize
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Proton.Particle} particle
@@ -90,12 +89,12 @@
 		 * Apply this behaviour for all particles every time
 		 *
 		 * @method applyBehaviour
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 *
 		 * @param {Proton.Particle} particle
-		 * @param {Number} the integrate time 1/ms
-		 * @param {Int} the particle index
+		 * @param {Number} 			time the integrate time 1/ms
+		 * @param {Int} 			index the particle index
 		 */
 		applyBehaviour : function(particle, time, index) {
 			this.age += time;
@@ -113,7 +112,7 @@
 		 * Destory this behaviour
 		 *
 		 * @method destroy
-		 * @memberof Proton#Proton.Behaviour
+		 * @memberof Proton.Behaviour
 		 * @instance
 		 */
 		destroy : function() {

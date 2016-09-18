@@ -1,9 +1,8 @@
 (function(Proton, undefined) {
 
 	/**
-	 * @namespace
 	 * @memberof! Proton#
-	 * @augments Behaviour
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Alpha
 	 *
@@ -11,10 +10,10 @@
 	 *
 	 * @param {Number} a
 	 * @param {String} b
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
-	 * @property {String} The Behaviour name
+	 * @property {String} name The Behaviour name
 	 */
 	function Alpha(a, b, life, easing) {
 		Alpha._super_.call(this, life, easing);
@@ -26,6 +25,8 @@
 	Proton.Util.inherits(Alpha, Proton.Behaviour);
 
 	/**
+	 * Reset this behaviour's parameters
+	 *
 	 * @method reset
 	 * @memberof Proton#Proton.Alpha
 	 * @instance
@@ -34,8 +35,8 @@
 	 *
 	 * @param {Number} a
 	 * @param {String} b
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 */
 	Alpha.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)
@@ -66,16 +67,14 @@
 	};
 
 	/**
-	 * Apply this behaviour for all particles every time
-	 *
-	 * @memberof Proton#Proton.Alpha
 	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Alpha
 	 * @instance
 	 *
 	 * @param {Proton.Particle} particle
 	 * @param {Number} 			time the integrate time 1/ms
 	 * @param {Int} 			index the particle index
-	 */
+ 	 */
 	Alpha.prototype.applyBehaviour = function(particle, time, index) {
 		Alpha._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.alpha = particle.transform.alphaB + (particle.transform.alphaA - particle.transform.alphaB) * this.energy;

@@ -1,5 +1,30 @@
 (function(Proton, undefined) {
 	//can use Collision(emitter,true,function(){}) or Collision();
+
+	/**
+	 * The callback after collision
+	 *
+	 * @callback Callback
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Proton.Paritcle} otherParticle
+	 */
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Collision
+	 *
+	 * @todo add description to mass
+	 *
+	 * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
+	 * @param {Boolean} 		[mass=true]			
+	 * @param {Callback}	 	[callback=null]		the callback after the collision
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Collision(emitter, mass, callback, life, easing) {
 		Collision._super_.call(this, life, easing);
 		this.reset(emitter, mass, callback);
@@ -8,6 +33,22 @@
 
 
 	Proton.Util.inherits(Collision, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @memberof Proton#Proton.Collision
+	 * @method reset
+	 * @instance
+	 *
+	 * @todo add description to mass
+	 *
+	 * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
+	 * @param {Boolean} 		[mass=true]			
+	 * @param {Callback}	 	[callback=null]		the callback after the collision
+	 * @param {Number} 			[life=Infinity] 	this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Collision.prototype.reset = function(emitter, mass, callback, life, easing) {
 		this.emitter = Proton.Util.initValue(emitter, null);
 		this.mass = Proton.Util.initValue(mass, true);
@@ -18,6 +59,17 @@
 			Collision._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @memberof Proton#Proton.Collision
+	 * @method applyBehaviour
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	Collision.prototype.applyBehaviour = function(particle, time, index) {
 		var newPool = this.emitter ? this.emitter.particles.slice(index) : this.pool.slice(index);
 		var otherParticle;

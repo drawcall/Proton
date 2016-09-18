@@ -1,4 +1,18 @@
 (function(Proton, undefined) {
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Color
+	 *
+	 * @param {Proton.ColorSpan | String} color1 the string should be a hex e.g. #000000 for black
+	 * @param {Proton.ColorSpan | String} color2 the string should be a hex e.g. #000000 for black
+	 * @param {Number} [life=Infinity] 	this behaviour's life
+	 * @param {String} [easing=easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Color(color1, color2, life, easing) {
 		Color._super_.call(this, life, easing);
 		this.reset(color1, color2);
@@ -7,6 +21,19 @@
 
 
 	Proton.Util.inherits(Color, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.ColorSpan | String} color1 the string should be a hex e.g. #000000 for black
+	 * @param {Proton.ColorSpan | String} color2 the string should be a hex e.g. #000000 for black
+	 * @param {Number} [life=Infinity] 	this behaviour's life
+	 * @param {String} [easing=easeLinear] 	this behaviour's easing
+	 */
 	Color.prototype.reset = function(color1, color2, life, easing) {
 		this.color1 = this.setSpanValue(color1);
 		this.color2 = this.setSpanValue(color2);
@@ -14,6 +41,15 @@
 			Color._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Initialize the behaviour's parameters for all particles
+	 *
+	 * @method initialize
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 */
 	Color.prototype.initialize = function(particle) {
 		particle.color = this.color1.getValue();
 		particle.transform.beginRGB = Proton.Util.hexToRGB(particle.color);
@@ -22,6 +58,17 @@
 			particle.transform.endRGB = Proton.Util.hexToRGB(this.color2.getValue());
 	};
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	Color.prototype.applyBehaviour = function(particle, time, index) {
 		if (this.color2) {
 			Color._super_.prototype.applyBehaviour.call(this, particle, time, index);
@@ -39,6 +86,17 @@
 		}
 	};
 
+	/**
+	 * Make sure that the color is an instance of Proton.ColorSpan, if not it makes a new instance
+	 *
+	 * @method setSpanValue
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	Color.prototype.setSpanValue = function(color) {
 		if (color) {
 			if ( color instanceof Proton.ColorSpan) {

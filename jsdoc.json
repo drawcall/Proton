@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["readme.md", "src"],
+    "include": ["home.md", "src"],
     "includePattern": ".+\\.js(doc)?$"
   },
   "opts": {
@@ -10,5 +10,8 @@
   },
   "plugins": [
     "plugins/markdown"
-  ]
+  ],
+  "markdown": {
+    "idInHeadings": true
+  }
 }

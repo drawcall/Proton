@@ -1,18 +1,19 @@
 (function(Proton, undefined) {
 	/**
-	 * @namespace
+	 * This behaviour let the particles follow one specific Proton.Vector2D
+	 *
 	 * @memberof! Proton#
-	 * @augments Behaviour
+	 * @augments Proton.Behaviour
 	 * @constructor
 	 * @alias Proton.Attraction
 	 *
 	 * @todo add description for 'force' and 'radius'
 	 *
 	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-	 * @param {Number} force
-	 * @param {Number} radius
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {Proton.Vector2D} targetPosition
 	 * @property {Number} radius
@@ -20,7 +21,7 @@
 	 * @property {Number} radiusSq
 	 * @property {Proton.Vector2D} attractionForce
 	 * @property {Number} lengthSq
-	 * @property {String} name
+	 * @property {String} name The Behaviour name
 	 */
 	function Attraction(targetPosition, force, radius, life, easing) {
 		Attraction._super_.call(this, life, easing);
@@ -38,6 +39,8 @@
 	Proton.Util.inherits(Attraction, Proton.Behaviour);
 
 	/**
+	 * Reset this behaviour's parameters
+	 *
 	 * @method reset
 	 * @memberof Proton#Proton.Attraction
 	 * @instance
@@ -45,10 +48,10 @@
 	 * @todo add description for 'force' and 'radius'
 	 *
 	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-	 * @param {Number} force
-	 * @param {Number} radius
-	 * @param {Number} life 	this behaviour's life
-	 * @param {String} easing 	this behaviour's easing
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
 	 */
 	Attraction.prototype.reset = function(targetPosition, force, radius, life, easing) {
 		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
