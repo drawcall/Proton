@@ -53,3 +53,15 @@ emitter.addInitialize(new Proton.Radius(0.4, 1));
 ### Available initializations
 
 Todo add documentation in `./src/initialize`
+
+## Emitter
+
+### Example
+
+### Available emitter
+
+## Renderer
+
+### Example
+
+### Available renderer

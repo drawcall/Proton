@@ -99,6 +99,17 @@
             return new factoryFunction();
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method judgeVector2D
+         *
+         * @todo add description for param `pOBJ`
+         * @todo add description for function
+         *
+         * @param {Object} pOBJ
+         *
+         * @return {String} result
+         */
         judgeVector2D: function(pOBJ) {
             var result = '';
             if (pOBJ.hasOwnProperty('x') || pOBJ.hasOwnProperty('y') || pOBJ.hasOwnProperty('p') || pOBJ.hasOwnProperty('position'))
@@ -111,6 +122,17 @@
             return result;
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method setVector2DByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `pOBJ`
+         * @todo add description for function
+         *
+         * @param {Object} target
+         * @param {Object} pOBJ
+         */
         setVector2DByObject: function(target, pOBJ) {
             if (pOBJ.hasOwnProperty('x'))
                 target.p.x = pOBJ['x'];
@@ -148,7 +170,23 @@
             if (pOBJ.hasOwnProperty('accelerate'))
                 particle.a.copy(pOBJ['accelerate']);
         },
-        //强行添加属性
+
+        /**
+         * 强行添加属性
+         *
+         * @memberof Proton#Proton.Util
+         * @method addPrototypeByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `filters`
+         * @todo translate desription from chinese to english
+         *
+         * @param {Object} target
+         * @param {Object} prototypeObject An object of single prototypes
+         * @param {Object} filters
+         *
+         * @return {Object} target
+         */
         addPrototypeByObject: function(target, prototypeObject, filters) {
             for (var singlePrototype in prototypeObject) {
                 if (filters) {
@@ -161,7 +199,23 @@
 
             return target;
         },
-        //set prototype
+
+        /**
+         * set the prototype in a given prototypeObject
+         *
+         * @memberof Proton#Proton.Util
+         * @method setPrototypeByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `filters`
+         * @todo translate desription from chinese to english
+         *
+         * @param {Object} target
+         * @param {Object} prototypeObject An object of single prototypes
+         * @param {Object} filters
+         *
+         * @return {Object} target
+         */
         setPrototypeByObject: function(target, prototypeObject, filters) {
             for (var singlePrototype in prototypeObject) {
                 if (target.hasOwnProperty(singlePrototype)) {
