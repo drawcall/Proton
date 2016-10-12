@@ -309,7 +309,7 @@
          * @memberof Proton#Proton.Util
          * @method getImageData
          *
-         * @param {Object}              context any canvas, must be a 2dContext 'canvas.getContext('2d')'
+         * @param {HTMLCanvasElement}   context any canvas, must be a 2dContext 'canvas.getContext('2d')'
          * @param {Object}              image   could be any dom image, e.g. document.getElementById('thisIsAnImgTag');
          * @param {Proton.Rectangle}    rect
          */
@@ -327,7 +327,7 @@
          * @todo add description
          * @todo describe fun
          *
-         * @param {Mixed}               img         any canvas, must be a 2dContext 'canvas.getContext('2d')'
+         * @param {Mixed}               img
          * @param {Proton.Particle}     particle
          * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
          * @param {Boolean}             fun
