@@ -403,6 +403,12 @@
         },
 
         /**
+         * @typedef  {Object} rgbObject
+         * @property {Number} r red value
+         * @property {Number} g green value
+         * @property {Number} b blue value
+         */
+        /**
          * converts a hex value to a rgb object
          *
          * @memberof Proton#Proton.Util
@@ -410,10 +416,7 @@
          *
          * @param {String} h any hex value, e.g. #000000 or 000000 for black
          *
-         * @return {Object}
-         * @property {Number} r red value
-         * @property {Number} g green value
-         * @property {Number} b blue value
+         * @return {rgbObject}
          */
         hexToRGB: function(h) {
             var hex16 = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
