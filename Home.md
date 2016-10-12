@@ -2,13 +2,40 @@
 
 > Proton is an easily customizable html5 particle engine including six different types of renderers.
 
-## Behaviour
+## Proton overview
+
+- [Utils](#utils)
+- [Behaviour](#behaviour)
+- [Particle initializations](#particle-initializations)
+- [Emitter](#emitter)
+- [Renderer](#renderer)
+
+## Proton parts
+
+### Utils
+
+> all Utils are static, there is no need to create an instance
+
+#### Available utils
+
+- [Proton.Util]{@link Proton#Proton.Util}
+- [Proton.DomUtil]{@link Proton#Proton.DomUtil}
+- [Proton.WebGLUtil]{@link Proton#Proton.WebGLUtil}
+- [Proton.CanvasUtil]{@link Proton#Proton.CanvasUtil}
+- [Proton.MStack]{@link Proton#Proton.MStack}
+
+
+---
+
+
+
+### Behaviour
 
 > Note: you can add more than just one behaviour to the emitter
 
 Behaviours will manipulate the particles. You can add as much behaviours as you want.
 
-### Example
+#### Example
 
 ```js
 // this example shows how to add a specific behaviour to the Proton instance
@@ -21,7 +48,7 @@ emitter.emit('once');
 proton.addEmmiter(emitter);
 ```
 
-### Available behaviours
+#### Available behaviours
 
 - [Proton.Alpha]{@link Proton#Proton.Alpha}
 - [Proton.Attraction]{@link Proton#Proton.Attraction}
@@ -36,11 +63,16 @@ proton.addEmmiter(emitter);
 - [Proton.Rotate]{@link Proton#Proton.Rotate}
 - [Proton.Scale]{@link Proton#Proton.Scale}
 
-## Particle initializations
+
+---
+
+
+
+### Particle initializations
 
 These settings are for manipulating the particle. Giving more mass or even another radius.
 
-### Example
+#### Example
 
 ```js
 var emitter = new Proton.Emitter();
@@ -50,18 +82,26 @@ emitter.addInitialize(new Proton.Mass(1));
 emitter.addInitialize(new Proton.Radius(0.4, 1));
 ```
 
-### Available initializations
+#### Available initializations
 
 Todo add documentation in `./src/initialize`
 
-## Emitter
 
-### Example
+---
 
-### Available emitter
 
-## Renderer
+### Emitter
 
-### Example
+#### Example
 
-### Available renderer
+#### Available emitter
+
+
+---
+
+
+### Renderer
+
+#### Example
+
+#### Available renderer
