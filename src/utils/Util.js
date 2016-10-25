@@ -99,6 +99,17 @@
             return new factoryFunction();
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method judgeVector2D
+         *
+         * @todo add description for param `pOBJ`
+         * @todo add description for function
+         *
+         * @param {Object} pOBJ
+         *
+         * @return {String} result
+         */
         judgeVector2D: function(pOBJ) {
             var result = '';
             if (pOBJ.hasOwnProperty('x') || pOBJ.hasOwnProperty('y') || pOBJ.hasOwnProperty('p') || pOBJ.hasOwnProperty('position'))
@@ -111,6 +122,17 @@
             return result;
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method setVector2DByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `pOBJ`
+         * @todo add description for function
+         *
+         * @param {Object} target
+         * @param {Object} pOBJ
+         */
         setVector2DByObject: function(target, pOBJ) {
             if (pOBJ.hasOwnProperty('x'))
                 target.p.x = pOBJ['x'];
@@ -148,7 +170,23 @@
             if (pOBJ.hasOwnProperty('accelerate'))
                 particle.a.copy(pOBJ['accelerate']);
         },
-        //强行添加属性
+
+        /**
+         * 强行添加属性
+         *
+         * @memberof Proton#Proton.Util
+         * @method addPrototypeByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `filters`
+         * @todo translate desription from chinese to english
+         *
+         * @param {Object} target
+         * @param {Object} prototypeObject An object of single prototypes
+         * @param {Object} filters
+         *
+         * @return {Object} target
+         */
         addPrototypeByObject: function(target, prototypeObject, filters) {
             for (var singlePrototype in prototypeObject) {
                 if (filters) {
@@ -161,7 +199,23 @@
 
             return target;
         },
-        //set prototype
+
+        /**
+         * set the prototype in a given prototypeObject
+         *
+         * @memberof Proton#Proton.Util
+         * @method setPrototypeByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `filters`
+         * @todo translate desription from chinese to english
+         *
+         * @param {Object} target
+         * @param {Object} prototypeObject An object of single prototypes
+         * @param {Object} filters
+         *
+         * @return {Object} target
+         */
         setPrototypeByObject: function(target, prototypeObject, filters) {
             for (var singlePrototype in prototypeObject) {
                 if (target.hasOwnProperty(singlePrototype)) {
@@ -177,6 +231,20 @@
             return target;
         },
 
+        /**
+         * Returns a new Proton.Span object
+         *
+         * @memberof Proton#Proton.Util
+         * @method setSpanValue
+         *
+         * @todo a, b and c should be 'Mixed' or 'Number'?
+         *
+         * @param {Mixed | Proton.Span} a
+         * @param {Mixed}               b
+         * @param {Mixed}               c
+         *
+         * @return {Proton.Span}
+         */
         setSpanValue: function(a, b, c) {
             if (a instanceof Proton.Span) {
                 return a;
@@ -192,6 +260,16 @@
             }
         },
 
+        /**
+         * Returns the value from a Proton.Span, if the param is not a Proton.Span it will return the given parameter
+         *
+         * @memberof Proton#Proton.Util
+         * @method getSpanValue
+         *
+         * @param {Mixed | Proton.Span} pan
+         *
+         * @return {Mixed} the value of Proton.Span OR the parameter if it is not a Proton.Span
+         */
         getSpanValue: function(pan) {
             if (pan instanceof Proton.Span)
                 return pan.getValue();
@@ -199,6 +277,15 @@
                 return pan;
         },
 
+        /**
+         * Inherits any class from the superclass. Acts like 'extends' in Java
+         *
+         * @memberof Proton#Proton.Util
+         * @method inherits
+         *
+         * @param {Object} subClass     the child class
+         * @param {Object} superClass   the parent/super class
+         */
         inherits: function(subClass, superClass) {
             subClass._super_ = superClass;
             if (Object['create']) {
@@ -216,6 +303,16 @@
             }
         },
 
+        /**
+         * This will get the image data. It could be necessary to create a Proton.Zone.
+         *
+         * @memberof Proton#Proton.Util
+         * @method getImageData
+         *
+         * @param {HTMLCanvasElement}   context any canvas, must be a 2dContext 'canvas.getContext('2d')'
+         * @param {Object}              image   could be any dom image, e.g. document.getElementById('thisIsAnImgTag');
+         * @param {Proton.Rectangle}    rect
+         */
         getImageData: function(context, image, rect) {
             context.drawImage(image, rect.x, rect.y);
             var imagedata = context.getImageData(rect.x, rect.y, rect.width, rect.height);
@@ -223,6 +320,18 @@
             return imagedata;
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method getImage
+         *
+         * @todo add description
+         * @todo describe fun
+         *
+         * @param {Mixed}               img
+         * @param {Proton.Particle}     particle
+         * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
+         * @param {Boolean}             fun
+         */
         getImage: function(img, particle, drawCanvas, fun) {
             if (typeof(img) == 'string') {
                 this.loadAndSetImage(img, particle, drawCanvas, fun);
@@ -233,6 +342,20 @@
             }
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method loadedImage
+         *
+         * @todo add description
+         * @todo describe fun
+         * @todo describe target
+         *
+         * @param {String}              src         the src of an img-tag
+         * @param {Proton.Particle}     particle
+         * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
+         * @param {Boolean}             fun
+         * @param {Object}              target
+         */
         loadedImage: function(src, particle, drawCanvas, fun, target) {
             particle.target = target;
             particle.transform.src = src;
@@ -254,6 +377,18 @@
                 fun(particle);
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method loadAndSetImage
+         *
+         * @todo add description
+         * @todo describe fun
+         *
+         * @param {String}              src         the src of an img-tag
+         * @param {Proton.Particle}     particle
+         * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
+         * @param {Boolean}             fun
+         */
         loadAndSetImage: function(src, particle, drawCanvas, fun) {
             if (Proton.TextureBuffer[src]) {
                 this.loadedImage(src, particle, drawCanvas, fun, Proton.TextureBuffer[src]);
@@ -267,6 +402,22 @@
             }
         },
 
+        /**
+         * @typedef  {Object} rgbObject
+         * @property {Number} r red value
+         * @property {Number} g green value
+         * @property {Number} b blue value
+         */
+        /**
+         * converts a hex value to a rgb object
+         *
+         * @memberof Proton#Proton.Util
+         * @method hexToRGB
+         *
+         * @param {String} h any hex value, e.g. #000000 or 000000 for black
+         *
+         * @return {rgbObject}
+         */
         hexToRGB: function(h) {
             var hex16 = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
             var r = parseInt(hex16.substring(0, 2), 16);
@@ -280,6 +431,16 @@
             }
         },
 
+        /**
+         * converts a rgb value to a rgb string
+         *
+         * @memberof Proton#Proton.Util
+         * @method rgbToHex
+         *
+         * @param {Object | Proton.hexToRGB} rgb a rgb object like in {@link Proton#Proton.Util.hexToRGB}
+         *
+         * @return {String} rgb()
+         */
         rgbToHex: function(rbg) {
             return 'rgb(' + rbg.r + ', ' + rbg.g + ', ' + rbg.b + ')';
         }
