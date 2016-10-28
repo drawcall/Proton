@@ -4,7 +4,7 @@ Proton
 > The documentation is available [here](https://projects.jpeer.at/proton/)
 
 Proton is an easily customizable html5 particle engine including six different types of renderers. <br>
-Check out examples at http://a-jie.github.io/Proton/ or http://www.a-jie.cn/proton/
+Check out examples at http://a-jie.github.io/Proton/
 
 ## Features
 - Six kinds of renderers
