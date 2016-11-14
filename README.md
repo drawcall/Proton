@@ -18,6 +18,7 @@ Check out examples at http://a-jie.github.io/Proton/
 - Integratable into any game engine
 - Veriety of behaviors
 - Three kinds of emitters which can simulate many different physical effects
+- The 3d version of the proton engine is here https://a-jie.github.io/three.proton/
 
 ## Usage
 ```javascript
