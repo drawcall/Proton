@@ -20,6 +20,22 @@ Check out examples at http://a-jie.github.io/Proton/
 - Three kinds of emitters which can simulate many different physical effects
 - The __3D version__ of the proton engine is here [https://a-jie.github.io/three.proton/](https://a-jie.github.io/three.proton/)
 
+## Installation
+
+#### Install using npm 
+[![anix](https://nodei.co/npm/proton-js.png)](https://npmjs.org/package/proton-js)
+
+``` 
+npm install proton-js --save
+... 
+import Proton from 'proton-js';
+```
+
+#### Include in html
+``` 
+<script type="text/javascript" src="js/proton.min.js"></script> 
+```
+
 ## Usage
 ```javascript
 var proton = new Proton();
