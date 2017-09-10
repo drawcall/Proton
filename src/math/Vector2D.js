@@ -29,23 +29,6 @@
 
 		},
 
-		setComponent : function(index, value) {
-
-			switch ( index ) {
-
-				case 0:
-					this.x = value;
-					break;
-				case 1:
-					this.y = value;
-					break;
-				default:
-					throw new Error("index is out of range: " + index);
-
-			}
-
-		},
-
 		getGradient : function() {
 			if (this.x != 0)
 				return Math.atan2(this.y, this.x);
@@ -53,21 +36,6 @@
 				return Math.PI / 2;
 			else if (this.y < 0)
 				return -Math.PI / 2;
-		},
-
-		getComponent : function(index) {
-
-			switch ( index ) {
-
-				case 0:
-					return this.x;
-				case 1:
-					return this.y;
-				default:
-					throw new Error("index is out of range: " + index);
-
-			}
-
 		},
 
 		copy : function(v) {
@@ -198,34 +166,6 @@
 			if (this.y < v.y) {
 
 				this.y = v.y;
-
-			}
-
-			return this;
-
-		},
-
-		clamp : function(min, max) {
-
-			// This function assumes min < max, if this assumption isn't true it will not operate correctly
-
-			if (this.x < min.x) {
-
-				this.x = min.x;
-
-			} else if (this.x > max.x) {
-
-				this.x = max.x;
-
-			}
-
-			if (this.y < min.y) {
-
-				this.y = min.y;
-
-			} else if (this.y > max.y) {
-
-				this.y = max.y;
 
 			}
 

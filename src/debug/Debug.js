@@ -10,12 +10,14 @@
 			var color = c || '#ff0000';
 			var rgb = Proton.Util.hexToRGB(color);
 			var style = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + 0.5 + ')';
+			
 			return style;
 		},
 
 		drawZone : function(proton, canvas, zone, clear) {
 			var context = canvas.getContext('2d');
 			var style = this.setStyle();
+
 			this.addEventListener(proton, function() {
 				if (clear)
 					context.clearRect(0, 0, canvas.width, canvas.height);

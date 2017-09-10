@@ -1,23 +1,32 @@
 /*!
- * Proton v2.1.0
+ * Proton v2.2.1
  * https://github.com/a-jie/Proton
  *
- * Copyright 2011-2016, A-JIE
+ * Copyright 2011-2017, A-JIE
  * Licensed under the MIT license
  * http://www.opensource.org/licenses/mit-license
  *
  */
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define([], factory);
+    } else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = factory();
+    } else {
+        root.Proton = factory();
+    }
+}(this, function () {
 
-(function(window, undefined) {
+
     //the max particle number in pool
     Proton.POOL_MAX = 1000;
     Proton.TIME_STEP = 60;
     Proton.USE_CLOCK = false;
+    
     //1:100
     Proton.MEASURE = 100;
     Proton.EULER = 'euler';
     Proton.RK2 = 'runge-kutta2';
-    Proton.RK4 = 'runge-kutta4';
     Proton.VERLET = 'verlet';
 
     Proton.PARTICLE_CREATED = 'partilcleCreated';
@@ -34,10 +43,21 @@
     Proton.TextureCanvasBuffer = {};
 
     /**
-     * Proton is a html5 particle engine
+     * The constructor to add emitters
      *
-     * @class Proton
-     * @constructor
+     * @constructor Proton
+     *
+     * @todo proParticleCount is not in use
+     * @todo add more documentation of the single properties and parameters
+     *
+     * @param {Number} [proParticleCount] not in use?
+     * @param {Number} [integrationType=Proton.EULER]
+     *
+     * @property {String} [integrationType=Proton.EULER]
+     * @property {Array} emitters   All added emitter
+     * @property {Array} renderers  All added renderer
+     * @property {Number} time      The active time
+     * @property {Number} oldtime   The old time
      */
     function Proton(proParticleCount, integrationType) {
         this.integrationType = Proton.Util.initValue(integrationType, Proton.EULER);
@@ -56,16 +76,23 @@
          * add a type of Renderer
          *
          * @method addRender
+         * @memberof Proton
+         * @instance
+         *
          * @param {Renderer} render
          */
         addRender: function(render) {
             render.proton = this;
             this.renderers.push(render.proton);
         },
+
         /**
          * add the Emitter
          *
          * @method addEmitter
+         * @memberof Proton
+         * @instance
+         *
          * @param {Emitter} emitter
          */
         addEmitter: function(emitter) {
@@ -75,6 +102,15 @@
             this.dispatchEvent(Proton.EMITTER_ADDED, emitter);
         },
 
+        /**
+         * Removes an Emitter
+         *
+         * @method removeEmitter
+         * @memberof Proton
+         * @instance
+         *
+         * @param {Proton.Emitter} emitter
+         */
         removeEmitter: function(emitter) {
             var index = this.emitters.indexOf(emitter);
             this.emitters.splice(index, 1);
@@ -83,6 +119,13 @@
             this.dispatchEvent(Proton.EMITTER_REMOVED, emitter);
         },
 
+        /**
+         * Updates all added emitters
+         *
+         * @method update
+         * @memberof Proton
+         * @instance
+         */
         update: function() {
             this.dispatchEvent(Proton.PROTON_UPDATE);
 
@@ -108,6 +151,13 @@
             this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
         },
 
+        /**
+         * @todo add description
+         *
+         * @method amendChangeTabsBug
+         * @memberof Proton
+         * @instance
+         */
         amendChangeTabsBug: function() {
             if (this.elapsed > .5) {
                 this.oldTime = new Date().getTime();
@@ -115,6 +165,13 @@
             }
         },
 
+        /**
+         * Counts all particles from all emitters
+         *
+         * @method getCount
+         * @memberof Proton
+         * @instance
+         */
         getCount: function() {
             var total = 0;
             var length = this.emitters.length;
@@ -124,6 +181,13 @@
             return total;
         },
 
+        /**
+         * Destroys everything related to this Proton instance. This includes all emitters, and all properties
+         *
+         * @method destroy
+         * @memberof Proton
+         * @instance
+         */
         destroy: function() {
             var length = this.emitters.length;
             for (var i = 0; i < length; i++) {
@@ -138,7 +202,7 @@
         }
     };
 
-    window.Proton = Proton;
+    
 
 
 /*
@@ -236,25 +300,78 @@
 
 
 
+
+    /**
+     * @namespace
+     * @memberof! Proton#
+     * @alias Proton.Util
+     */
     var Util = Util || {
+
+        /**
+         * Returns the default if the value is null or undefined
+         *
+         * @memberof Proton#Proton.Util
+         * @method initValue
+         *
+         * @param {Mixed} value a specific value, could be everything but null or undefined
+         * @param {Mixed} defaults the default if the value is null or undefined
+         */
         initValue: function(value, defaults) {
             var value = (value != null && value != undefined) ? value : defaults;
             return value;
         },
 
+        /**
+         * Checks if the value is a valid array
+         *
+         * @memberof Proton#Proton.Util
+         * @method isArray
+         *
+         * @param {Array} value Any array
+         *
+         * @returns {Boolean} 
+         */
         isArray: function(value) {
             return typeof value === 'object' && value.hasOwnProperty('length');
         },
 
+        /**
+         * Destroyes the given array
+         *
+         * @memberof Proton#Proton.Util
+         * @method destroyArray
+         *
+         * @param {Array} array Any array
+         */
         destroyArray: function(array) {
             array.length = 0;
         },
 
+        /**
+         * Destroyes the given object
+         *
+         * @memberof Proton#Proton.Util
+         * @method destroyObject
+         *
+         * @param {Object} obj Any object
+         */
         destroyObject: function(obj) {
             for (var o in obj)
                 delete obj[o];
         },
 
+        /**
+         * Returns the Vector2D - or creates a new one
+         *
+         * @memberof Proton#Proton.Util
+         * @method getVector2D
+         *
+         * @param {Proton.Vector2D | Number} postionOrX
+         * @param {Number} [y] just valid if 'postionOrX' is not an object
+         *
+         * @return {Proton.Vector2D}
+         */
         getVector2D: function(postionOrX, y) {
             if (typeof(postionOrX) == 'object') {
                 return postionOrX;
@@ -264,6 +381,17 @@
             }
         },
 
+        /**
+         * Makes an instance of a class and binds the given array
+         *
+         * @memberof Proton#Proton.Util
+         * @method classApply
+         *
+         * @param {Function} constructor A class to make an instance from
+         * @param {Array} [argArray] Any array to bind it to the constructor
+         *
+         * @return {Object} The instance of constructor, optionally bind with argArray
+         */
         classApply: function(constructor, argArray) {
             if (!argArray) return new constructor;
 
@@ -272,6 +400,17 @@
             return new factoryFunction();
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method judgeVector2D
+         *
+         * @todo add description for param `pOBJ`
+         * @todo add description for function
+         *
+         * @param {Object} pOBJ
+         *
+         * @return {String} result
+         */
         judgeVector2D: function(pOBJ) {
             var result = '';
             if (pOBJ.hasOwnProperty('x') || pOBJ.hasOwnProperty('y') || pOBJ.hasOwnProperty('p') || pOBJ.hasOwnProperty('position'))
@@ -284,6 +423,17 @@
             return result;
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method setVector2DByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `pOBJ`
+         * @todo add description for function
+         *
+         * @param {Object} target
+         * @param {Object} pOBJ
+         */
         setVector2DByObject: function(target, pOBJ) {
             if (pOBJ.hasOwnProperty('x'))
                 target.p.x = pOBJ['x'];
@@ -321,7 +471,23 @@
             if (pOBJ.hasOwnProperty('accelerate'))
                 particle.a.copy(pOBJ['accelerate']);
         },
-        //强行添加属性
+
+        /**
+         * 强行添加属性
+         *
+         * @memberof Proton#Proton.Util
+         * @method addPrototypeByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `filters`
+         * @todo translate desription from chinese to english
+         *
+         * @param {Object} target
+         * @param {Object} prototypeObject An object of single prototypes
+         * @param {Object} filters
+         *
+         * @return {Object} target
+         */
         addPrototypeByObject: function(target, prototypeObject, filters) {
             for (var singlePrototype in prototypeObject) {
                 if (filters) {
@@ -334,7 +500,23 @@
 
             return target;
         },
-        //set prototype
+
+        /**
+         * set the prototype in a given prototypeObject
+         *
+         * @memberof Proton#Proton.Util
+         * @method setPrototypeByObject
+         *
+         * @todo add description for param `target`
+         * @todo add description for param `filters`
+         * @todo translate desription from chinese to english
+         *
+         * @param {Object} target
+         * @param {Object} prototypeObject An object of single prototypes
+         * @param {Object} filters
+         *
+         * @return {Object} target
+         */
         setPrototypeByObject: function(target, prototypeObject, filters) {
             for (var singlePrototype in prototypeObject) {
                 if (target.hasOwnProperty(singlePrototype)) {
@@ -350,6 +532,20 @@
             return target;
         },
 
+        /**
+         * Returns a new Proton.Span object
+         *
+         * @memberof Proton#Proton.Util
+         * @method setSpanValue
+         *
+         * @todo a, b and c should be 'Mixed' or 'Number'?
+         *
+         * @param {Mixed | Proton.Span} a
+         * @param {Mixed}               b
+         * @param {Mixed}               c
+         *
+         * @return {Proton.Span}
+         */
         setSpanValue: function(a, b, c) {
             if (a instanceof Proton.Span) {
                 return a;
@@ -365,6 +561,16 @@
             }
         },
 
+        /**
+         * Returns the value from a Proton.Span, if the param is not a Proton.Span it will return the given parameter
+         *
+         * @memberof Proton#Proton.Util
+         * @method getSpanValue
+         *
+         * @param {Mixed | Proton.Span} pan
+         *
+         * @return {Mixed} the value of Proton.Span OR the parameter if it is not a Proton.Span
+         */
         getSpanValue: function(pan) {
             if (pan instanceof Proton.Span)
                 return pan.getValue();
@@ -372,6 +578,15 @@
                 return pan;
         },
 
+        /**
+         * Inherits any class from the superclass. Acts like 'extends' in Java
+         *
+         * @memberof Proton#Proton.Util
+         * @method inherits
+         *
+         * @param {Object} subClass     the child class
+         * @param {Object} superClass   the parent/super class
+         */
         inherits: function(subClass, superClass) {
             subClass._super_ = superClass;
             if (Object['create']) {
@@ -389,6 +604,16 @@
             }
         },
 
+        /**
+         * This will get the image data. It could be necessary to create a Proton.Zone.
+         *
+         * @memberof Proton#Proton.Util
+         * @method getImageData
+         *
+         * @param {HTMLCanvasElement}   context any canvas, must be a 2dContext 'canvas.getContext('2d')'
+         * @param {Object}              image   could be any dom image, e.g. document.getElementById('thisIsAnImgTag');
+         * @param {Proton.Rectangle}    rect
+         */
         getImageData: function(context, image, rect) {
             context.drawImage(image, rect.x, rect.y);
             var imagedata = context.getImageData(rect.x, rect.y, rect.width, rect.height);
@@ -396,6 +621,18 @@
             return imagedata;
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method getImage
+         *
+         * @todo add description
+         * @todo describe fun
+         *
+         * @param {Mixed}               img
+         * @param {Proton.Particle}     particle
+         * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
+         * @param {Boolean}             fun
+         */
         getImage: function(img, particle, drawCanvas, fun) {
             if (typeof(img) == 'string') {
                 this.loadAndSetImage(img, particle, drawCanvas, fun);
@@ -406,6 +643,20 @@
             }
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method loadedImage
+         *
+         * @todo add description
+         * @todo describe fun
+         * @todo describe target
+         *
+         * @param {String}              src         the src of an img-tag
+         * @param {Proton.Particle}     particle
+         * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
+         * @param {Boolean}             fun
+         * @param {Object}              target
+         */
         loadedImage: function(src, particle, drawCanvas, fun, target) {
             particle.target = target;
             particle.transform.src = src;
@@ -427,6 +678,18 @@
                 fun(particle);
         },
 
+        /**
+         * @memberof Proton#Proton.Util
+         * @method loadAndSetImage
+         *
+         * @todo add description
+         * @todo describe fun
+         *
+         * @param {String}              src         the src of an img-tag
+         * @param {Proton.Particle}     particle
+         * @param {Boolean}             drawCanvas  set to true if a canvas should be saved into particle.transform.canvas
+         * @param {Boolean}             fun
+         */
         loadAndSetImage: function(src, particle, drawCanvas, fun) {
             if (Proton.TextureBuffer[src]) {
                 this.loadedImage(src, particle, drawCanvas, fun, Proton.TextureBuffer[src]);
@@ -440,6 +703,22 @@
             }
         },
 
+        /**
+         * @typedef  {Object} rgbObject
+         * @property {Number} r red value
+         * @property {Number} g green value
+         * @property {Number} b blue value
+         */
+        /**
+         * converts a hex value to a rgb object
+         *
+         * @memberof Proton#Proton.Util
+         * @method hexToRGB
+         *
+         * @param {String} h any hex value, e.g. #000000 or 000000 for black
+         *
+         * @return {rgbObject}
+         */
         hexToRGB: function(h) {
             var hex16 = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
             var r = parseInt(hex16.substring(0, 2), 16);
@@ -453,6 +732,16 @@
             }
         },
 
+        /**
+         * converts a rgb value to a rgb string
+         *
+         * @memberof Proton#Proton.Util
+         * @method rgbToHex
+         *
+         * @param {Object | Proton.hexToRGB} rgb a rgb object like in {@link Proton#Proton.Util.hexToRGB}
+         *
+         * @return {String} rgb()
+         */
         rgbToHex: function(rbg) {
             return 'rgb(' + rbg.r + ', ' + rbg.g + ', ' + rbg.b + ')';
         }
@@ -487,11 +776,40 @@ if (!Function.prototype.bind) {
 }
 
 
+
+	/**
+     * @namespace
+     * @memberof! Proton#
+     * @alias Proton.WebGLUtil
+     */
 	var WebGLUtil = WebGLUtil || {
+
+		/**
+         * @memberof Proton#Proton.WebGLUtil
+         * @method ipot
+         *
+         * @todo add description
+         * @todo add length description
+         *
+         * @param {Number} length
+         *
+         * @return {Boolean}
+         */
 		ipot : function(length) {
 			return (length & (length - 1)) == 0;
 		},
 
+		/**
+         * @memberof Proton#Proton.WebGLUtil
+         * @method nhpot
+         *
+         * @todo add description
+         * @todo add length description
+         *
+         * @param {Number} length
+         *
+         * @return {Number}
+         */
 		nhpot : function(length) {--length;
 			for (var i = 1; i < 32; i <<= 1) {
 				length = length | length >> i;
@@ -499,20 +817,70 @@ if (!Function.prototype.bind) {
 			return length + 1;
 		},
 
+		/**
+         * @memberof Proton#Proton.WebGLUtil
+         * @method makeTranslation
+         *
+         * @todo add description
+         * @todo add tx, ty description
+         * @todo add return description
+         *
+         * @param {Number} tx either 0 or 1
+         * @param {Number} ty either 0 or 1
+         *
+         * @return {Object}
+         */
 		makeTranslation : function(tx, ty) {
 			return [1, 0, 0, 0, 1, 0, tx, ty, 1];
 		},
 
+		/**
+         * @memberof Proton#Proton.WebGLUtil
+         * @method makeRotation
+         *
+         * @todo add description
+         * @todo add return description
+         *
+         * @param {Number} angleInRadians
+         *
+         * @return {Object}
+         */
 		makeRotation : function(angleInRadians) {
 			var c = Math.cos(angleInRadians);
 			var s = Math.sin(angleInRadians);
 			return [c, -s, 0, s, c, 0, 0, 0, 1];
 		},
 
+		/**
+         * @memberof Proton#Proton.WebGLUtil
+         * @method makeScale
+         *
+         * @todo add description
+         * @todo add tx, ty description
+         * @todo add return description
+         *
+         * @param {Number} sx either 0 or 1
+         * @param {Number} sy either 0 or 1
+         *
+         * @return {Object}
+         */
 		makeScale : function(sx, sy) {
 			return [sx, 0, 0, 0, sy, 0, 0, 0, 1];
 		},
 
+		/**
+         * @memberof Proton#Proton.WebGLUtil
+         * @method matrixMultiply
+         *
+         * @todo add description
+         * @todo add a, b description
+         * @todo add return description
+         *
+         * @param {Object} a
+         * @param {Object} b
+         *
+         * @return {Object}
+         */
 		matrixMultiply : function(a, b) {
 			var a00 = a[0 * 3 + 0];
 			var a01 = a[0 * 3 + 1];
@@ -540,7 +908,27 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+     * @namespace
+     * @memberof! Proton#
+     * @alias Proton.DomUtil
+     */
 	var DomUtil = DomUtil || {
+
+		/**
+         * Creates and returns a new canvas. The opacity is by default set to 0
+         *
+         * @memberof Proton#Proton.DomUtil
+         * @method createCanvas
+         *
+         * @param {String} $id the canvas' id
+         * @param {Number} $width the canvas' width
+         * @param {Number} $height the canvas' height
+         * @param {String} [$position=absolute] the canvas' position, default is 'absolute' 
+         *
+         * @return {Object}
+         */
 		createCanvas : function($id, $width, $height, $position) {
 			var element = document.createElement("canvas");
 			var position = $position ? $position : 'absolute';
@@ -553,6 +941,18 @@ if (!Function.prototype.bind) {
 			return element;
 		},
 
+		/**
+         * Adds a transform: translate(), scale(), rotate() to a given div element for all browsers
+         *
+         * @memberof Proton#Proton.DomUtil
+         * @method transformDom
+         *
+         * @param {HTMLDivElement} $div 
+         * @param {Number} $x 
+         * @param {Number} $y 
+         * @param {Number} $scale 
+         * @param {Number} $rotate 
+         */
 		transformDom : function($div, $x, $y, $scale, $rotate) {
 			$div.style.WebkitTransform = 'translate(' + $x + 'px, ' + $y + 'px) ' + 'scale(' + $scale + ') ' + 'rotate(' + $rotate + 'deg)';
 			$div.style.MozTransform = 'translate(' + $x + 'px, ' + $y + 'px) ' + 'scale(' + $scale + ') ' + 'rotate(' + $rotate + 'deg)';
@@ -617,7 +1017,7 @@ if (!Function.prototype.bind) {
 		/**
 		 * The particle's id;
 		 * @property id
-		 * @type {String} id
+		 * @type {string}
 		 */
 		this.id = 'particle_' + Particle.ID++;
 		this.reset(true);
@@ -633,7 +1033,8 @@ if (!Function.prototype.bind) {
 		reset : function(init) {
 			this.life = Infinity;
 			this.age = 0;
-			//能量损失
+
+			//Energy loss
 			this.energy = 1;
 			this.dead = false;
 			this.sleep = false;
@@ -647,6 +1048,7 @@ if (!Function.prototype.bind) {
 			this.rotation = 0;
 			this.color = null;
 			this.easing = Proton.ease.setEasingByName(Proton.easeLinear);
+
 			if (init) {
 				this.transform = {}
 				this.p = new Proton.Vector2D();
@@ -666,6 +1068,7 @@ if (!Function.prototype.bind) {
 				this.old.p.set(0, 0);
 				this.old.v.set(0, 0);
 				this.old.a.set(0, 0);
+
 				this.removeAllBehaviours();
 			}
 
@@ -674,6 +1077,7 @@ if (!Function.prototype.bind) {
 				g : 255,
 				b : 255
 			}
+
 			return this;
 		},
 
@@ -681,6 +1085,7 @@ if (!Function.prototype.bind) {
 			if (!this.sleep) {
 				this.age += time;
 				var length = this.behaviours.length, i;
+
 				for ( i = 0; i < length; i++) {
 					if (this.behaviours[i])
 						this.behaviours[i].applyBehaviour(this, time, index)
@@ -702,11 +1107,13 @@ if (!Function.prototype.bind) {
 			this.behaviours.push(behaviour);
 			if (behaviour.hasOwnProperty('parents'))
 				behaviour.parents.push(this);
+
 			behaviour.initialize(this);
 		},
 
 		addBehaviours : function(behaviours) {
 			var length = behaviours.length, i;
+
 			for ( i = 0; i < length; i++) {
 				this.addBehaviour(behaviours[i]);
 			}
@@ -723,6 +1130,7 @@ if (!Function.prototype.bind) {
 		removeAllBehaviours : function() {
 			Proton.Util.destroyArray(this.behaviours);
 		},
+		
 		/**
 		 * Destory this particle
 		 * @method destroy
@@ -740,77 +1148,148 @@ if (!Function.prototype.bind) {
 
 
 
-    function Pool() {
-        this.cID = 0;
-        this.list = {};
-    }
-    
-    Pool.prototype = {
-        create: function(obj, params) {
-            this.cID++;
+	/**
+	 * @memberof! Proton#
+	 * @constructor
+	 * @alias Proton.Pool
+	 *
+	 * @todo add description
+	 * @todo add description of properties
+	 *
+	 * @property {Number} cID
+	 * @property {Object} list
+	 */
+	function Pool() {
+		this.cID = 0;
+		this.list = {};
+	}
+	
+	Pool.prototype = {
+
+		/**
+		 * Creates a new class instance
+		 *
+		 * @todo add more documentation 
+		 *
+		 * @method create
+		 * @memberof Proton#Proton.Pool
+		 *
+		 * @param {Object|Function} obj any Object or Function
+		 * @param {Object} [params] just add if `obj` is a function
+		 *
+		 * @return {Object}
+		 */
+		create: function(obj, params) {
+			this.cID++;
    
-            if (typeof obj == "function")
-                return Proton.Util.classApply(obj, params);
-            else
-                return obj.clone();
-        },
+			if (typeof obj == "function")
+				return Proton.Util.classApply(obj, params);
+			else
+				return obj.clone();
+		},
 
-        getCount: function() {
-            var count = 0;
-            for (var id in this.list)
-                count += this.list[id].length;
+		/**
+		 * @todo add description - what is in the list?
+		 *
+		 * @method getCount
+		 * @memberof Proton#Proton.Pool
+		 *
+		 * @return {Number}
+		 */
+		getCount: function() {
+			var count = 0;
+			for (var id in this.list)
+				count += this.list[id].length;
 
-            return count++;;
-        },
+			return count++;;
+		},
 
-        get: function(obj, params) {
-            var p, puid = obj.__puid || PUID.id(obj);
-            if (this.list[puid] && this.list[puid].length > 0)
-                p = this.list[puid].pop();
-            else
-                p = this.create(obj, params);
+		/**
+		 * @todo add description
+		 *
+		 * @method get
+		 * @memberof Proton#Proton.Pool
+		 *
+		 * @param {Object|Function} obj
+		 * @param {Object} [params] just add if `obj` is a function
+		 *
+		 * @return {Object}
+		 */
+		get: function(obj, params) {
+			var p, puid = obj.__puid || PUID.id(obj);
+			if (this.list[puid] && this.list[puid].length > 0)
+				p = this.list[puid].pop();
+			else
+				p = this.create(obj, params);
 
-            p.__puid = obj.__puid || puid;
-            return p;
-        },
+			p.__puid = obj.__puid || puid;
+			return p;
+		},
 
-        set: function(obj) {
-            return this._getList(obj.__puid).push(obj);
-        },
+		/**
+		 * @todo add description
+		 *
+		 * @method set
+		 * @memberof Proton#Proton.Pool
+		 *
+		 * @param {Object} obj
+		 *
+		 * @return {Object}
+		 */
+		set: function(obj) {
+			return this._getList(obj.__puid).push(obj);
+		},
 
-        destroy: function() {
-            for (var id in this.list) {
-                this.list[id].length = 0;
-                delete this.list[id];
-            }
-        },
+		/**
+		 * Destroyes all items from Pool.list
+		 *
+		 * @method destroy
+		 * @memberof Proton#Proton.Pool
+		 */
+		destroy: function() {
+			for (var id in this.list) {
+				this.list[id].length = 0;
+				delete this.list[id];
+			}
+		},
 
-        _getList: function(uid) {
-            uid = uid || "default";
-            if (!this.list[uid]) this.list[uid] = [];
-            return this.list[uid];
-        }
-    }
+		/**
+		 * Returns Pool.list
+		 *
+		 * @method _getList
+		 * @memberof Proton#Proton.Pool
+		 * @private
+		 *
+		 * @param {Number} uid the unique id
+		 *
+		 * @return {Object}
+		 */
+		_getList: function(uid) {
+			uid = uid || "default";
+			if (!this.list[uid]) this.list[uid] = [];
+			return this.list[uid];
+		}
+	}
 
-    Proton.Pool = Pool;
+	Proton.Pool = Pool;
 
-    var PUID = {
-        _id: 0,
-        _uids: {},
-        id: function(obj) {
-            for (var id in this._uids) {
-                if (this._uids[id] == obj) return id;
-            }
+	var PUID = {
+		_id: 0,
+		_uids: {},
+		id: function(obj) {
+			for (var id in this._uids) {
+				if (this._uids[id] == obj) return id;
+			}
 
-            var nid = "PUID_" + (this._id++);
-            this._uids[nid] = obj;
-            return nid;
-        },
+			var nid = "PUID_" + (this._id++);
+			this._uids[nid] = obj;
+			return nid;
+		},
 
-        hash: function(str) {
-            return;
-        }
-    }
+		hash: function(str) {
+			return;
+		}
+	}
 
 
 
@@ -904,23 +1383,6 @@ if (!Function.prototype.bind) {
 
 		},
 
-		setComponent : function(index, value) {
-
-			switch ( index ) {
-
-				case 0:
-					this.x = value;
-					break;
-				case 1:
-					this.y = value;
-					break;
-				default:
-					throw new Error("index is out of range: " + index);
-
-			}
-
-		},
-
 		getGradient : function() {
 			if (this.x != 0)
 				return Math.atan2(this.y, this.x);
@@ -928,21 +1390,6 @@ if (!Function.prototype.bind) {
 				return Math.PI / 2;
 			else if (this.y < 0)
 				return -Math.PI / 2;
-		},
-
-		getComponent : function(index) {
-
-			switch ( index ) {
-
-				case 0:
-					return this.x;
-				case 1:
-					return this.y;
-				default:
-					throw new Error("index is out of range: " + index);
-
-			}
-
 		},
 
 		copy : function(v) {
@@ -1073,34 +1520,6 @@ if (!Function.prototype.bind) {
 			if (this.y < v.y) {
 
 				this.y = v.y;
-
-			}
-
-			return this;
-
-		},
-
-		clamp : function(min, max) {
-
-			// This function assumes min < max, if this assumption isn't true it will not operate correctly
-
-			if (this.x < min.x) {
-
-				this.x = min.x;
-
-			} else if (this.x > max.x) {
-
-				this.x = max.x;
-
-			}
-
-			if (this.y < min.y) {
-
-				this.y = min.y;
-
-			} else if (this.y > max.y) {
-
-				this.y = max.y;
 
 			}
 
@@ -1422,46 +1841,34 @@ if (!Function.prototype.bind) {
 
 
 	Behaviour.id = 0;
+
 	/**
 	 * The Behaviour class is the base for the other Behaviour
 	 *
-	 * @class Behaviour
-	 * @constructor
+	 * @memberof! -
+	 * @interface
+	 * @alias Proton.Behaviour
+	 *
+	 * @param {Number} life 	the behaviours life
+	 * @param {String} easing 	The behaviour's decaying trend, for example Proton.easeOutQuart
+	 *
+	 * @property {String}  id 		The behaviours id
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @property {Number}  age=0 	How long the particle should be 'alife'
+	 * @property {Number}  energy=1
+	 * @property {Boolean} dead=false The particle is dead at first
+	 * @property {Array}   parents 	The behaviour's parents array
+	 * @property {String}  name 	The behaviour name
 	 */
 	function Behaviour(life, easing) {
-		/**
-		 * The behaviour's id;
-		 * @property id
-		 * @type {String} id
-		 */
 		this.id = 'Behaviour_' + Behaviour.id++;
 		this.life = Proton.Util.initValue(life, Infinity);
-		/**
-		 * The behaviour's decaying trend, for example Proton.easeOutQuart;
-		 * @property easing
-		 * @type {String}
-		 * @default Proton.easeLinear
-		 */
 		this.easing = Proton.ease.setEasingByName(easing);
 		this.age = 0;
 		this.energy = 1;
-		/**
-		 * The behaviour is Dead;
-		 * @property dead
-		 * @type {Boolean}
-		 */
 		this.dead = false;
-		/**
-		 * The behaviour's parents array;
-		 * @property parents
-		 * @type {Array}
-		 */
 		this.parents = [];
-		/**
-		 * The behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = 'Behaviour';
 	}
 
@@ -1471,8 +1878,11 @@ if (!Function.prototype.bind) {
 		 * Reset this behaviour's parameters
 		 *
 		 * @method reset
-		 * @param {Number} this behaviour's life
-		 * @param {String} this behaviour's easing
+		 * @memberof Proton.Behaviour
+		 * @instance
+		 *
+		 * @param {Number} [life=Infinity] 		this behaviour's life
+		 * @param {String} [easing=easeLinear] 	this behaviour's easing
 		 */
 		reset : function(life, easing) {
 			this.life = Proton.Util.initValue(life, Infinity);
@@ -1482,6 +1892,9 @@ if (!Function.prototype.bind) {
 		 * Normalize a force by 1:100;
 		 *
 		 * @method normalizeForce
+		 * @memberof Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Proton.Vector2D} force 
 		 */
 		normalizeForce : function(force) {
@@ -1492,6 +1905,9 @@ if (!Function.prototype.bind) {
 		 * Normalize a value by 1:100;
 		 *
 		 * @method normalizeValue
+		 * @memberof Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Number} value
 		 */
 		normalizeValue : function(value) {
@@ -1502,6 +1918,9 @@ if (!Function.prototype.bind) {
 		 * Initialize the behaviour's parameters for all particles
 		 *
 		 * @method initialize
+		 * @memberof Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Proton.Particle} particle
 		 */
 		initialize : function(particle) {
@@ -1511,9 +1930,12 @@ if (!Function.prototype.bind) {
 		 * Apply this behaviour for all particles every time
 		 *
 		 * @method applyBehaviour
+		 * @memberof Proton.Behaviour
+		 * @instance
+		 *
 		 * @param {Proton.Particle} particle
-		 * @param {Number} the integrate time 1/ms
-		 * @param {Int} the particle index
+		 * @param {Number} 			time the integrate time 1/ms
+		 * @param {Int} 			index the particle index
 		 */
 		applyBehaviour : function(particle, time, index) {
 			this.age += time;
@@ -1529,7 +1951,10 @@ if (!Function.prototype.bind) {
 		
 		/**
 		 * Destory this behaviour
+		 *
 		 * @method destroy
+		 * @memberof Proton.Behaviour
+		 * @instance
 		 */
 		destroy : function() {
 			var index;
@@ -1548,10 +1973,13 @@ if (!Function.prototype.bind) {
 
 	/**
 	 * The number of particles per second emission (a [particle]/b [s]);
-	 * @class Proton.Rate
+	 * @namespace
+	 * @memberof! Proton#
 	 * @constructor
-	 * @param {Array or Number or Proton.Span} numpan the number of each emission;
-	 * @param {Array or Number or Proton.Span} timepan the time of each emission;
+	 * @alias Proton.Rate
+	 *
+	 * @param {Array | Number | Proton.Span} numpan the number of each emission;
+	 * @param {Array | Number | Proton.Span} timepan the time of each emission;
 	 * for example: new Proton.Rate(new Proton.Span(10, 20), new Proton.Span(.1, .25));
 	 */
 	function Rate(numpan, timepan) {
@@ -1566,6 +1994,11 @@ if (!Function.prototype.bind) {
 
 
 	Rate.prototype = {
+		/**
+		 * @method init
+		 * @memberof Proton#Proton.Rate
+		 * @instance
+		 */
 		init : function() {
 			this.startTime = 0;
 			this.nextTime = this.timePan.getValue();
@@ -1799,6 +2232,20 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Force
+	 *
+	 * @param {Number} fx
+	 * @param {Number} fy
+	 * @param {Number} [life=Infinity] 			this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Force(fx, fy, life, easing) {
 		Force._super_.call(this, life, easing);
 		this.force = this.normalizeForce(new Proton.Vector2D(fx, fy));
@@ -1807,12 +2254,36 @@ if (!Function.prototype.bind) {
 
 
 	Proton.Util.inherits(Force, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Force
+	 * @instance
+	 *
+	 * @param {Number} fx
+	 * @param {Number} fy
+	 * @param {Number} [life=Infinity] 			this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Force.prototype.reset = function(fx, fy, life, easing) {
 		this.force = this.normalizeForce(new Proton.Vector2D(fx, fy));
 		if (life)
 			Force._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Force
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	Force.prototype.applyBehaviour = function(particle, time, index) {
 		Force._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.a.add(this.force);
@@ -1823,8 +2294,33 @@ if (!Function.prototype.bind) {
 
 
 
+	/**
+	 * This behaviour let the particles follow one specific Proton.Vector2D
+	 *
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Attraction
+	 *
+	 * @todo add description for 'force' and 'radius'
+	 *
+	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {Proton.Vector2D} targetPosition
+	 * @property {Number} radius
+	 * @property {Number} force
+	 * @property {Number} radiusSq
+	 * @property {Proton.Vector2D} attractionForce
+	 * @property {Number} lengthSq
+	 * @property {String} name The Behaviour name
+	 */
 	function Attraction(targetPosition, force, radius, life, easing) {
 		Attraction._super_.call(this, life, easing);
+
 		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
 		this.radius = Proton.Util.initValue(radius, 1000);
 		this.force = Proton.Util.initValue(this.normalizeValue(force), 100);
@@ -1836,6 +2332,22 @@ if (!Function.prototype.bind) {
 
 
 	Proton.Util.inherits(Attraction, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Attraction
+	 * @instance
+	 *
+	 * @todo add description for 'force' and 'radius'
+	 *
+	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Attraction.prototype.reset = function(targetPosition, force, radius, life, easing) {
 		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
 		this.radius = Proton.Util.initValue(radius, 1000);
@@ -1847,6 +2359,17 @@ if (!Function.prototype.bind) {
 			Attraction._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @memberof Proton#Proton.Attraction
+	 * @method applyBehaviour
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	Attraction.prototype.applyBehaviour = function(particle, time, index) {
 		Attraction._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		this.attractionForce.copy(this.targetPosition);
@@ -1865,6 +2388,22 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.RandomDrift
+	 *
+	 * @param {Number} driftX 				X value of the new Proton.Vector2D
+	 * @param {Number} driftY  				Y value of the new Proton.Vector2D
+	 * @param {Number} delay 				How much delay the drift should have
+	 * @param {Number} [life=Infinity] 		this behaviour's life
+	 * @param {String} [easing=easeLinear] 	this behaviour's easing
+	 *
+	 * @property {Number} time The time of the drift
+	 * @property {String} name The Behaviour name
+	 */
 	function RandomDrift(driftX, driftY, delay, life, easing) {
 		RandomDrift._super_.call(this, life, easing);
 		this.reset(driftX, driftY, delay);
@@ -1872,8 +2411,21 @@ if (!Function.prototype.bind) {
 		this.name = "RandomDrift";
 	}
 
-
 	Proton.Util.inherits(RandomDrift, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.RandomDrift
+	 * @instance
+	 *
+	 * @param {Number} driftX 				X value of the new Proton.Vector2D
+	 * @param {Number} driftY  				Y value of the new Proton.Vector2D
+	 * @param {Number} delay 				How much delay the drift should have
+	 * @param {Number} [life=Infinity] 		this behaviour's life
+	 * @param {String} [easing=easeLinear] 	this behaviour's easing
+	 */
 	RandomDrift.prototype.reset = function(driftX, driftY, delay, life, easing) {
 		this.panFoce = new Proton.Vector2D(driftX, driftY);
 		this.panFoce = this.normalizeForce(this.panFoce);
@@ -1882,6 +2434,17 @@ if (!Function.prototype.bind) {
 			RandomDrift._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.RandomDrift
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	RandomDrift.prototype.applyBehaviour = function(particle, time, index) {
 		RandomDrift._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		this.time += time;
@@ -1896,39 +2459,125 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * The oppisite of Proton.Attraction - turns the force
+	 *
+	 * @memberof! Proton#
+	 * @augments Proton#Proton.Attraction
+	 * @constructor
+	 * @alias Proton.Repulsion
+	 *
+	 * @todo add description for 'force' and 'radius'
+	 *
+	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {Number} force
+	 * @property {String} name The Behaviour name
+	 */
 	function Repulsion(targetPosition, force, radius, life, easing) {
 		Repulsion._super_.call(this, targetPosition, force, radius, life, easing);
 		this.force *= -1;
 		this.name = "Repulsion";
 	}
 
-
 	Proton.Util.inherits(Repulsion, Proton.Attraction);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Repulsion
+	 * @instance
+	 *
+	 * @todo add description for 'force' and 'radius'
+	 *
+	 * @param {Proton.Vector2D} targetPosition the attraction point coordinates
+	 * @param {Number} [force=100]
+	 * @param {Number} [radius=1000]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Repulsion.prototype.reset = function(targetPosition, force, radius, life, easing) {
 		Repulsion._super_.prototype.reset.call(this, targetPosition, force, radius, life, easing);
 		this.force *= -1;
 	}
+
 	Proton.Repulsion = Repulsion;
 
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton#Proton.Force
+	 * @constructor
+	 * @alias Proton.Gravity
+	 *
+	 * @param {Number} g 							Gravity
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Gravity(g, life, easing) {
 		Gravity._super_.call(this, 0, g, life, easing);
 		this.name = "Gravity";
 	}
 
-
 	Proton.Util.inherits(Gravity, Proton.Force);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Gravity
+	 * @instance
+	 *
+	 * @param {Number} g 							Gravity
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Gravity.prototype.reset = function(g, life, easing) {
 		Gravity._super_.prototype.reset.call(this, 0, g, life, easing);
 	}
+
 	Proton.Gravity = Gravity;
 	Proton.G = Gravity;
 
 
 
 	//can use Collision(emitter,true,function(){}) or Collision();
+
+	/**
+	 * The callback after collision
+	 *
+	 * @callback Callback
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Proton.Paritcle} otherParticle
+	 */
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Collision
+	 *
+	 * @todo add description to mass
+	 *
+	 * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
+	 * @param {Boolean} 		[mass=true]			
+	 * @param {Callback}	 	[callback=null]		the callback after the collision
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Collision(emitter, mass, callback, life, easing) {
 		Collision._super_.call(this, life, easing);
 		this.reset(emitter, mass, callback);
@@ -1937,6 +2586,22 @@ if (!Function.prototype.bind) {
 
 
 	Proton.Util.inherits(Collision, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @memberof Proton#Proton.Collision
+	 * @method reset
+	 * @instance
+	 *
+	 * @todo add description to mass
+	 *
+	 * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
+	 * @param {Boolean} 		[mass=true]			
+	 * @param {Callback}	 	[callback=null]		the callback after the collision
+	 * @param {Number} 			[life=Infinity] 	this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Collision.prototype.reset = function(emitter, mass, callback, life, easing) {
 		this.emitter = Proton.Util.initValue(emitter, null);
 		this.mass = Proton.Util.initValue(mass, true);
@@ -1947,6 +2612,17 @@ if (!Function.prototype.bind) {
 			Collision._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @memberof Proton#Proton.Collision
+	 * @method applyBehaviour
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	Collision.prototype.applyBehaviour = function(particle, time, index) {
 		var newPool = this.emitter ? this.emitter.particles.slice(index) : this.pool.slice(index);
 		var otherParticle;
@@ -1982,15 +2658,42 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * Defines what happens if the particles come to the end of the specified zone
+	 *
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.CrossZone
+	 *
+	 * @param {Proton.Zone} zone 						can be any Proton.Zone - e.g. Proton.RectZone()
+	 * @param {String} 		[crossType=dead] 			what happens if the particles pass the zone - allowed strings: dead | bound | cross
+	 * @param {Number} 		[life=Infinity] 			this behaviour's life
+	 * @param {String} 		[easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function CrossZone(zone, crossType, life, easing) {
 		CrossZone._super_.call(this, life, easing);
 		this.reset(zone, crossType);
-		///dead /bound /cross
 		this.name = "CrossZone";
 	}
 
-
 	Proton.Util.inherits(CrossZone, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.CrossZone
+	 * @instance
+	 *
+	 * @param {Proton.Zone} zone 				can be any Proton.Zone - e.g. Proton.RectZone()
+ 	 * @param {String} 		[crossType=dead] 	what happens if the particles pass the zone - allowed strings: dead | bound | cross
+	 * @param {Number} 		[life=Infinity] 	this behaviour's life
+	 * @param {String} 		[easing=easeLinear]	this behaviour's easing
+	 */
 	CrossZone.prototype.reset = function(zone, crossType, life, easing) {
 		this.zone = zone;
 		this.zone.crossType = Proton.Util.initValue(crossType, "dead");
@@ -1998,6 +2701,17 @@ if (!Function.prototype.bind) {
 			CrossZone._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.CrossZone
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	CrossZone.prototype.applyBehaviour = function(particle, time, index) {
 		CrossZone._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		this.zone.crossing(particle);
@@ -2007,19 +2721,45 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Alpha
+	 *
+	 * @todo add description for 'a' and 'b'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Alpha(a, b, life, easing) {
 		Alpha._super_.call(this, life, easing);
 		this.reset(a, b);
-		/**
-		 * The Behaviour name;
-		 * @property name
-		 * @type {string}
-		 */
 		this.name = "Alpha";
 	}
 
 
 	Proton.Util.inherits(Alpha, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Alpha
+	 * @instance
+	 *
+	 * @todo add description for 'a' and 'b'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Alpha.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -2031,6 +2771,15 @@ if (!Function.prototype.bind) {
 			Alpha._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Sets the new alpha value of the particle
+	 *
+	 * @method initialize
+	 * @memberof Proton#Proton.Alpha
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle A single Proton generated particle
+	 */
 	Alpha.prototype.initialize = function(particle) {
 		particle.transform.alphaA = this.a.getValue();
 		if (this.same)
@@ -2039,6 +2788,15 @@ if (!Function.prototype.bind) {
 			particle.transform.alphaB = this.b.getValue();
 	};
 
+	/**
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Alpha
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+ 	 */
 	Alpha.prototype.applyBehaviour = function(particle, time, index) {
 		Alpha._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.alpha = particle.transform.alphaB + (particle.transform.alphaA - particle.transform.alphaB) * this.energy;
@@ -2050,6 +2808,22 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Scale
+	 *
+	 * @todo add description for 'a' and 'b'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Scale(a, b, life, easing) {
 		Scale._super_.call(this, life, easing);
 		this.reset(a, b);
@@ -2058,6 +2832,19 @@ if (!Function.prototype.bind) {
 
 
 	Proton.Util.inherits(Scale, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Scale
+	 * @instance
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Scale.prototype.reset = function(a, b, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -2069,6 +2856,15 @@ if (!Function.prototype.bind) {
 			Scale._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Initialize the behaviour's parameters for all particles
+	 *
+	 * @method initialize
+	 * @memberof Proton#Proton.Scale
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 */
 	Scale.prototype.initialize = function(particle) {
 		particle.transform.scaleA = this.a.getValue();
 		particle.transform.oldRadius = particle.radius;
@@ -2079,6 +2875,17 @@ if (!Function.prototype.bind) {
 
 	};
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Scale
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	Scale.prototype.applyBehaviour = function(particle, time, index) {
 		Scale._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		particle.scale = particle.transform.scaleB + (particle.transform.scaleA - particle.transform.scaleB) * this.energy;
@@ -2091,14 +2898,46 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Rotate
+	 *
+	 * @todo add description for 'a', 'b' and 'style'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {String} [style=to]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Rotate(a, b, style, life, easing) {
 		Rotate._super_.call(this, life, easing);
 		this.reset(a, b, style);
 		this.name = "Rotate";
 	}
 
-
 	Proton.Util.inherits(Rotate, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Rotate
+	 * @instance
+	 *
+	 * @todo add description for 'a', 'b' and 'style'
+	 *
+	 * @param {Number} a
+	 * @param {String} b
+	 * @param {String} [style=to]
+	 * @param {Number} [life=Infinity] 				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 */
 	Rotate.prototype.reset = function(a, b, style, life, easing) {
 		if (b == null || b == undefined)
 			this.same = true;
@@ -2111,6 +2950,15 @@ if (!Function.prototype.bind) {
 			Rotate._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Initialize the behaviour's parameters for all particles
+	 *
+	 * @method initialize
+	 * @memberof Proton#Proton.Rotate
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 */
 	Rotate.prototype.initialize = function(particle) {
 		particle.rotation = this.a.getValue();
 		particle.transform.rotationA = this.a.getValue();
@@ -2118,6 +2966,17 @@ if (!Function.prototype.bind) {
 			particle.transform.rotationB = this.b.getValue();
 	};
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Rotate
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} 			time the integrate time 1/ms
+	 * @param {Int} 			index the particle index
+	 */
 	Rotate.prototype.applyBehaviour = function(particle, time, index) {
 		Rotate._super_.prototype.applyBehaviour.call(this, particle, time, index);
 		if (!this.same) {
@@ -2136,6 +2995,20 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.Color
+	 *
+	 * @param {Proton.ColorSpan | String} color1 the string should be a hex e.g. #000000 for black
+	 * @param {Proton.ColorSpan | String} color2 the string should be a hex e.g. #000000 for black
+	 * @param {Number} [life=Infinity] 	this behaviour's life
+	 * @param {String} [easing=easeLinear] 	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function Color(color1, color2, life, easing) {
 		Color._super_.call(this, life, easing);
 		this.reset(color1, color2);
@@ -2144,6 +3017,19 @@ if (!Function.prototype.bind) {
 
 
 	Proton.Util.inherits(Color, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.ColorSpan | String} color1 the string should be a hex e.g. #000000 for black
+	 * @param {Proton.ColorSpan | String} color2 the string should be a hex e.g. #000000 for black
+	 * @param {Number} [life=Infinity] 	this behaviour's life
+	 * @param {String} [easing=easeLinear] 	this behaviour's easing
+	 */
 	Color.prototype.reset = function(color1, color2, life, easing) {
 		this.color1 = this.setSpanValue(color1);
 		this.color2 = this.setSpanValue(color2);
@@ -2151,6 +3037,15 @@ if (!Function.prototype.bind) {
 			Color._super_.prototype.reset.call(this, life, easing);
 	}
 
+	/**
+	 * Initialize the behaviour's parameters for all particles
+	 *
+	 * @method initialize
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 */
 	Color.prototype.initialize = function(particle) {
 		particle.color = this.color1.getValue();
 		particle.transform.beginRGB = Proton.Util.hexToRGB(particle.color);
@@ -2159,6 +3054,17 @@ if (!Function.prototype.bind) {
 			particle.transform.endRGB = Proton.Util.hexToRGB(this.color2.getValue());
 	};
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	Color.prototype.applyBehaviour = function(particle, time, index) {
 		if (this.color2) {
 			Color._super_.prototype.applyBehaviour.call(this, particle, time, index);
@@ -2176,6 +3082,17 @@ if (!Function.prototype.bind) {
 		}
 	};
 
+	/**
+	 * Make sure that the color is an instance of Proton.ColorSpan, if not it makes a new instance
+	 *
+	 * @method setSpanValue
+	 * @memberof Proton#Proton.Color
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	Color.prototype.setSpanValue = function(color) {
 		if (color) {
 			if ( color instanceof Proton.ColorSpan) {
@@ -2192,6 +3109,20 @@ if (!Function.prototype.bind) {
 
 
 
+
+	/**
+	 * @memberof! Proton#
+	 * @augments Proton.Behaviour
+	 * @constructor
+	 * @alias Proton.GravityWell
+	 *
+	 * @param {Proton.Vector2D} [centerPoint=new Proton.Vector2D] The point in the center
+	 * @param {Number} [force=100]					The force	
+	 * @param {Number} [life=Infinity]				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear]	this behaviour's easing
+	 *
+	 * @property {String} name The Behaviour name
+	 */
 	function GravityWell(centerPoint, force, life, easing) {
 		GravityWell._super_.call(this, life, easing);
 		this.distanceVec = new Proton.Vector2D();
@@ -2200,8 +3131,20 @@ if (!Function.prototype.bind) {
 		this.name = "GravityWell";
 	}
 
-
 	Proton.Util.inherits(GravityWell, Proton.Behaviour);
+
+	/**
+	 * Reset this behaviour's parameters
+	 *
+	 * @method reset
+	 * @memberof Proton#Proton.GravityWell
+	 * @instance
+	 *
+	 * @param {Proton.Vector2D} [centerPoint=new Proton.Vector2D] The point in the center
+	 * @param {Number} [force=100]					The force	
+	 * @param {Number} [life=Infinity]				this behaviour's life
+	 * @param {String} [easing=Proton.easeLinear]	this behaviour's easing
+	 */
 	GravityWell.prototype.reset = function(centerPoint, force, life, easing) {
 		this.distanceVec = new Proton.Vector2D();
 		this.centerPoint = Proton.Util.initValue(centerPoint, new Proton.Vector2D);
@@ -2209,10 +3152,25 @@ if (!Function.prototype.bind) {
 		if (life)
 			GravityWell._super_.prototype.reset.call(this, life, easing);
 	};
+
+	/**
+	 * @inheritdoc
+	 */
 	GravityWell.prototype.initialize = function(particle) {
 
 	};
 
+	/**
+	 * Apply this behaviour for all particles every time
+	 *
+	 * @method applyBehaviour
+	 * @memberof Proton#Proton.GravityWell
+	 * @instance
+	 *
+	 * @param {Proton.Particle} particle
+	 * @param {Number} the integrate time 1/ms
+	 * @param {Int} the particle index
+	 */
 	GravityWell.prototype.applyBehaviour = function(particle, time, index) {
 		this.distanceVec.set(this.centerPoint.x - particle.p.x, this.centerPoint.y - particle.p.y);
 		var distanceSq = this.distanceVec.lengthSq();
@@ -2273,7 +3231,7 @@ if (!Function.prototype.bind) {
 		/**
 		 * The emitter's id;
 		 * @property id
-		 * @type {String} id
+		 * @type {string}
 		 */
 		this.id = 'emitter_' + Emitter.ID++;
 	};
@@ -2743,133 +3701,19 @@ if (!Function.prototype.bind) {
 			return 0.5 * ((value -= 2) * value * (((s *= (1.525)) + 1) * value + s) + 2);
 		},
 
-		setEasingByName : function(name) {
-			switch (name) {
-				case 'easeLinear':
-					return Proton.ease.easeLinear;
-					break;
-
-				case 'easeInQuad':
-					return Proton.ease.easeInQuad;
-					break;
-
-				case 'easeOutQuad':
-					return Proton.ease.easeOutQuad;
-					break;
-
-				case 'easeInOutQuad':
-					return Proton.ease.easeInOutQuad;
-					break;
-
-				case 'easeInCubic':
-					return Proton.ease.easeInCubic;
-					break;
-
-				case 'easeOutCubic':
-					return Proton.ease.easeOutCubic;
-					break;
-
-				case 'easeInOutCubic':
-					return Proton.ease.easeInOutCubic;
-					break;
-
-				case 'easeInQuart':
-					return Proton.ease.easeInQuart;
-					break;
-
-				case 'easeOutQuart':
-					return Proton.ease.easeOutQuart;
-					break;
-
-				case 'easeInOutQuart':
-					return Proton.ease.easeInOutQuart;
-					break;
-
-				case 'easeInSine':
-					return Proton.ease.easeInSine;
-					break;
-
-				case 'easeOutSine':
-					return Proton.ease.easeOutSine;
-					break;
-
-				case 'easeInOutSine':
-					return Proton.ease.easeInOutSine;
-					break;
-
-				case 'easeInExpo':
-					return Proton.ease.easeInExpo;
-					break;
-
-				case 'easeOutExpo':
-					return Proton.ease.easeOutExpo;
-					break;
-
-				case 'easeInOutExpo':
-					return Proton.ease.easeInOutExpo;
-					break;
-
-				case 'easeInCirc':
-					return Proton.ease.easeInCirc;
-					break;
-
-				case 'easeOutCirc':
-					return Proton.ease.easeOutCirc;
-					break;
-
-				case 'easeInOutCirc':
-					return Proton.ease.easeInOutCirc;
-					break;
-
-				case 'easeInBack':
-					return Proton.ease.easeInBack;
-					break;
-
-				case 'easeOutBack':
-					return Proton.ease.easeOutBack;
-					break;
-
-				case 'easeInOutBack':
-					return Proton.ease.easeInOutBack;
-					break;
-				
-				default:
-					return Proton.ease.easeLinear;
-					break;
-			}
-		}
+		setEasingByName: function(easeName) {
+            if (!!ease[easeName])
+                return ease[easeName];
+            else
+                return ease.easeLinear;
+        }
 	}
 
-	Proton.ease = ease;
-	Proton.easeLinear = 'easeLinear';
+	for (var key in ease) {
+        if (key != "setEasingByName") Proton[key] = ease[key];
+    }
 
-	Proton.easeInQuad = 'easeInQuad';
-	Proton.easeOutQuad = 'easeOutQuad';
-	Proton.easeInOutQuad = 'easeInOutQuad';
-
-	Proton.easeInCubic = 'easeInCubic';
-	Proton.easeOutCubic = 'easeOutCubic';
-	Proton.easeInOutCubic = 'easeInOutCubic';
-
-	Proton.easeInQuart = 'easeInQuart';
-	Proton.easeOutQuart = 'easeOutQuart';
-	Proton.easeInOutQuart = 'easeInOutQuart';
-
-	Proton.easeInSine = 'easeInSine';
-	Proton.easeOutSine = 'easeOutSine';
-	Proton.easeInOutSine = 'easeInOutSine';
-
-	Proton.easeInExpo = 'easeInExpo';
-	Proton.easeOutExpo = 'easeOutExpo';
-	Proton.easeInOutExpo = 'easeInOutExpo';
-
-	Proton.easeInCirc = 'easeInCirc';
-	Proton.easeOutCirc = 'easeOutCirc';
-	Proton.easeInOutCirc = 'easeInOutCirc';
-
-	Proton.easeInBack = 'easeInBack';
-	Proton.easeOutBack = 'easeOutBack';
-	Proton.easeInOutBack = 'easeInOutBack';
+    Proton.ease = ease;
 	
 
 
@@ -4015,42 +4859,6 @@ if (!Function.prototype.bind) {
 	Proton.ImageZone = ImageZone;
 
 
-/**
- * You can use this emit particles.
- *
- * This method will console.log the fixed number of your info  in updata or requestAnimationFrame
- * 
- * use like this Proton.log('+12',mc); log 12 times
- *
- * @class Proton.log
- * @constructor
- * @param {*} logInfo;
- */
-
-	var log = function() {
-		if (window.console && window.console.log) {
-			var arg = arguments;
-			if ( typeof arguments[0] == 'string') {
-				if (arguments[0].indexOf('+') == 0) {
-					var n = parseInt(arguments[0]);
-					if (log.once < n) {
-						delete arg[0];
-						console.log(arg);
-						log.once++;
-					}
-				} else {
-					console.log(arg);
-				}
-			} else {
-				console.log(arg);
-			}
-		}
-	}
-
-	log.once = 0;
-	Proton.log = log;
-
-
 
 	var Debug = Debug || {
 		addEventListener : function(proton, fun) {
@@ -4063,12 +4871,14 @@ if (!Function.prototype.bind) {
 			var color = c || '#ff0000';
 			var rgb = Proton.Util.hexToRGB(color);
 			var style = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + 0.5 + ')';
+			
 			return style;
 		},
 
 		drawZone : function(proton, canvas, zone, clear) {
 			var context = canvas.getContext('2d');
 			var style = this.setStyle();
+
 			this.addEventListener(proton, function() {
 				if (clear)
 					context.clearRect(0, 0, canvas.width, canvas.height);
@@ -4134,7 +4944,6 @@ if (!Function.prototype.bind) {
 	Proton.Debug = Debug;
 
 
-})(window);
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 
@@ -4164,3 +4973,6 @@ if (!Function.prototype.bind) {
 				clearTimeout(id);
 			};
 	}()); 
+
+    return Proton;
+}));

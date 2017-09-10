@@ -107,132 +107,18 @@
 			return 0.5 * ((value -= 2) * value * (((s *= (1.525)) + 1) * value + s) + 2);
 		},
 
-		setEasingByName : function(name) {
-			switch (name) {
-				case 'easeLinear':
-					return Proton.ease.easeLinear;
-					break;
-
-				case 'easeInQuad':
-					return Proton.ease.easeInQuad;
-					break;
-
-				case 'easeOutQuad':
-					return Proton.ease.easeOutQuad;
-					break;
-
-				case 'easeInOutQuad':
-					return Proton.ease.easeInOutQuad;
-					break;
-
-				case 'easeInCubic':
-					return Proton.ease.easeInCubic;
-					break;
-
-				case 'easeOutCubic':
-					return Proton.ease.easeOutCubic;
-					break;
-
-				case 'easeInOutCubic':
-					return Proton.ease.easeInOutCubic;
-					break;
-
-				case 'easeInQuart':
-					return Proton.ease.easeInQuart;
-					break;
-
-				case 'easeOutQuart':
-					return Proton.ease.easeOutQuart;
-					break;
-
-				case 'easeInOutQuart':
-					return Proton.ease.easeInOutQuart;
-					break;
-
-				case 'easeInSine':
-					return Proton.ease.easeInSine;
-					break;
-
-				case 'easeOutSine':
-					return Proton.ease.easeOutSine;
-					break;
-
-				case 'easeInOutSine':
-					return Proton.ease.easeInOutSine;
-					break;
-
-				case 'easeInExpo':
-					return Proton.ease.easeInExpo;
-					break;
-
-				case 'easeOutExpo':
-					return Proton.ease.easeOutExpo;
-					break;
-
-				case 'easeInOutExpo':
-					return Proton.ease.easeInOutExpo;
-					break;
-
-				case 'easeInCirc':
-					return Proton.ease.easeInCirc;
-					break;
-
-				case 'easeOutCirc':
-					return Proton.ease.easeOutCirc;
-					break;
-
-				case 'easeInOutCirc':
-					return Proton.ease.easeInOutCirc;
-					break;
-
-				case 'easeInBack':
-					return Proton.ease.easeInBack;
-					break;
-
-				case 'easeOutBack':
-					return Proton.ease.easeOutBack;
-					break;
-
-				case 'easeInOutBack':
-					return Proton.ease.easeInOutBack;
-					break;
-				
-				default:
-					return Proton.ease.easeLinear;
-					break;
-			}
-		}
+		setEasingByName: function(easeName) {
+            if (!!ease[easeName])
+                return ease[easeName];
+            else
+                return ease.easeLinear;
+        }
 	}
 
-	Proton.ease = ease;
-	Proton.easeLinear = 'easeLinear';
+	for (var key in ease) {
+        if (key != "setEasingByName") Proton[key] = ease[key];
+    }
 
-	Proton.easeInQuad = 'easeInQuad';
-	Proton.easeOutQuad = 'easeOutQuad';
-	Proton.easeInOutQuad = 'easeInOutQuad';
-
-	Proton.easeInCubic = 'easeInCubic';
-	Proton.easeOutCubic = 'easeOutCubic';
-	Proton.easeInOutCubic = 'easeInOutCubic';
-
-	Proton.easeInQuart = 'easeInQuart';
-	Proton.easeOutQuart = 'easeOutQuart';
-	Proton.easeInOutQuart = 'easeInOutQuart';
-
-	Proton.easeInSine = 'easeInSine';
-	Proton.easeOutSine = 'easeOutSine';
-	Proton.easeInOutSine = 'easeInOutSine';
-
-	Proton.easeInExpo = 'easeInExpo';
-	Proton.easeOutExpo = 'easeOutExpo';
-	Proton.easeInOutExpo = 'easeInOutExpo';
-
-	Proton.easeInCirc = 'easeInCirc';
-	Proton.easeOutCirc = 'easeOutCirc';
-	Proton.easeInOutCirc = 'easeInOutCirc';
-
-	Proton.easeInBack = 'easeInBack';
-	Proton.easeOutBack = 'easeOutBack';
-	Proton.easeInOutBack = 'easeInOutBack';
+    Proton.ease = ease;
 	
 })(Proton);

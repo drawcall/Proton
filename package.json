@@ -1,12 +1,13 @@
 {
   "name": "proton",
-  "version": "2.1.0",
+  "version": "2.2.1",
   "description": "Proton is an easily customizable html5 particle engine including six different types of renderers.",
-  "main": "./build/proton-2.1.0.min.js",
+  "main": "./build/proton.min.js",
   "scripts": {
     "doc": "jsdoc -c jsdoc.json",
     "doc:watch": "npm run clean && npm run doc && watch -p 'src/**/*.js' -c 'npm run doc'",
-    "clean": "rm -rf ./build/docs"
+    "clean": "rm -rf ./build/docs",
+    "build": "cd ./build && node build.js"
   },
   "repository": {
     "type": "git",

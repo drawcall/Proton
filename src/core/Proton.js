@@ -3,11 +3,11 @@
     Proton.POOL_MAX = 1000;
     Proton.TIME_STEP = 60;
     Proton.USE_CLOCK = false;
+    
     //1:100
     Proton.MEASURE = 100;
     Proton.EULER = 'euler';
     Proton.RK2 = 'runge-kutta2';
-    Proton.RK4 = 'runge-kutta4';
     Proton.VERLET = 'verlet';
 
     Proton.PARTICLE_CREATED = 'partilcleCreated';

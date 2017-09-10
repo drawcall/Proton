@@ -29,7 +29,8 @@
 		reset : function(init) {
 			this.life = Infinity;
 			this.age = 0;
-			//能量损失
+
+			//Energy loss
 			this.energy = 1;
 			this.dead = false;
 			this.sleep = false;
@@ -43,6 +44,7 @@
 			this.rotation = 0;
 			this.color = null;
 			this.easing = Proton.ease.setEasingByName(Proton.easeLinear);
+
 			if (init) {
 				this.transform = {}
 				this.p = new Proton.Vector2D();
@@ -62,6 +64,7 @@
 				this.old.p.set(0, 0);
 				this.old.v.set(0, 0);
 				this.old.a.set(0, 0);
+
 				this.removeAllBehaviours();
 			}
 
@@ -70,6 +73,7 @@
 				g : 255,
 				b : 255
 			}
+
 			return this;
 		},
 
@@ -77,6 +81,7 @@
 			if (!this.sleep) {
 				this.age += time;
 				var length = this.behaviours.length, i;
+
 				for ( i = 0; i < length; i++) {
 					if (this.behaviours[i])
 						this.behaviours[i].applyBehaviour(this, time, index)
@@ -98,11 +103,13 @@
 			this.behaviours.push(behaviour);
 			if (behaviour.hasOwnProperty('parents'))
 				behaviour.parents.push(this);
+
 			behaviour.initialize(this);
 		},
 
 		addBehaviours : function(behaviours) {
 			var length = behaviours.length, i;
+
 			for ( i = 0; i < length; i++) {
 				this.addBehaviour(behaviours[i]);
 			}
@@ -119,6 +126,7 @@
 		removeAllBehaviours : function() {
 			Proton.Util.destroyArray(this.behaviours);
 		},
+		
 		/**
 		 * Destory this particle
 		 * @method destroy

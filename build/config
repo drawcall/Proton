@@ -1,7 +1,7 @@
-version = 2.1.0
+version = 2.2.1
 source_dir = ../src/
-output_full = proton-{version}.js
-output_min = proton-{version}.min.js
+output_full = proton.js
+output_min = proton.min.js
 
 head
 -----
@@ -14,6 +14,19 @@ head
  * http://www.opensource.org/licenses/mit-license
  *
  */
+-----
+
+umd
+-----
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define([], factory);
+    } else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = factory();
+    } else {
+        root.Proton = factory();
+    }
+}(this, function () {
 -----
 
 files
@@ -73,11 +86,6 @@ zone/CircleZone.js
 zone/PointZone.js
 zone/RectZone.js
 zone/ImageZone.js
-debug/log.js
 debug/Debug.js
------
-
-foot
------
 plus/requestAnimationFrame.js
 -----
