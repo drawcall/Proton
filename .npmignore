@@ -1,0 +1,15 @@
+DS_Store
+git/
+node_modules/
+example/
+.*.swp
+.DS_Store
+.git
+.hg
+.npmrc
+.lock-wscript
+.svn
+.wafpickle-*
+config.gypi
+CVS
+npm-debug.log
