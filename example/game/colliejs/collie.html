@@ -1,205 +1,209 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<title>proton.js-behaviour-custom</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0" />
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-		
-		<style type="text/css">
-			body {
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#collie_container {
-				width: 1003px;
-				margin-top: 50px;
-				margin-left: -501px;
-				left: 50%;
-				position: absolute;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="viewporter">
-			<div id="container">
-			</div>
-		</div>
-		<script src="js/viewporter.js"></script>
-		<script src="../../../build/proton-2.1.0.min.js"></script>
-		<script src="js/collie.min.js"></script>
-		<script>
-			var bird, rabbit, blood;
-			var proton;
-			var renderer;
-			var emitter;
-			var stats;
-			var layer;
-			var begin = true;
-			
-			Main();
-			function Main() {
-				setupCollieEngine();
-				createProton();
-				createRenderer();
-			}
 
-			function setupCollieEngine() {
-				collie.ImageManager.add({
-					rabbit : "image/yame_walk2.png",
-					bird : "image/bird.png",
-					sky : "image/sky.png",
-					ground : "image/ground2.png",
-					blood : "image/blood.png"
-				});
+<head>
+    <title>proton.js-behaviour-custom</title>
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <style type="text/css">
+        body {
+            background-color: #fff;
+            margin: 0px;
+            overflow: hidden;
+        }
+        
+        #collie_container {
+            width: 1003px;
+            margin-top: 50px;
+            margin-left: -501px;
+            left: 50%;
+            position: absolute;
+        }
+    </style>
+</head>
 
-				layer = new collie.Layer({
-					width : 320,
-					height : 480
-				});
+<body>
+    <div id="container">
 
-				var sky = new collie.DisplayObject({
-					width : 320,
-					height : 480,
-					backgroundImage : "sky",
-					backgroundRepeat : "repeat"
-				}).addTo(layer);
+    </div>
+    <script src="../../../build/proton.min.js"></script>
+    <script src="js/collie.min.js"></script>
+    <script>
+        var bird, rabbit, blood;
+        var proton;
+        var renderer;
+        var emitter;
+        var stats;
+        var layer;
+        var begin = true;
 
-				blood = new collie.DisplayObject({
-					width : 20,
-					height : 29,
-					backgroundImage : "blood",
-				});
+        Main();
 
-				rabbit = new collie.DisplayObject({
-					x : "center",
-					width : 129.4,
-					height : 165,
-					zIndex : 2,
-					backgroundImage : "rabbit"
-				}).bottom(50).addTo(layer);
+        function Main() {
+            setupCollieEngine();
+            createProton();
+        }
 
-				bird = new collie.DisplayObject({
-					width : 50,
-					height : 50,
-					x : 'center',
-					y : 190,
-					visible : true,
-					backgroundImage : "bird"
-				}).addTo(layer);
+        function setupCollieEngine() {
+            collie.ImageManager.add({
+                rabbit: "image/yame_walk2.png",
+                bird: "image/bird.png",
+                sky: "image/sky.png",
+                ground: "image/ground2.png",
+                blood: "image/blood.png"
+            });
 
-				collie.Timer.cycle(bird, 100, {
-					to : 1
-				});
+            layer = new collie.Layer({
+                width: 320,
+                height: 480
+            });
 
-				var currentY = rabbit.get("y");
+            var sky = new collie.DisplayObject({
+                width: 320,
+                height: 480,
+                backgroundImage: "sky",
+                backgroundRepeat: "repeat"
+            }).addTo(layer);
 
-				rabbit.attach({
-					click : function(e) {
-						collie.Timer.queue().transition(rabbit, 400, {
-							to : currentY - 100,
-							effect : collie.Effect.easeOut,
-							set : "y"
-						}).transition(rabbit, 400, {
-							to : currentY,
-							effect : collie.Effect.easeIn,
-							set : "y"
-						});
-					}
-				});
+            blood = new collie.DisplayObject({
+                width: 20,
+                height: 29,
+                backgroundImage: "blood",
+            });
 
-				collie.Timer.cycle(rabbit, "18fps", {
-					from : 0,
-					to : 8,
-					loop : 0
-				});
+            rabbit = new collie.DisplayObject({
+                x: "center",
+                width: 129.4,
+                height: 165,
+                zIndex: 2,
+                backgroundImage: "rabbit"
+            }).bottom(50).addTo(layer);
 
-				var ground = new collie.MovableObject({
-					x : 0,
-					width : 320 * 2,
-					height : 88,
-					velocityX : -200,
-					backgroundImage : "ground",
-					backgroundRepeat : "repeat-x",
-					rangeX : [-320, 0],
-					positionRepeat : true
-				}).bottom(0).addTo(layer);
+            bird = new collie.DisplayObject({
+                width: 50,
+                height: 50,
+                x: 'center',
+                y: 190,
+                visible: true,
+                backgroundImage: "bird"
+            }).addTo(layer);
 
-				collie.Renderer.addLayer(layer);
-				collie.Renderer.load(document.getElementById("container"));
-				collie.Renderer.start();
+            collie.Timer.cycle(bird, 100, {
+                to: 1
+            });
 
-				var birdx = bird.get("x");
-				collie.Timer.repeat(function() {
-					proton.update();
-					if (rabbit.get('y') - 15 <= bird.get('y')) {
-						if (begin) {
-							collie.Timer.transition(bird, 500, {
-								to : [0, 0, 400, 100, 80],
-								set : ["scaleX", "scaleY", "angle", "y", 'x']
-							});
+            var currentY = rabbit.get("y");
 
-							emitter.p.x = bird.get("x") + 10;
-							emitter.p.y = bird.get("y") + 10;
-							emitter.emit('once');
-							setTimeout(function() {
-								bird.set('x', birdx);
-								bird.set('y', 190);
-								collie.Timer.transition(bird, 300, {
-									to : [1, 1, 0],
-									set : ["scaleX", "scaleY", "angle"],
-									effect : collie.Effect.overphase
-								});
-								begin = true;
-							}, 1600);
-							begin = false;
-						}
-					}
-				}, 10);
-			}
+            rabbit.attach({
+                click: function(e) {
+                    collie.Timer.queue().transition(rabbit, 400, {
+                        to: currentY - 100,
+                        effect: collie.Effect.easeOut,
+                        set: "y"
+                    }).transition(rabbit, 400, {
+                        to: currentY,
+                        effect: collie.Effect.easeIn,
+                        set: "y"
+                    });
+                }
+            });
 
-			function createProton() {
-				proton = new Proton;
-				emitter = new Proton.Emitter();
-				emitter.rate = new Proton.Rate(new Proton.Span(16, 18), new Proton.Span(.05, .2));
-				emitter.addInitialize(new Proton.Mass(1));
-				emitter.addInitialize(new Proton.ImageTarget(blood));
-				emitter.addInitialize(new Proton.Life(1));
-				emitter.addInitialize(new Proton.Velocity(new Proton.Span(1, 2), new Proton.Span(0, 80, true), 'polar'));
-				emitter.addBehaviour(new Proton.Alpha(1, 0));
-				emitter.addBehaviour(new Proton.Gravity(3));
-				emitter.addBehaviour(new Proton.Rotate());
-				emitter.addBehaviour(new Proton.Scale(0, Proton.getSpan(0.3, 0.5), Infinity, Proton.easeOutCubic));
-				proton.addEmitter(emitter);
-			}
+            collie.Timer.cycle(rabbit, "18fps", {
+                from: 0,
+                to: 8,
+                loop: 0
+            });
 
-			function createRenderer() {
-				renderer = new Proton.Renderer('other', proton);
+            var ground = new collie.MovableObject({
+                x: 0,
+                width: 320 * 2,
+                height: 88,
+                velocityX: -200,
+                backgroundImage: "ground",
+                backgroundRepeat: "repeat-x",
+                rangeX: [-320, 0],
+                positionRepeat: true
+            }).bottom(0).addTo(layer);
 
-				renderer.onParticleCreated = function(particle) {
-					var p = particle.target.clone().addTo(layer);
-					particle.sprite = p;
-				};
+            collie.Renderer.addLayer(layer);
+            collie.Renderer.load(document.getElementById("container"));
+            collie.Renderer.start();
 
-				renderer.onParticleUpdate = function(particle) {
-					if (!!particle['sprite']) {
-						var mc = particle['sprite'];
-						mc.set('x', particle.p.x);
-						mc.set('y', particle.p.y);
-						mc.set('angle', particle.rotation);
-						mc.set('scaleX', particle.scale);
-						mc.set('scaleY', particle.scale);
-						mc.set('opacity', particle.alpha);
-					}
-				};
+            var birdx = bird.get("x");
+            collie.Timer.repeat(function() {
+                proton.update();
+                if (rabbit.get('y') - 15 <= bird.get('y')) {
+                    if (begin) {
+                        collie.Timer.transition(bird, 500, {
+                            to: [0, 0, 400, 100, 80],
+                            set: ["scaleX", "scaleY", "angle", "y", 'x']
+                        });
 
-				renderer.onParticleDead = function(particle) {
-					layer.removeChild(particle.sprite);
-				};
-				renderer.start();
-			}
-		</script>
-	</body>
+                        emitter.p.x = bird.get("x") + 10;
+                        emitter.p.y = bird.get("y") + 10;
+                        emitter.emit('once');
+                        setTimeout(function() {
+                            bird.set('x', birdx);
+                            bird.set('y', 190);
+                            collie.Timer.transition(bird, 300, {
+                                to: [1, 1, 0],
+                                set: ["scaleX", "scaleY", "angle"],
+                                effect: collie.Effect.overphase
+                            });
+                            begin = true;
+                        }, 1600);
+                        begin = false;
+                    }
+                }
+            }, 10);
+        }
+
+        function createProton() {
+            proton = new Proton;
+            emitter = new Proton.Emitter();
+            emitter.rate = new Proton.Rate(new Proton.Span(16, 18), new Proton.Span(.05, .2));
+
+            emitter.addInitialize(new Proton.Mass(1));
+            emitter.addInitialize(new Proton.Body(blood));
+            emitter.addInitialize(new Proton.Life(1));
+
+            emitter.addInitialize(new Proton.Velocity(new Proton.Span(1, 2), new Proton.Span(0, 80, true), 'polar'));
+            emitter.addBehaviour(new Proton.Alpha(1, 0));
+            emitter.addBehaviour(new Proton.Gravity(3));
+            emitter.addBehaviour(new Proton.Rotate());
+            emitter.addBehaviour(new Proton.Scale(0, Proton.getSpan(0.3, 0.5), Infinity, Proton.easeOutCubic));
+
+            proton.addEmitter(emitter);
+            proton.addRenderer(createRenderer());
+        }
+
+        function createRenderer() {
+            var renderer = new Proton.CustomRenderer();
+
+            renderer.onParticleCreated = function(particle) {
+                var p = particle.body.clone().addTo(layer);
+                particle.sprite = p;
+            };
+
+            renderer.onParticleUpdate = function(particle) {
+                if (!!particle['sprite']) {
+                    var mc = particle['sprite'];
+                    mc.set('x', particle.p.x);
+                    mc.set('y', particle.p.y);
+                    mc.set('angle', particle.rotation);
+                    mc.set('scaleX', particle.scale);
+                    mc.set('scaleY', particle.scale);
+                    mc.set('opacity', particle.alpha);
+                }
+            };
+
+            renderer.onParticleDead = function(particle) {
+                layer.removeChild(particle.sprite);
+            };
+
+            return renderer;
+        }
+    </script>
+</body>
+
 </html>

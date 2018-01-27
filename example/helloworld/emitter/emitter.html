@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>proton.js-emitter-Emitter</title>
+		<meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -18,7 +19,7 @@
 	<body>
 		<canvas id="testCanvas"></canvas>
 		<script src="../../lib/stats.min.js"></script>
-		<script src="../../../build/proton-2.1.0.min.js"></script>
+		<script src="../../../build/proton.min.js"></script>
 		<script>
 			var canvas;
 			var context;
@@ -68,14 +69,16 @@
 				emitter.p.x = canvas.width / 2;
 				emitter.p.y = canvas.height / 2;
 				emitter.emit();
+				
 				proton.addEmitter(emitter);
 
-				renderer = new Proton.Renderer('canvas', proton, canvas);
+				renderer = new Proton.CanvasRenderer(canvas);
 				renderer.onProtonUpdate = function() {
 					context.fillStyle = "rgba(0, 0, 0, 0.1)";
 					context.fillRect(0, 0, canvas.width, canvas.height);
 				};
-				renderer.start();
+
+				proton.addRenderer(renderer);
 			}
 
 			function tick() {

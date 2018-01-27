@@ -9,8 +9,6 @@
 		
 		<script src="js/jquery-1.10.2.min.js"></script>
 		<script src="js/highlight.pack.js"></script>
-		<script src="js/jquery.scrollTo.min.js"></script>
-		<script src="js/jquery.easing.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<script src="js/Main.js"></script>
 	</head>
@@ -32,7 +30,7 @@
 								<a href="./comesoon.html" target="_blank">Tutorials</a>
 							</li>
 							<li id='documents'>
-								<a href="./comesoon.html" target="_blank">Documents</a>
+								<a href="https://projects.jpeer.at/proton/" target="_blank">Documents</a>
 							</li>
 							<li id='about'>
 								<a href="#about">About</a>
@@ -50,9 +48,9 @@
 				</div>
 				<div class='span5 main_title'>
 					<h1>Proton</h1>
-					<h2>html5 particle engine</h2>
+					<h2>javascript particle engine</h2>
 					<div class="bottom clearfix">
-						<a href="./build/proton-2.1.0.min.js" target="_blank" class="button get-started orange-gradient" download>download</a>
+						<a href="https://github.com/a-jie/Proton/blob/master/build/proton.min.js" target="_blank" class="button get-started orange-gradient" download>download</a>
 						<a id='demo2' href="#example" class="button get-started orange-gradient">demo</a>
 					</div>
 				</div>
@@ -121,8 +119,8 @@ emitter.emit();
 //add emitter to the proton
 proton.addEmitter(emitter);
 // add canvas renderer
-var renderer = new Proton.Renderer('canvas', proton, canvas);
-renderer.start();
+var renderer = new Proton.CanvasRenderer(canvas);
+proton.addRenderer(renderer);
 </code></pre>
 						<p>
 							<a class="btn btn-link" href="#" style="padding-left: 0;">Check the full tutorial &raquo;</a>
@@ -168,7 +166,7 @@ renderer.start();
 				<div class='span7 about-txt'>
 					<h1>About</h1>
 					<p class="zhengwen2">
-						I am a chinese literary youth.I used to be a flash developer,I like math,hongkong comics,classical novels,and nan pai san shu.
+						I am a chinese literary youth.I like math,hongkong comics,classical novels,and nan pai san shu.
 					</p>
 					<p></p>
 					<p class="zhengwen2">

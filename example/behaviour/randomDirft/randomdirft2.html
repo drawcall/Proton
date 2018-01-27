@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>proton.js-behaviour-RandomDirft2</title>
+		<meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -18,7 +19,7 @@
 	<body>
 		<canvas id="testCanvas"></canvas>
 		<script src="../../lib/stats.min.js"></script>
-		<script src="../../../build/proton-2.1.0.min.js"></script>
+		<script src="../../../build/proton.min.js"></script>
 		<script>
 			var canvas;
 			var context;
@@ -49,27 +50,28 @@
 			}
 
 			function createProton() {
-				Proton.USE_CLOCK = true;
 				proton = new Proton;
 				emitter = new Proton.Emitter();
 				emitter.rate = new Proton.Rate(new Proton.Span(3, 6), new Proton.Span(1));
+				
 				emitter.addInitialize(new Proton.Mass(1));
 				emitter.addInitialize(new Proton.Radius(20));
 				emitter.addInitialize(new Proton.Life(1, 2));
 				emitter.addInitialize(new Proton.Velocity(new Proton.Span(.5, 1), new Proton.Span(-20, 20), 'polar'));
+				
 				emitter.addBehaviour(new Proton.RandomDrift(30, 30, .05));
 				emitter.addBehaviour(new Proton.Scale(1, [.5, .3, 0]));
 				emitter.addBehaviour(new Proton.Color('#ffffff'));
+				
 				emitter.p.x = canvas.width / 2;
 				emitter.p.y = canvas.height / 2;
 				emitter.emit(20);
 				proton.addEmitter(emitter);
 
-				renderer = new Proton.Renderer('canvas', proton, canvas);
+				renderer = new Proton.CanvasRenderer(canvas);
 				renderer.setStroke('#ff0000');
-				renderer.onProtonUpdate = function() {
-				};
-				renderer.start();
+				renderer.onProtonUpdate = function() {};
+				proton.addRenderer(renderer);
 
 				var subemitter = new Proton.Emitter();
 				var radius = new Proton.Radius(10);
@@ -86,7 +88,7 @@
 				subemitter.addBehaviour(new Proton.Scale(1, 0));
 				proton.addEmitter(subemitter);
 
-				emitter.addEventListener(Proton.PARTICLE_DEAD, function(particle) {
+				proton.addEventListener(Proton.PARTICLE_DEAD, function(particle) {
 					if (particle.radius > 0) {
 						var angle = particle.getDirection();
 						radius.reset(particle.radius);

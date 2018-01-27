@@ -1,129 +1,129 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
 	var sparksArr = [{
-		src : 'sun',
-		url : 'sparks/sun/sun'
+		src: 'sun',
+		url: 'sparks/sun/sun'
 	}, {
-		src : 'fireball',
-		url : 'sparks/sun/fireball'
+		src: 'fireball',
+		url: 'sparks/sun/fireball'
 	}, {
-		src : 'eightDiagrams',
-		url : 'sparks/eightDiagrams/eightDiagrams'
+		src: 'eightDiagrams',
+		url: 'sparks/eightDiagrams/eightDiagrams'
 	}, {
-		src : 'bomb',
-		url : 'sparks/bomb/bomb'
+		src: 'bomb',
+		url: 'sparks/bomb/bomb'
 	}, {
-		src : 'drugs',
-		url : 'sparks/drugs/drugs'
+		src: 'drugs',
+		url: 'sparks/drugs/drugs'
 	}, {
-		src : 'fireworks',
-		url : 'sparks/firework/fireworks'
+		src: 'fireworks',
+		url: 'sparks/firework/fireworks'
 	}, {
-		src : 'bigfire',
-		url : 'sparks/bigfire/bigfire'
+		src: 'bigfire',
+		url: 'sparks/bigfire/bigfire'
 	}];
 
 	var behaviourArr = [{
-		src : 'attraction1',
-		url : 'behaviour/attraction/attraction1'
+		src: 'attraction1',
+		url: 'behaviour/attraction/attraction1'
 	}, {
-		src : 'attraction2',
-		url : 'behaviour/attraction/attraction2'
+		src: 'attraction2',
+		url: 'behaviour/attraction/attraction2'
 	}, {
-		src : 'collision',
-		url : 'behaviour/collision/collision'
+		src: 'collision',
+		url: 'behaviour/collision/collision'
 	}, {
-		src : 'collisionBall',
-		url : 'behaviour/collision/collisionBall'
+		src: 'collisionBall',
+		url: 'behaviour/collision/collisionBall'
 	}, {
-		src : 'circle',
-		url : 'behaviour/custom/circle'
+		src: 'circle',
+		url: 'behaviour/custom/circle'
 	}, {
-		src : 'star',
-		url : 'behaviour/force/star'
+		src: 'star',
+		url: 'behaviour/force/star'
 	}, {
-		src : 'randomdirft2',
-		url : 'behaviour/randomDirft/randomdirft2'
+		src: 'randomdirft2',
+		url: 'behaviour/randomDirft/randomdirft2'
 	}, {
-		src : 'randomdirft3',
-		url : 'behaviour/randomDirft/randomdirft3'
+		src: 'randomdirft3',
+		url: 'behaviour/randomDirft/randomdirft3'
 	}, {
-		src : 'rotate',
-		url : 'behaviour/rotate/rotate'
+		src: 'rotate',
+		url: 'behaviour/rotate/rotate'
 	}, {
-		src : 'fireflies',
-		url : 'behaviour/repulsion/fireflies'
+		src: 'fireflies',
+		url: 'behaviour/repulsion/fireflies'
 	}, {
-		src : 'repulsion',
-		url : 'behaviour/repulsion/repulsion'
+		src: 'repulsion',
+		url: 'behaviour/repulsion/repulsion'
 	}, {
-		src : 'color',
-		url : 'behaviour/color/color'
+		src: 'color',
+		url: 'behaviour/color/color'
 	}];
 
 	var gameArr = [{
-		src : 'collie',
-		url : 'game/colliejs/collie'
+		src: 'collie',
+		url: 'game/colliejs/collie'
 	}, {
-		src : 'easeljs',
-		url : 'game/easeljs/easeljs'
+		src: 'easeljs',
+		url: 'game/easeljs/easeljs'
 	}, {
-		src : 'asteroids',
-		url : 'game/crafty/asteroids'
+		src: 'asteroids',
+		url: 'game/crafty/asteroids'
 	}, {
-		src : 'quarkjs',
-		url : 'game/quarkjs/squirrel'
+		src: 'quarkjs',
+		url: 'game/quarkjs/squirrel'
 	}];
 
 	var renderArr = [{
-		src : 'pixelrender',
-		url : 'render/pixel/pixelrender'
+		src: 'pixelrender',
+		url: 'render/pixel/pixelrender'
 	}, {
-		src : 'google',
-		url : 'render/pixel/google'
+		src: 'google',
+		url: 'render/pixel/google'
 	}, {
-		src : 'dom',
-		url : 'render/dom/domrender'
+		src: 'dom',
+		url: 'render/dom/domrender'
 	}, {
-		src : 'createjs',
-		url : 'render/easeljs/easeljs'
+		src: 'createjs',
+		url: 'render/easeljs/easeljs'
 	}, {
-		src : 'webglrender',
-		url : 'render/webgl/webglrender'
+		src: 'webglrender',
+		url: 'render/webgl/webglrender'
 	}, {
-		src : 'pixijs',
-		url : 'render/custom/pixijs'
+		src: 'pixijs',
+		url: 'render/pixi/pixirender'
 	}];
 
 	var emitterArr = [{
-		src : 'emitter',
-		url : 'helloworld/emitter/emitter'
+		src: 'emitter',
+		url: 'helloworld/emitter/emitter'
 	}, {
-		src : 'followEmitter',
-		url : 'emitter/followEmitter/followEmitter'
+		src: 'followEmitter',
+		url: 'emitter/followEmitter/followEmitter'
 	}, {
-		src : 'mouseDown',
-		url : 'emitter/followEmitter/mouseDown'
+		src: 'mouseDown',
+		url: 'emitter/followEmitter/mouseDown'
 	}, {
-		src : 'Spitfire',
-		url : 'initialize/imagetarget/Spitfire'
+		src: 'Spitfire',
+		url: 'initialize/imagetarget/Spitfire'
 	}, {
-		src : 'imagetarget',
-		url : 'initialize/imagetarget/imagetarget'
+		src: 'imagetarget',
+		url: 'initialize/imagetarget/imagetarget'
 	}];
 
 	var zoneArr = [{
-		src : 'circlezone',
-		url : 'zone/circlezone/circlezone'
+		src: 'circlezone',
+		url: 'zone/circlezone/circlezone'
 	}, {
-		src : 'imagezone',
-		url : 'zone/imagezone/imagezone'
+		src: 'imagezone',
+		url: 'zone/imagezone/imagezone'
 	}, {
-		src : 'linezone',
-		url : 'zone/linezone/bound'
+		src: 'linezone',
+		url: 'zone/linezone/bound'
 	}, {
-		src : 'pointzone',
-		url : 'zone/pointzone/pointzone'
+		src: 'pointzone',
+		url: 'zone/pointzone/pointzone'
 	}];
 	function init() {
 		hljs.initHighlightingOnLoad();
@@ -154,8 +154,8 @@ $(document).ready(function() {
 			container.append(div);
 
 			div.click({
-				src : src
-			}, function(e) {
+				src: src
+			}, function (e) {
 				window.open(e.data.src, '_blank');
 			});
 		}
@@ -164,10 +164,12 @@ $(document).ready(function() {
 
 	function setScrollTo($btn, $target, $time) {
 		var time = $time ? $time : 500;
-		$btn.click(function() {
-			$.scrollTo($target, time, {
-				easing : 'easeInOutQuad'
-			});
+		var top = $target === 0 ? 0 : $target.offset().top;
+
+		$btn.click(function () {
+			$('html, body').animate({
+				scrollTop: top
+			}, time);
 		});
 	}
 
