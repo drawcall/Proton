@@ -1,4 +1,8 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Emitter from './Emitter';
+
+export default class FollowEmitter extends Emitter {
+
 	/**
 	 * The FollowEmitter class inherits from Proton.Emitter
 	 *
@@ -11,46 +15,41 @@
 	 * @default 0.7
 	 * @param {Object} pObj the parameters object;
 	 */
-	function FollowEmitter(mouseTarget, ease, pObj) {
-		this.mouseTarget = Proton.Util.initValue(mouseTarget, window);
-		this.ease = Proton.Util.initValue(ease, .7);
+	constructor(mouseTarget, ease, pObj) {
+		super(pObj);
+
+		this.mouseTarget = Util.initValue(mouseTarget, window);
+		this.ease = Util.initValue(ease, .7);
+
 		this._allowEmitting = false;
 		this.initEventHandler();
-		FollowEmitter._super_.call(this, pObj);
 	};
 
-	Proton.Util.inherits(FollowEmitter, Proton.Emitter);
-	FollowEmitter.prototype.initEventHandler = function() {
-		var self = this;
-		this.mousemoveHandler = function(e) {
-			self.mousemove.call(self, e);
-		};
+	initEventHandler() {
+		this.mousemoveHandler = e => this.mousemove.call(this, e);
+		this.mousedownHandler = e => this.mousedown.call(this, e);
+		this.mouseupHandler = e => this.mouseup.call(this, e);
 
-		this.mousedownHandler = function(e) {
-			self.mousedown.call(self, e);
-		};
-
-		this.mouseupHandler = function(e) {
-			self.mouseup.call(self, e);
-		};
 		this.mouseTarget.addEventListener('mousemove', this.mousemoveHandler, false);
 	}
+
 	/**
 	 * start emit particle
 	 * @method emit
 	 */
-	FollowEmitter.prototype.emit = function() {
+	emit() {
 		this._allowEmitting = true;
 	}
+
 	/**
 	 * stop emiting
-	 * @method stopEmit
+	 * @method stop
 	 */
-	FollowEmitter.prototype.stopEmit = function() {
+	stop() {
 		this._allowEmitting = false;
 	}
 
-	FollowEmitter.prototype.mousemove = function(e) {
+	mousemove(e) {
 		if (e.layerX || e.layerX == 0) {
 			this.p.x += (e.layerX - this.p.x) * this.ease;
 			this.p.y += (e.layerY - this.p.y) * this.ease;
@@ -58,17 +57,17 @@
 			this.p.x += (e.offsetX - this.p.x) * this.ease;
 			this.p.y += (e.offsetY - this.p.y) * this.ease;
 		}
-		if (this._allowEmitting)
-			FollowEmitter._super_.prototype.emit.call(this, 'once');
+
+		if (this._allowEmitting) super.emit('once');
 	};
+
 	/**
 	 * Destory this Emitter
 	 * @method destroy
 	 */
-	FollowEmitter.prototype.destroy = function() {
-		FollowEmitter._super_.prototype.destroy.call(this);
+	destroy() {
+		super.destroy();
 		this.mouseTarget.removeEventListener('mousemove', this.mousemoveHandler, false);
 	}
 
-	Proton.FollowEmitter = FollowEmitter;
-})(Proton);
+}

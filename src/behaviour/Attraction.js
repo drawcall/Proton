@@ -1,4 +1,9 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Vector2D from '../math/Vector2D';
+import Behaviour from './Behaviour';
+
+export default class Attraction extends Behaviour {
+
 	/**
 	 * This behaviour let the particles follow one specific Proton.Vector2D
 	 *
@@ -13,7 +18,7 @@
 	 * @param {Number} [force=100]
 	 * @param {Number} [radius=1000]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {Proton.Vector2D} targetPosition
 	 * @property {Number} radius
@@ -23,20 +28,19 @@
 	 * @property {Number} lengthSq
 	 * @property {String} name The Behaviour name
 	 */
-	function Attraction(targetPosition, force, radius, life, easing) {
-		Attraction._super_.call(this, life, easing);
+	constructor(targetPosition, force, radius, life, easing) {
+		super(life, easing);
 
-		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
-		this.radius = Proton.Util.initValue(radius, 1000);
-		this.force = Proton.Util.initValue(this.normalizeValue(force), 100);
+		this.targetPosition = Util.initValue(targetPosition, new Vector2D);
+		this.radius = Util.initValue(radius, 1000);
+		this.force = Util.initValue(this.normalizeValue(force), 100);
+
 		this.radiusSq = this.radius * this.radius
-		this.attractionForce = new Proton.Vector2D();
+		this.attractionForce = new Vector2D();
 		this.lengthSq = 0;
+
 		this.name = "Attraction";
 	}
-
-
-	Proton.Util.inherits(Attraction, Proton.Behaviour);
 
 	/**
 	 * Reset this behaviour's parameters
@@ -51,17 +55,18 @@
 	 * @param {Number} [force=100]
 	 * @param {Number} [radius=1000]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 */
-	Attraction.prototype.reset = function(targetPosition, force, radius, life, easing) {
-		this.targetPosition = Proton.Util.initValue(targetPosition, new Proton.Vector2D);
-		this.radius = Proton.Util.initValue(radius, 1000);
-		this.force = Proton.Util.initValue(this.normalizeValue(force), 100);
+	reset(targetPosition, force, radius, life, easing) {
+		this.targetPosition = Util.initValue(targetPosition, new Vector2D);
+		this.radius = Util.initValue(radius, 1000);
+		this.force = Util.initValue(this.normalizeValue(force), 100);
+
 		this.radiusSq = this.radius * this.radius
-		this.attractionForce = new Proton.Vector2D();
+		this.attractionForce = new Vector2D();
 		this.lengthSq = 0;
-		if (life)
-			Attraction._super_.prototype.reset.call(this, life, easing);
+
+		life && super.reset(life, easing);
 	}
 
 	/**
@@ -75,19 +80,20 @@
 	 * @param {Number} 			time the integrate time 1/ms
 	 * @param {Int} 			index the particle index
 	 */
-	Attraction.prototype.applyBehaviour = function(particle, time, index) {
-		Attraction._super_.prototype.applyBehaviour.call(this, particle, time, index);
+	applyBehaviour(particle, time, index) {
+		this.calculate(particle, time, index);
+
 		this.attractionForce.copy(this.targetPosition);
 		this.attractionForce.sub(particle.p);
 		this.lengthSq = this.attractionForce.lengthSq();
+
 		if (this.lengthSq > 0.000004 && this.lengthSq < this.radiusSq) {
 			this.attractionForce.normalize();
 			this.attractionForce.multiplyScalar(1 - this.lengthSq / this.radiusSq);
 			this.attractionForce.multiplyScalar(this.force);
+
 			particle.a.add(this.attractionForce);
 		}
-	};
-
-	Proton.Attraction = Attraction;
-})(Proton);
+	}
+}
 

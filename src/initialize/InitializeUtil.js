@@ -1,34 +1,35 @@
-(function(Proton, undefined) {
-	var InitializeUtil = {
+import Util from '../utils/Util';
+import MathUtils from '../math/MathUtils';
 
-		initialize : function(emitter, particle, initializes) {
-			var length = initializes.length, i;
-			for ( i = 0; i < length; i++) {
-				if (initializes[i] instanceof Proton.Initialize)
-					initializes[i].init(emitter, particle);
-				else
-					Proton.InitializeUtil.init(emitter, particle, initializes[i]);
-			}
+export default {
 
-			Proton.InitializeUtil.bindEmitter(emitter, particle);
-		},
-		
-		//////////////////////init//////////////////////
-		init : function(emitter, particle, initialize) {
-			Proton.Util.setPrototypeByObject(particle, initialize);
-			Proton.Util.setVector2DByObject(particle, initialize);
-		},
+	initialize(emitter, particle, initializes) {
+		const length = initializes.length;
+		let i;
 
-		bindEmitter : function(emitter, particle) {
-			if (emitter.bindEmitter) {
-				particle.p.add(emitter.p);
-				particle.v.add(emitter.v);
-				particle.a.add(emitter.a);
-				particle.v.rotate(Proton.MathUtils.degreeTransform(emitter.rotation));
-			}
+		for (i = 0; i < length; i++) {
+			if (initializes[i] instanceof Proton.Initialize)
+				initializes[i].init(emitter, particle);
+			else
+				this.init(emitter, particle, initializes[i]);
 		}
-		//////////////////////init//////////////////////
-	}
 
-	Proton.InitializeUtil = InitializeUtil;
-})(Proton);
+		this.bindEmitter(emitter, particle);
+	},
+
+	//////////////////////init//////////////////////
+	init(emitter, particle, initialize) {
+		Util.setPrototypeByObject(particle, initialize);
+		Util.setVector2DByObject(particle, initialize);
+	},
+	
+	bindEmitter(emitter, particle) {
+		if (emitter.bindEmitter) {
+			particle.p.add(emitter.p);
+			particle.v.add(emitter.v);
+			particle.a.add(emitter.a);
+
+			particle.v.rotate(MathUtils.degreeTransform(emitter.rotation));
+		}
+	}
+}

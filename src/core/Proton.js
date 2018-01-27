@@ -1,27 +1,29 @@
-(function(window, undefined) {
-    //the max particle number in pool
-    Proton.POOL_MAX = 1000;
-    Proton.TIME_STEP = 60;
-    Proton.USE_CLOCK = false;
-    
+import Pool from './Pool';
+import Util from '../utils/Util';
+import Stats from '../debug/Stats';
+import EventDispatcher from '../events/EventDispatcher';
+import Integration from '../math/Integration';
+
+export default class Proton {
+
+    static USE_CLOCK = false;
+
     //1:100
-    Proton.MEASURE = 100;
-    Proton.EULER = 'euler';
-    Proton.RK2 = 'runge-kutta2';
-    Proton.VERLET = 'verlet';
+    static MEASURE = 100;
+    static EULER = 'euler';
+    static RK2 = 'runge-kutta2';
 
-    Proton.PARTICLE_CREATED = 'partilcleCreated';
-    Proton.PARTICLE_UPDATE = 'partilcleUpdate';
-    Proton.PARTICLE_SLEEP = 'particleSleep';
-    Proton.PARTICLE_DEAD = 'partilcleDead';
-    Proton.PROTON_UPDATE = 'protonUpdate';
-    Proton.PROTON_UPDATE_AFTER = 'protonUpdateAfter';
-    Proton.EMITTER_ADDED = 'emitterAdded';
-    Proton.EMITTER_REMOVED = 'emitterRemoved';
+    static PARTICLE_CREATED = 'PARTICLE_CREATED';
+    static PARTICLE_UPDATE = 'PARTICLE_UPDATE';
+    static PARTICLE_SLEEP = 'PARTICLE_SLEEP';
+    static PARTICLE_DEAD = 'PARTICLE_DEAD';
+    static PROTON_UPDATE = 'PROTON_UPDATE';
+    static PROTON_UPDATE_AFTER = 'PROTON_UPDATE_AFTER';
+    static EMITTER_ADDED = 'EMITTER_ADDED';
+    static EMITTER_REMOVED = 'EMITTER_REMOVED';
 
-    Proton.amendChangeTabsBug = true;
-    Proton.TextureBuffer = {};
-    Proton.TextureCanvasBuffer = {};
+    static amendChangeTabsBug = true;
+    static bindEmtterEvent = false;
 
     /**
      * The constructor to add emitters
@@ -40,148 +42,167 @@
      * @property {Number} time      The active time
      * @property {Number} oldtime   The old time
      */
-    function Proton(proParticleCount, integrationType) {
-        this.integrationType = Proton.Util.initValue(integrationType, Proton.EULER);
+    constructor(integrationType) {
+
         this.emitters = [];
         this.renderers = [];
+
+        this.time = 0;
+        this.oldTime = 0;
+        this.elapsed = 0;
+
+        this.stats = new Stats(this);
+        this.pool = new Pool(80);
+
+        this.integrationType = Util.initValue(integrationType, Proton.EULER);
+        this.integrator = new Integration(this.integrationType);
+    }
+
+    /**
+    * add a type of Renderer
+    *
+    * @method addRenderer
+    * @memberof Proton
+    * @instance
+    *
+    * @param {Renderer} render
+    */
+    addRenderer(render) {
+        render.init(this);
+        this.renderers.push(render);
+    }
+
+    /**
+    * @name add a type of Renderer
+    *
+    * @method addRenderer
+    * @param {Renderer} render
+    */
+    removeRenderer(render) {
+        const index = this.renderers.indexOf(render);
+        this.renderers.splice(index, 1);
+        render.remove(this);
+    }
+
+    /**
+     * add the Emitter
+     *
+     * @method addEmitter
+     * @memberof Proton
+     * @instance
+     *
+     * @param {Emitter} emitter
+     */
+    addEmitter(emitter) {
+        this.emitters.push(emitter);
+        emitter.parent = this;
+
+        this.dispatchEvent(Proton.EMITTER_ADDED, emitter);
+    }
+
+    /**
+     * Removes an Emitter
+     *
+     * @method removeEmitter
+     * @memberof Proton
+     * @instance
+     *
+     * @param {Proton.Emitter} emitter
+     */
+    removeEmitter(emitter) {
+        const index = this.emitters.indexOf(emitter);
+        this.emitters.splice(index, 1);
+        emitter.parent = null;
+
+        this.dispatchEvent(Proton.EMITTER_REMOVED, emitter);
+    }
+
+    /**
+     * Updates all added emitters
+     *
+     * @method update
+     * @memberof Proton
+     * @instance
+     */
+    update() {
+        this.dispatchEvent(Proton.PROTON_UPDATE);
+
+        if (Proton.USE_CLOCK) {
+            if (!this.oldTime) this.oldTime = (new Date()).getTime();
+
+            let time = new Date().getTime();
+            this.elapsed = (time - this.oldTime) / 1000;
+            Proton.amendChangeTabsBug && this.amendChangeTabsBug();
+
+            this.oldTime = time;
+        } else {
+            this.elapsed = 0.0167;
+        }
+
+        // emitter update
+        if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+
+        this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+    }
+
+    emittersUpdate(elapsed) {
+        let i = this.emitters.length;
+        while (i--) this.emitters[i].update(elapsed);
+    }
+
+    /**
+     * @todo add description
+     *
+     * @method amendChangeTabsBug
+     * @memberof Proton
+     * @instance
+     */
+    amendChangeTabsBug() {
+        if (this.elapsed > .5) {
+            this.oldTime = (new Date()).getTime();
+            this.elapsed = 0;
+        }
+    }
+
+    /**
+     * Counts all particles from all emitters
+     *
+     * @method getCount
+     * @memberof Proton
+     * @instance
+     */
+    getCount() {
+        let total = 0;
+        let i = this.emitters.length;
+
+        while (i--) total += this.emitters[i].particles.length;
+        return total;
+    }
+
+    getAllParticles() {
+        let particles = [];
+        let i = this.emitters.length;
+
+        while (i--) particles = particles.concat(this.emitters[i].particles);
+        return particles;
+    }
+
+    /**
+     * Destroys everything related to this Proton instance. This includes all emitters, and all properties
+     *
+     * @method destroy
+     * @memberof Proton
+     * @instance
+     */
+    destroy() {
+        Util.destroy(this.renderers, this.getAllParticles());
+        Util.destroy(this.emitters);
+
         this.time = 0;
         this.oldTime = 0;
 
-        Proton.pool = new Proton.Pool(100);
-        Proton.integrator = new Proton.NumericalIntegration(this.integrationType);
+        this.pool.destroy();
     }
+}
 
-
-    Proton.prototype = {
-        /**
-         * add a type of Renderer
-         *
-         * @method addRender
-         * @memberof Proton
-         * @instance
-         *
-         * @param {Renderer} render
-         */
-        addRender: function(render) {
-            render.proton = this;
-            this.renderers.push(render.proton);
-        },
-
-        /**
-         * add the Emitter
-         *
-         * @method addEmitter
-         * @memberof Proton
-         * @instance
-         *
-         * @param {Emitter} emitter
-         */
-        addEmitter: function(emitter) {
-            this.emitters.push(emitter);
-            emitter.parent = this;
-
-            this.dispatchEvent(Proton.EMITTER_ADDED, emitter);
-        },
-
-        /**
-         * Removes an Emitter
-         *
-         * @method removeEmitter
-         * @memberof Proton
-         * @instance
-         *
-         * @param {Proton.Emitter} emitter
-         */
-        removeEmitter: function(emitter) {
-            var index = this.emitters.indexOf(emitter);
-            this.emitters.splice(index, 1);
-            emitter.parent = null;
-
-            this.dispatchEvent(Proton.EMITTER_REMOVED, emitter);
-        },
-
-        /**
-         * Updates all added emitters
-         *
-         * @method update
-         * @memberof Proton
-         * @instance
-         */
-        update: function() {
-            this.dispatchEvent(Proton.PROTON_UPDATE);
-
-            if (Proton.USE_CLOCK) {
-                if (!this.oldTime)
-                    this.oldTime = new Date().getTime();
-
-                var time = new Date().getTime();
-                this.elapsed = (time - this.oldTime) / 1000;
-                if (Proton.amendChangeTabsBug)
-                    this.amendChangeTabsBug();
-                this.oldTime = time;
-            } else {
-                this.elapsed = 0.0167;
-            }
-
-            if (this.elapsed > 0) {
-                for (var i = 0; i < this.emitters.length; i++) {
-                    this.emitters[i].update(this.elapsed);
-                }
-            }
-
-            this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
-        },
-
-        /**
-         * @todo add description
-         *
-         * @method amendChangeTabsBug
-         * @memberof Proton
-         * @instance
-         */
-        amendChangeTabsBug: function() {
-            if (this.elapsed > .5) {
-                this.oldTime = new Date().getTime();
-                this.elapsed = 0;
-            }
-        },
-
-        /**
-         * Counts all particles from all emitters
-         *
-         * @method getCount
-         * @memberof Proton
-         * @instance
-         */
-        getCount: function() {
-            var total = 0;
-            var length = this.emitters.length;
-            for (var i = 0; i < length; i++) {
-                total += this.emitters[i].particles.length;
-            }
-            return total;
-        },
-
-        /**
-         * Destroys everything related to this Proton instance. This includes all emitters, and all properties
-         *
-         * @method destroy
-         * @memberof Proton
-         * @instance
-         */
-        destroy: function() {
-            var length = this.emitters.length;
-            for (var i = 0; i < length; i++) {
-                this.emitters[i].destroy();
-                delete this.emitters[i];
-            }
-
-            this.emitters = [];
-            this.time = 0;
-            this.oldTime = 0;
-            Proton.pool.release();
-        }
-    };
-
-    window.Proton = Proton;
-})(window);
+EventDispatcher.bind(Proton);

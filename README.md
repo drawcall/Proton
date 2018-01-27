@@ -3,7 +3,7 @@ Proton
 
 > The documentation is available [here](https://projects.jpeer.at/proton/)
 
-Proton is an easily customizable html5 particle engine including six different types of renderers. <br>
+Proton is a lightweight and powerful javascript particle engine including six different types of renderers. <br>
 Check out examples at http://a-jie.github.io/Proton/
 
 ## Features
@@ -11,8 +11,8 @@ Check out examples at http://a-jie.github.io/Proton/
   - canvas 
   - dom 
   - webgl 
-  - easeljs 
   - pixel
+  - easeljs 
   - pixijs
 - Create cool effects like the demo of <a href="http://www.71squared.com/">71squared's ParticleDesigner</a> in 10 lines of code.
 - Integratable into any game engine
@@ -56,33 +56,34 @@ emitter.addBehaviour(new Proton.Alpha(1, 0));
 //set emitter position
 emitter.p.x = canvas.width / 2;
 emitter.p.y = canvas.height / 2;
-emitter.emit();
+emitter.emit(5);
 
 //add emitter to the proton
 proton.addEmitter(emitter);
 
 // add canvas renderer
-var renderer = new Proton.Renderer('canvas', proton, canvas);
-renderer.start();
+var renderer = new Proton.CanvasRenderer(canvas);
+proton.addRenderer(renderer);
 
 //use Euler integration calculation is more accurate (default false)
 Proton.USE_CLOCK = false or true;
 ```
 
 ## Building Proton
-Node is a dependency, use terminal to install it with with:  
-`git clone git://github.com/a-jie/Proton.git`
+Node is a dependency, use terminal to install it with:   
 
-Then navigate to the build directory by running:  
-
-```
-cd ./build
-node build.js
+```javascript
+git clone git://github.com/a-jie/Proton.git
+...
+npm install
+npm run build
 ``` 
 
-Or use npm script  
-```
-npm run build
+and run example 
+
+```javascript
+npm start
+//vist http://localhost:3001/example/
 ```
 
 ## Changelog

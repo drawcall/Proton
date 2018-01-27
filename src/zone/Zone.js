@@ -1,21 +1,16 @@
-(function(Proton, undefined) {
-	function Zone() {
-		this.vector = new Proton.Vector2D(0, 0);
+import Vector2D from '../math/Vector2D';
+
+export default class Zone {
+	constructor() {
+		this.vector = new Vector2D(0, 0);
 		this.random = 0;
 		this.crossType = "dead";
 		this.alert = true;
 	}
 
+	getPosition() {
+	}
 
-	Zone.prototype = {
-		getPosition : function() {
-
-		},
-
-		crossing : function(particle) {
-
-		}
-	};
-
-	Proton.Zone = Zone;
-})(Proton);
+	crossing(particle) {
+	}
+}

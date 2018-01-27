@@ -1,19 +1,21 @@
-(function(Proton, undefined) {
-	function Radius(a, b, c) {
-		Radius._super_.call(this);
-		this.radius = Proton.Util.setSpanValue(a, b, c);
+import Util from '../utils/Util';
+import Initialize from './Initialize';
+
+export default class Radius extends Initialize {
+
+	constructor(a, b, c) {
+		super();
+		this.radius = Util.setSpanValue(a, b, c);
+
+		this.name = 'Radius';
 	}
 
-
-	Proton.Util.inherits(Radius, Proton.Initialize);
-	Radius.prototype.reset = function(a, b, c) {
-		this.radius = Proton.Util.setSpanValue(a, b, c);
+	reset(a, b, c) {
+		this.radius = Util.setSpanValue(a, b, c);
 	};
 
-	Radius.prototype.initialize = function(particle) {
+	initialize(particle) {
 		particle.radius = this.radius.getValue();
 		particle.transform.oldRadius = particle.radius;
 	};
-
-	Proton.Radius = Radius;
-})(Proton);
+}

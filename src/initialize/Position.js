@@ -1,21 +1,25 @@
-(function(Proton, undefined) {
-	function Position(zone) {
-		Position._super_.call(this);
-		this.zone = Proton.Util.initValue(zone, new Proton.PointZone());
+import Util from '../utils/Util';
+import PointZone from '../zone/PointZone';
+import Initialize from './Initialize';
+
+export default class Position extends Initialize {
+
+	constructor(zone) {
+		super();
+		this.zone = Util.initValue(zone, new PointZone());
+
+		this.name = 'Position';
 	}
 
+	reset(zone) {
+		this.zone = Util.initValue(zone, new PointZone());
+	}
 
-	Proton.Util.inherits(Position, Proton.Initialize);
-	Position.prototype.reset = function(zone) {
-		this.zone = Proton.Util.initValue(zone, new Proton.PointZone());
-	};
-
-	Position.prototype.initialize = function(target) {
+	initialize(target) {
 		this.zone.getPosition();
+
 		target.p.x = this.zone.vector.x;
 		target.p.y = this.zone.vector.y;
 	};
 
-	Proton.Position = Position;
-	Proton.P = Position;
-})(Proton);
+}

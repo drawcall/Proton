@@ -1,13 +1,18 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Vector2D from '../math/Vector2D';
+import MathUtils from '../math/MathUtils';
+import Behaviour from './Behaviour';
+
+export default class RandomDrift extends Behaviour {
 
 	/**
 	 * @memberof! Proton#
-	 * @augments Proton.Behaviour
+	 * @augments Behaviour
 	 * @constructor
-	 * @alias Proton.RandomDrift
+	 * @alias RandomDrift
 	 *
-	 * @param {Number} driftX 				X value of the new Proton.Vector2D
-	 * @param {Number} driftY  				Y value of the new Proton.Vector2D
+	 * @param {Number} driftX 				X value of the new Vector2D
+	 * @param {Number} driftY  				Y value of the new Vector2D
 	 * @param {Number} delay 				How much delay the drift should have
 	 * @param {Number} [life=Infinity] 		this behaviour's life
 	 * @param {String} [easing=easeLinear] 	this behaviour's easing
@@ -15,56 +20,53 @@
 	 * @property {Number} time The time of the drift
 	 * @property {String} name The Behaviour name
 	 */
-	function RandomDrift(driftX, driftY, delay, life, easing) {
-		RandomDrift._super_.call(this, life, easing);
+	constructor(driftX, driftY, delay, life, easing) {
+		super(life, easing);
+
 		this.reset(driftX, driftY, delay);
 		this.time = 0;
 		this.name = "RandomDrift";
 	}
 
-	Proton.Util.inherits(RandomDrift, Proton.Behaviour);
-
 	/**
 	 * Reset this behaviour's parameters
 	 *
 	 * @method reset
-	 * @memberof Proton#Proton.RandomDrift
+	 * @memberof Proton#RandomDrift
 	 * @instance
 	 *
-	 * @param {Number} driftX 				X value of the new Proton.Vector2D
-	 * @param {Number} driftY  				Y value of the new Proton.Vector2D
+	 * @param {Number} driftX 				X value of the new Vector2D
+	 * @param {Number} driftY  				Y value of the new Vector2D
 	 * @param {Number} delay 				How much delay the drift should have
 	 * @param {Number} [life=Infinity] 		this behaviour's life
 	 * @param {String} [easing=easeLinear] 	this behaviour's easing
 	 */
-	RandomDrift.prototype.reset = function(driftX, driftY, delay, life, easing) {
-		this.panFoce = new Proton.Vector2D(driftX, driftY);
+	reset(driftX, driftY, delay, life, easing) {
+		this.panFoce = new Vector2D(driftX, driftY);
 		this.panFoce = this.normalizeForce(this.panFoce);
 		this.delay = delay;
-		if (life)
-			RandomDrift._super_.prototype.reset.call(this, life, easing);
+
+		life && super.reset(life, easing);
 	}
 
 	/**
 	 * Apply this behaviour for all particles every time
 	 *
 	 * @method applyBehaviour
-	 * @memberof Proton#Proton.RandomDrift
+	 * @memberof Proton#RandomDrift
 	 * @instance
 	 *
-	 * @param {Proton.Particle} particle
+	 * @param {Particle} particle
 	 * @param {Number} 			time the integrate time 1/ms
 	 * @param {Int} 			index the particle index
 	 */
-	RandomDrift.prototype.applyBehaviour = function(particle, time, index) {
-		RandomDrift._super_.prototype.applyBehaviour.call(this, particle, time, index);
+	applyBehaviour(particle, time, index) {
+		this.calculate(particle, time, index);
 		this.time += time;
+
 		if (this.time >= this.delay) {
-			
-			particle.a.addXY(Proton.MathUtils.randomAToB(-this.panFoce.x, this.panFoce.x), Proton.MathUtils.randomAToB(-this.panFoce.y, this.panFoce.y));
+			particle.a.addXY(MathUtils.randomAToB(-this.panFoce.x, this.panFoce.x), MathUtils.randomAToB(-this.panFoce.y, this.panFoce.y));
 			this.time = 0;
 		};
-	};
-
-	Proton.RandomDrift = RandomDrift;
-})(Proton);
+	}
+}

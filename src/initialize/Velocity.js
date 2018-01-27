@@ -1,36 +1,40 @@
-(function(Proton, undefined) {
-	//radius and tha
-	function Velocity(rpan, thapan, type) {
-		Velocity._super_.call(this);
-		this.rPan = Proton.Util.setSpanValue(rpan);
-		this.thaPan = Proton.Util.setSpanValue(thapan);
-		this.type = Proton.Util.initValue(type, 'vector');
-	}
+import Proton from '../core/Proton';
+import Util from '../utils/Util';
+import Polar2D from '../math/Polar2D';
+import MathUtils from '../math/MathUtils';
+import Initialize from './Initialize';
 
+export default class Velocity extends Initialize {
 
-	Proton.Util.inherits(Velocity, Proton.Initialize);
+    constructor(rpan, thapan, type) {
+        super();
 
-	Velocity.prototype.reset = function(rpan, thapan, type) {
-		this.rPan = Proton.Util.setSpanValue(rpan);
-		this.thaPan = Proton.Util.setSpanValue(thapan);
-		this.type = Proton.Util.initValue(type, 'vector');
-	};
+        this.rPan = Util.setSpanValue(rpan);
+        this.thaPan = Util.setSpanValue(thapan);
+        this.type = Util.initValue(type, 'vector');
 
-	Velocity.prototype.normalizeVelocity = function(vr) {
-		return vr * Proton.MEASURE;
-	}
+        this.name = 'Velocity';
+    }
 
-	Velocity.prototype.initialize = function(target) {
-		if (this.type == 'p' || this.type == 'P' || this.type == 'polar') {
-			var polar2d = new Proton.Polar2D(this.normalizeVelocity(this.rPan.getValue()), this.thaPan.getValue() * Math.PI / 180);
-			target.v.x = polar2d.getX();
-			target.v.y = polar2d.getY();
-		} else {
-			target.v.x = this.normalizeVelocity(this.rPan.getValue());
-			target.v.y = this.normalizeVelocity(this.thaPan.getValue());
-		}
-	};
+    reset(rpan, thapan, type) {
+        this.rPan = Util.setSpanValue(rpan);
+        this.thaPan = Util.setSpanValue(thapan);
+        this.type = Util.initValue(type, 'vector');
+    };
 
-	Proton.Velocity = Velocity;
-	Proton.V = Velocity;
-})(Proton);
+    normalizeVelocity(vr) {
+        return vr * Proton.MEASURE;
+    }
+
+    initialize(target) {
+        if (this.type == 'p' || this.type == 'P' || this.type == 'polar') {
+            const polar2d = new Polar2D(this.normalizeVelocity(this.rPan.getValue()), this.thaPan.getValue() * MathUtils.PI_180);
+
+            target.v.x = polar2d.getX();
+            target.v.y = polar2d.getY();
+        } else {
+            target.v.x = this.normalizeVelocity(this.rPan.getValue());
+            target.v.y = this.normalizeVelocity(this.thaPan.getValue());
+        }
+    };
+}

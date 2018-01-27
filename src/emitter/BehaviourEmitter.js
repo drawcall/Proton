@@ -1,4 +1,8 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Emitter from './Emitter';
+
+export default class BehaviourEmitter extends Emitter {
+
 	/**
 	 * The BehaviourEmitter class inherits from Proton.Emitter
 	 *
@@ -7,12 +11,12 @@
 	 * @constructor
 	 * @param {Object} pObj the parameters object;
 	 */
-	function BehaviourEmitter(pObj) {
-		this.selfBehaviours = [];
-		BehaviourEmitter._super_.call(this, pObj);
-	};
+	constructor(pObj) {
+		super(pObj);
 
-	Proton.Util.inherits(BehaviourEmitter, Proton.Emitter);
+		this.selfBehaviours = [];
+	};
+	
 	/**
 	 * add the Behaviour to emitter;
 	 *
@@ -20,33 +24,35 @@
 	 * @method addSelfBehaviour
 	 * @param {Proton.Behaviour} behaviour like this new Proton.Color('random')
 	 */
-	BehaviourEmitter.prototype.addSelfBehaviour = function() {
-		var length = arguments.length, i;
-		for ( i = 0; i < length; i++) {
-			this.selfBehaviours.push(arguments[i]);
+	addSelfBehaviour(...rest) {
+		const length = rest.length;
+		let i;
+
+		for (i = 0; i < length; i++) {
+			this.selfBehaviours.push(rest[i]);
 		}
 	};
+
 	/**
 	 * remove the Behaviour for self
 	 * @method removeSelfBehaviour
 	 * @param {Proton.Behaviour} behaviour a behaviour
 	 */
-	BehaviourEmitter.prototype.removeSelfBehaviour = function(behaviour) {
-		var index = this.selfBehaviours.indexOf(behaviour);
-		if (index > -1)
-			this.selfBehaviours.splice(index, 1);
+	removeSelfBehaviour(behaviour) {
+		const index = this.selfBehaviours.indexOf(behaviour);
+		if (index > -1) this.selfBehaviours.splice(index, 1);
 	};
 
-	BehaviourEmitter.prototype.update = function(time) {
-		BehaviourEmitter._super_.prototype.update.call(this, time);
+	update(time) {
+		super.update(time);
 
 		if (!this.sleep) {
-			var length = this.selfBehaviours.length, i;
-			for ( i = 0; i < length; i++) {
-				this.selfBehaviours[i].applyBehaviour(this, time, i)
+			const length = this.selfBehaviours.length;
+			let i;
+
+			for (i = 0; i < length; i++) {
+				this.selfBehaviours[i].applyBehaviour(this, time, i);
 			}
 		}
 	}
-
-	Proton.BehaviourEmitter = BehaviourEmitter;
-})(Proton);
+}

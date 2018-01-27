@@ -1,0 +1,271 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>proton.js-render-custom-pixidemo</title>
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <style type="text/css">
+        body {
+            background-color: #000;
+            margin: 0px;
+            font-family: 'inconsolata';
+            overflow: hidden;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+
+        .tips {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #fff;
+
+            text-align: right;
+            z-index: 99;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7)
+        }
+
+        #info {
+            color: #ff0000;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tips">space key control behaviour | A/S key control emitter | enter key control destroy
+        <br>
+        <span id="info">Add Behaviours: Gravity + Alpha</span>
+    </div>
+    <div id="container"></div>
+    <script src="../../lib/stats.min.js"></script>
+    <script src="//localhost:3001/build/proton.js"></script>
+    <script src="../../lib/pixi.min.js"></script>
+    <script>
+        var canvas;
+        var context;
+        var proton;
+        var emitter1, emitter2, renderer;
+        var pool;
+        var stats;
+        var app;
+        var scale, zone, repulsion, rotate, color;
+        var num = 0;
+
+        Main();
+
+        function Main() {
+            addStats();
+            createPixi();
+            createProton();
+            keydownEvent();
+
+            tick();
+        }
+
+        function addStats() {
+            stats = new Stats();
+            stats.setMode(2);
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+            document.getElementById('container').appendChild(stats.domElement);
+        }
+
+        function createProton() {
+            proton = new Proton();
+            proton.stats.add(3, document.getElementById('container'));
+
+            renderer = createRenderer();
+            proton.addRenderer(renderer);
+
+            emitter1 = createEmitter({
+                src: "image/flowerTop.png",
+                x: 0,
+                y: window.innerHeight,
+                angle: new Proton.Span(45, 30, true)
+            });
+
+            emitter2 = createEmitter({
+                src: "image/helmlok.png",
+                x: window.innerWidth,
+                y: 0,
+                angle: new Proton.Span(-90, 30, true)
+            });
+
+            proton.addEmitter(emitter1);
+            proton.addEmitter(emitter2);
+        }
+
+        function createEmitter(conf) {
+            var emitter = new Proton.Emitter();
+            emitter.rate = new Proton.Rate(new Proton.Span(10, 15), new Proton.Span(.2, .5));
+
+            emitter.addInitialize(new Proton.M(1));
+            conf.src && emitter.addInitialize(new Proton.B(conf.src));
+            emitter.addInitialize(new Proton.L(2, 3));
+            emitter.addInitialize(new Proton.V(new Proton.Span(3, 10), conf.angle, 'polar'));
+
+            emitter.addBehaviour(new Proton.G(8));
+            emitter.addBehaviour(new Proton.A(1, 0.1));
+
+            emitter.p.x = conf.x;
+            emitter.p.y = conf.y;
+            emitter.emit();
+
+            return emitter;
+        }
+
+        function keydownEvent() {
+            document.onkeydown = function (e) {
+                var keyCode = window.event ? e.keyCode : e.which;
+                if (keyCode == 32) {
+                    controllBehaviour();
+                } else if (keyCode == 13) {
+                    controllRenderer();
+                } else if (keyCode == 65 || keyCode == 83) {
+                    controllEmitter(keyCode);
+                }
+            }
+        }
+
+        function controllEmitter(keyCode) {
+            var emitter = keyCode == 65 ? emitter1 : emitter2;
+
+            if (!emitter.parent)
+                proton.addEmitter(emitter);
+            else
+                proton.removeEmitter(emitter);
+        }
+
+        function controllRenderer() {
+            if (emitter1.stoped) {
+                emitter1.emit();
+                emitter2.emit();
+            } else {
+                emitter1.stop();
+                emitter2.stop();
+            }
+        }
+
+        function controllBehaviour() {
+            if (num > 10) num = 0;
+            num++;
+
+            switch (num) {
+                case 1:
+                    rotate = new Proton.Rotate(0, Proton.getSpan(-8, 9), 'add');
+                    addBehaviour(rotate);
+                    addInfo(" + Rotate");
+                    break;
+
+                case 2:
+                    zone = new Proton.RectZone(0, 0, window.innerWidth, window.innerHeight);
+                    addBehaviour(new Proton.CrossZone(zone, "bound"));
+                    addInfo(" + CrossZone");
+                    break;
+
+                case 3:
+                    repulsion = new Proton.Repulsion({
+                        x: window.innerWidth / 2,
+                        y: window.innerHeight / 2
+                    }, 20, window.innerWidth / 2);
+                    addBehaviour(repulsion);
+                    addInfo(" + Repulsion");
+                    break;
+
+                case 4:
+                    scale = new Proton.S(new Proton.Span(.5, 1.5), .1);
+                    addBehaviour(scale);
+                    addInfo(" + Scale");
+                    break;
+
+                case 5:
+                    color = new Proton.Color('random', 'random', Infinity, Proton.easeOutQuart);
+                    addBehaviour(color);
+                    addInfo(" + Color");
+                    break;
+
+                case 6:
+                    removeBehaviour(color);
+                    reduceInfo(" + Color");
+                    break;
+
+                case 7:
+                    removeBehaviour(scale);
+                    reduceInfo(" + Scale");
+                    break;
+
+                case 8:
+                    removeBehaviour(repulsion);
+                    reduceInfo(" + Repulsion");
+                    break;
+
+                case 9:
+                    removeBehaviour(zone);
+                    reduceInfo(" + CrossZone");
+                    break;
+
+                case 10:
+                    removeBehaviour(rotate);
+                    reduceInfo(" + Rotate");
+                    break;
+
+                default:
+
+            }
+        }
+
+        function addInfo(info) {
+            document.getElementById("info").innerText += info;
+        }
+
+        function reduceInfo(info) {
+            var all = document.getElementById("info").innerText;
+            all = all.replace(info, "");
+            document.getElementById("info").innerText = all;
+        }
+
+        function addBehaviour(behaviour) {
+            emitter1.addBehaviour(behaviour);
+            emitter2.addBehaviour(behaviour);
+        }
+
+        function removeBehaviour(behaviour) {
+            emitter1.removeBehaviour(behaviour);
+            emitter2.removeBehaviour(behaviour);
+        }
+
+
+        function createRenderer() {
+            var renderer = new Proton.PixiRenderer(app.stage);
+            renderer.setColor = true;
+            return renderer;
+        }
+
+        function createPixi() {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            app = new PIXI.Application(w, h, { backgroundColor: 0x000 });
+            document.getElementById('container').appendChild(app.view);
+        }
+
+        function tick() {
+            requestAnimationFrame(tick);
+
+            stats.begin();
+            proton.update();
+            proton.stats.update();
+            stats.end();
+        }
+    </script>
+</body>
+
+</html>

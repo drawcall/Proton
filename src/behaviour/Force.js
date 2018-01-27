@@ -1,4 +1,8 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Vector2D from '../math/Vector2D';
+import Behaviour from './Behaviour';
+
+export default class Force extends Behaviour {
 
 	/**
 	 * @memberof! Proton#
@@ -9,18 +13,16 @@
 	 * @param {Number} fx
 	 * @param {Number} fy
 	 * @param {Number} [life=Infinity] 			this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {String} name The Behaviour name
 	 */
-	function Force(fx, fy, life, easing) {
-		Force._super_.call(this, life, easing);
-		this.force = this.normalizeForce(new Proton.Vector2D(fx, fy));
+	constructor(fx, fy, life, easing) {
+		super(life, easing);
+
+		this.force = this.normalizeForce(new Vector2D(fx, fy));
 		this.name = "Force";
 	}
-
-
-	Proton.Util.inherits(Force, Proton.Behaviour);
 
 	/**
 	 * Reset this behaviour's parameters
@@ -32,12 +34,12 @@
 	 * @param {Number} fx
 	 * @param {Number} fy
 	 * @param {Number} [life=Infinity] 			this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 */
-	Force.prototype.reset = function(fx, fy, life, easing) {
-		this.force = this.normalizeForce(new Proton.Vector2D(fx, fy));
-		if (life)
-			Force._super_.prototype.reset.call(this, life, easing);
+	reset(fx, fy, life, easing) {
+		this.force = this.normalizeForce(new Vector2D(fx, fy));
+
+		life && super.reset(life, easing);
 	}
 
 	/**
@@ -51,11 +53,8 @@
 	 * @param {Number} the integrate time 1/ms
 	 * @param {Int} the particle index
 	 */
-	Force.prototype.applyBehaviour = function(particle, time, index) {
-		Force._super_.prototype.applyBehaviour.call(this, particle, time, index);
+	applyBehaviour(particle, time, index) {
+		this.calculate(particle, time, index);
 		particle.a.add(this.force);
-	};
-
-	Proton.Force = Force;
-	Proton.F = Force;
-})(Proton);
+	}
+}

@@ -1,21 +1,24 @@
-(function(Proton, undefined) {
-	function RectZone(x, y, width, height) {
-		RectZone._super_.call(this);
+import Zone from './Zone';
+
+export default class PointZoneRectZone extends Zone {
+
+	constructor(x, y, width, height) {
+		super();
+
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 	}
 
-
-	Proton.Util.inherits(RectZone, Proton.Zone);
-	RectZone.prototype.getPosition = function() {
+	getPosition() {
 		this.vector.x = this.x + Math.random() * this.width;
 		this.vector.y = this.y + Math.random() * this.height;
+
 		return this.vector;
 	}
 
-	RectZone.prototype.crossing = function(particle) {
+	crossing(particle) {
 		if (this.crossType == "dead") {
 			if (particle.p.x + particle.radius < this.x)
 				particle.dead = true;
@@ -26,7 +29,9 @@
 				particle.dead = true;
 			else if (particle.p.y - particle.radius > this.y + this.height)
 				particle.dead = true;
-		} else if (this.crossType == "bound") {
+		}
+
+		else if (this.crossType == "bound") {
 			if (particle.p.x - particle.radius < this.x) {
 				particle.p.x = this.x + particle.radius;
 				particle.v.x *= -1;
@@ -34,7 +39,7 @@
 				particle.p.x = this.x + this.width - particle.radius;
 				particle.v.x *= -1;
 			}
-			
+
 			if (particle.p.y - particle.radius < this.y) {
 				particle.p.y = this.y + particle.radius;
 				particle.v.y *= -1;
@@ -42,7 +47,9 @@
 				particle.p.y = this.y + this.height - particle.radius;
 				particle.v.y *= -1;
 			}
-		} else if (this.crossType == "cross") {
+		}
+
+		else if (this.crossType == "cross") {
 			if (particle.p.x + particle.radius < this.x && particle.v.x <= 0)
 				particle.p.x = this.x + this.width + particle.radius;
 			else if (particle.p.x - particle.radius > this.x + this.width && particle.v.x >= 0)
@@ -54,6 +61,4 @@
 				particle.p.y = this.y - particle.radius;
 		}
 	}
-
-	Proton.RectZone = RectZone;
-})(Proton);
+}

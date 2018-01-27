@@ -1,93 +1,92 @@
 /*
  * EventDispatcher
- * Visit http://createjs.com/ for documentation, updates and examples.
+ * This code reference since http://createjs.com/.
  *
  **/
 
-(function(Proton, undefined) {
-    function EventDispatcher() {
-        this.initialize();
-    };
+export default class EventDispatcher {
 
-    EventDispatcher.initialize = function(target) {
-        target.addEventListener = p.addEventListener;
-        target.removeEventListener = p.removeEventListener;
-        target.removeAllEventListeners = p.removeAllEventListeners;
-        target.hasEventListener = p.hasEventListener;
-        target.dispatchEvent = p.dispatchEvent;
-    };
+    constructor() {
+        this._listeners = null;
+    }
 
-    var p = EventDispatcher.prototype;
+    static bind(TargetClass){
+        TargetClass.prototype.dispatchEvent = EventDispatcher.prototype.dispatchEvent;
+        TargetClass.prototype.hasEventListener = EventDispatcher.prototype.hasEventListener;
+        TargetClass.prototype.addEventListener = EventDispatcher.prototype.addEventListener;
+        TargetClass.prototype.removeEventListener = EventDispatcher.prototype.removeEventListener;
+        TargetClass.prototype.removeAllEventListeners = EventDispatcher.prototype.removeAllEventListeners;
+    }
 
-    p._listeners = null;
-
-    p.initialize = function() {};
-    p.addEventListener = function(type, listener) {
+    addEventListener(type, listener) {
         if (!this._listeners) {
             this._listeners = {};
         } else {
             this.removeEventListener(type, listener);
         }
 
-        if (!this._listeners[type]) this._listeners[type] = []
+        if (!this._listeners[type]) this._listeners[type] = [];
         this._listeners[type].push(listener);
 
         return listener;
-    };
+    }
 
-    p.removeEventListener = function(type, listener) {
+    removeEventListener(type, listener) {
         if (!this._listeners) return;
         if (!this._listeners[type]) return;
 
-        var arr = this._listeners[type];
-        for (var i = 0, l = arr.length; i < l; i++) {
+        const arr = this._listeners[type];
+        const length = arr.length;
+
+        for (let i = 0;i < length; i++) {
             if (arr[i] == listener) {
-                if (l == 1) {
-                    delete(this._listeners[type]);
+                if (length == 1) {
+                    delete (this._listeners[type]);
                 }
+
                 // allows for faster checks.
                 else {
                     arr.splice(i, 1);
                 }
+
                 break;
             }
         }
-    };
+    }
 
-    p.removeAllEventListeners = function(type) {
+    removeAllEventListeners(type) {
         if (!type)
             this._listeners = null;
         else if (this._listeners)
-            delete(this._listeners[type]);
-    };
+            delete (this._listeners[type]);
+    }
 
-    p.dispatchEvent = function(eventName, eventTarget) {
-        var ret = false,
-            listeners = this._listeners;
+    dispatchEvent(type, args) {
+        let result = false;
+        const listeners = this._listeners;
 
-        if (eventName && listeners) {
-            var arr = listeners[eventName];
-            if (!arr) return ret;
+        if (type && listeners) {
+            let arr = listeners[type];
+            if (!arr) return result;
 
-            arr = arr.slice();
+            //arr = arr.slice();
             // to avoid issues with items being removed or added during the dispatch
 
-            var handler, i = arr.length;
+            let handler;
+            let i = arr.length;
             while (i--) {
-                var handler = arr[i];
-                ret = ret || handler(eventTarget);
+                handler = arr[i];
+                result = result || handler(args);
             }
-            
+
         }
 
-        return !!ret;
-    };
+        return !!result;
+    }
 
-    p.hasEventListener = function(type) {
-        var listeners = this._listeners;
+    hasEventListener(type) {
+        const listeners = this._listeners;
         return !!(listeners && listeners[type]);
-    };
+    }
 
-    EventDispatcher.initialize(Proton.prototype);
-    Proton.EventDispatcher = EventDispatcher;
-})(Proton);
+}

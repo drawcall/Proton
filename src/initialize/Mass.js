@@ -1,14 +1,15 @@
-(function(Proton, undefined) {
-	function Mass(a, b, c) {
-		Mass._super_.call(this);
-		this.massPan = Proton.Util.setSpanValue(a, b, c);
+import Util from '../utils/Util';
+import Initialize from './Initialize';
+
+export default class Mass extends Initialize {
+
+	constructor(a, b, c) {
+		super();
+		this.massPan = Util.setSpanValue(a, b, c);
+		this.name = 'Mass';
 	}
 
-
-	Proton.Util.inherits(Mass, Proton.Initialize);
-	Mass.prototype.initialize = function(target) {
+	initialize(target) {
 		target.mass = this.massPan.getValue();
-	};
-
-	Proton.Mass = Mass;
-})(Proton);
+	}
+}

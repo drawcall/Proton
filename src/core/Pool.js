@@ -1,146 +1,141 @@
-(function(Proton, undefined) {
+/**
+ * get    -> PUID :: uid-> Body
+ *        -> cache[abc].         -> cache[abc] .pop()
+ *                               -> create [new Body| clone]
+ *        -> return p1: { __pid: abc }
+ * 
+ * expire -> cache[abc]= [p0, p1];
+ * 
+ */
+import Util from '../utils/Util';
+import PUID from '../utils/PUID';
 
-	/**
-	 * @memberof! Proton#
-	 * @constructor
-	 * @alias Proton.Pool
-	 *
-	 * @todo add description
-	 * @todo add description of properties
-	 *
-	 * @property {Number} cID
-	 * @property {Object} list
-	 */
-	function Pool() {
-		this.cID = 0;
-		this.list = {};
-	}
-	
-	Pool.prototype = {
+export default class Pool {
 
-		/**
-		 * Creates a new class instance
-		 *
-		 * @todo add more documentation 
-		 *
-		 * @method create
-		 * @memberof Proton#Proton.Pool
-		 *
-		 * @param {Object|Function} obj any Object or Function
-		 * @param {Object} [params] just add if `obj` is a function
-		 *
-		 * @return {Object}
-		 */
-		create: function(obj, params) {
-			this.cID++;
-   
-			if (typeof obj == "function")
-				return Proton.Util.classApply(obj, params);
-			else
-				return obj.clone();
-		},
+    /**
+     * @memberof! Proton#
+     * @constructor
+     * @alias Proton.Pool
+     *
+     * @todo add description
+     * @todo add description of properties
+     *
+     * @property {Number} total
+     * @property {Object} cache
+     */
+    constructor(num) {
+        this.total = 0;
+        this.cache = {};
+    }
 
-		/**
-		 * @todo add description - what is in the list?
-		 *
-		 * @method getCount
-		 * @memberof Proton#Proton.Pool
-		 *
-		 * @return {Number}
-		 */
-		getCount: function() {
-			var count = 0;
-			for (var id in this.list)
-				count += this.list[id].length;
+    /**
+     * @todo add description
+     *
+     * @method get
+     * @memberof Proton#Proton.Pool
+     *
+     * @param {Object|Function} target
+     * @param {Object} [params] just add if `target` is a function
+     *
+     * @return {Object}
+     */
+    get(target, params, uid) {
+        let p;
+        uid = uid || target.__puid || PUID.getID(target);
 
-			return count++;;
-		},
+        if (this.cache[uid] && this.cache[uid].length > 0)
+            p = this.cache[uid].pop();
+        else
+            p = this.createOrClone(target, params);
 
-		/**
-		 * @todo add description
-		 *
-		 * @method get
-		 * @memberof Proton#Proton.Pool
-		 *
-		 * @param {Object|Function} obj
-		 * @param {Object} [params] just add if `obj` is a function
-		 *
-		 * @return {Object}
-		 */
-		get: function(obj, params) {
-			var p, puid = obj.__puid || PUID.id(obj);
-			if (this.list[puid] && this.list[puid].length > 0)
-				p = this.list[puid].pop();
-			else
-				p = this.create(obj, params);
+        p.__puid = target.__puid || uid;
+        return p;
+    }
 
-			p.__puid = obj.__puid || puid;
-			return p;
-		},
+    /**
+     * @todo add description
+     *
+     * @method set
+     * @memberof Proton#Proton.Pool
+     *
+     * @param {Object} target
+     *
+     * @return {Object}
+     */
+    expire(target) {
+        return this.getCache(target.__puid).push(target);
+    }
 
-		/**
-		 * @todo add description
-		 *
-		 * @method set
-		 * @memberof Proton#Proton.Pool
-		 *
-		 * @param {Object} obj
-		 *
-		 * @return {Object}
-		 */
-		set: function(obj) {
-			return this._getList(obj.__puid).push(obj);
-		},
+    /**
+     * Creates a new class instance
+     *
+     * @todo add more documentation 
+     *
+     * @method create
+     * @memberof Proton#Proton.Pool
+     *
+     * @param {Object|Function} target any Object or Function
+     * @param {Object} [params] just add if `target` is a function
+     *
+     * @return {Object}
+     */
+    createOrClone(target, params) {
+        this.total++;
 
-		/**
-		 * Destroyes all items from Pool.list
-		 *
-		 * @method destroy
-		 * @memberof Proton#Proton.Pool
-		 */
-		destroy: function() {
-			for (var id in this.list) {
-				this.list[id].length = 0;
-				delete this.list[id];
-			}
-		},
+        if (this.create) {
+            return this.create(target, params);
+        } else if (typeof target == "function") {
+            return Util.classApply(target, params);
+        } else {
+            return target.clone();
+        }
+    }
 
-		/**
-		 * Returns Pool.list
-		 *
-		 * @method _getList
-		 * @memberof Proton#Proton.Pool
-		 * @private
-		 *
-		 * @param {Number} uid the unique id
-		 *
-		 * @return {Object}
-		 */
-		_getList: function(uid) {
-			uid = uid || "default";
-			if (!this.list[uid]) this.list[uid] = [];
-			return this.list[uid];
-		}
-	}
+    /**
+     * @todo add description - what is in the cache?
+     *
+     * @method getCount
+     * @memberof Proton#Proton.Pool
+     *
+     * @return {Number}
+     */
+    getCount() {
+        let count = 0;
 
-	Proton.Pool = Pool;
+        for (let id in this.cache)
+            count += this.cache[id].length;
 
-	var PUID = {
-		_id: 0,
-		_uids: {},
-		id: function(obj) {
-			for (var id in this._uids) {
-				if (this._uids[id] == obj) return id;
-			}
+        return count++;;
+    }
 
-			var nid = "PUID_" + (this._id++);
-			this._uids[nid] = obj;
-			return nid;
-		},
+    /**
+     * Destroyes all items from Pool.cache
+     *
+     * @method destroy
+     * @memberof Proton#Proton.Pool
+     */
+    destroy() {
+        for (let id in this.cache) {
+            this.cache[id].length = 0;
+            delete this.cache[id];
+        }
+    }
 
-		hash: function(str) {
-			return;
-		}
-	}
+    /**
+     * Returns Pool.cache
+     *
+     * @method getCache
+     * @memberof Proton#Proton.Pool
+     * @private
+     *
+     * @param {Number} uid the unique id
+     *
+     * @return {Object}
+     */
+    getCache(uid) {
+        uid = uid || "default";
 
-})(Proton);
+        if (!this.cache[uid]) this.cache[uid] = [];
+        return this.cache[uid];
+    }
+}

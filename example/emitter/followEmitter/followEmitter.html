@@ -19,7 +19,7 @@
 	<body>
 		<canvas id="testCanvas"></canvas>
 		<script src="../../lib/stats.min.js"></script>
-		<script src="../../../build/proton.min.js"></script>
+		<script src="//localhost:3001/build/proton.js"></script>
 		<script>
 			var canvas;
 			var proton;
@@ -57,17 +57,20 @@
 				proton = new Proton;
 				var emitter = new Proton.FollowEmitter();
 				emitter.rate = new Proton.Rate(new Proton.Span(0, 5));
+				
 				emitter.addInitialize(new Proton.Mass(1));
 				emitter.addInitialize(new Proton.Radius(3, 40));
 				emitter.addInitialize(new Proton.Life(1, 3));
 				emitter.addInitialize(new Proton.Velocity(new Proton.Span(-1, 1), new Proton.Span(-3, 0), 'vector'));
+				
 				emitter.addBehaviour(new Proton.Gravity(9.8));
 				emitter.addBehaviour(new Proton.Color('random'));
 				emitter.addBehaviour(new Proton.RandomDrift(30, 0, .035));
+				
 				emitter.emit();
 				proton.addEmitter(emitter);
-				renderer = new Proton.Renderer('canvas', proton, canvas);
-				renderer.start();
+				renderer = new Proton.CanvasRenderer(canvas);
+				proton.addRenderer(renderer);
 			}
 
 			function tick() {
@@ -75,6 +78,7 @@
 
 				stats.begin();
 				proton.update();
+				proton.stats.update(1);
 				stats.end();
 			}
 		</script>

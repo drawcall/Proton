@@ -1,14 +1,9 @@
-(function(Proton, undefined) {
-	function Initialize() {
-
+export default class Initialize {
+	
+	reset() {
 	}
 
-
-	Initialize.prototype.reset = function() {
-
-	}
-
-	Initialize.prototype.init = function(emitter, particle) {
+	init(emitter, particle) {
 		if (particle) {
 			this.initialize(particle);
 		} else {
@@ -17,8 +12,6 @@
 	};
 
 	///sub class init
-	Initialize.prototype.initialize = function(target) {
+	initialize(target) {
 	};
-
-	Proton.Initialize = Initialize;
-})(Proton);
+}

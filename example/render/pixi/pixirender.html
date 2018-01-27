@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>proton.js-render-custom-pixi.js</title>
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <style type="text/css">
+        body {
+            background-color: #333;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        #container {
+            width: 1003px;
+            height: 650px;
+            margin-top: 50px;
+            margin-left: -501px;
+            left: 50%;
+            box-shadow: 0 0 20px #000;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+
+    </div>
+    <script src="../../lib/stats.min.js"></script>
+    <script src="//localhost:3001/build/proton.js"></script>
+    <script src="../../lib/pixi.min.js"></script>
+    <script>
+        var canvas;
+        var context;
+        var proton;
+        var emitter;
+        var pool;
+        var stats;
+        var sprite;
+        var app;
+
+        main();
+
+        function main() {
+            addStats();
+            createPixi();
+            createProton();
+            tick();
+        }
+
+        function addStats() {
+            stats = new Stats();
+            stats.setMode(2);
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+            document.getElementById('container').appendChild(stats.domElement);
+        }
+
+        function createPixi(){
+            app = new PIXI.Application(1003, 650, {backgroundColor : 0x1099bb});
+            document.getElementById('container').appendChild(app.view);
+
+            sprite = new PIXI.Sprite(new PIXI.Texture.fromImage("image/eggHead.png"));
+            sprite.anchor.set(0.5);
+            app.stage.addChild(sprite);
+        }
+
+        function createProton() {
+            var texture = new PIXI.Texture.fromImage("image/bunny.png");
+            proton = new Proton();
+            proton.stats.add(2, document.getElementById('container'));
+            emitter = new Proton.BehaviourEmitter();
+            emitter.rate = new Proton.Rate(new Proton.Span(25, 40), new Proton.Span(.2, .5));
+
+            emitter.addInitialize(new Proton.Mass(1));
+            emitter.addInitialize(new Proton.Body("image/bunny.png"));
+            emitter.addInitialize(new Proton.Life(2, 3));
+            emitter.addInitialize(new Proton.Velocity(new Proton.Span(3, 9), new Proton.Span(0, 30, true), 'polar'));
+
+            emitter.addBehaviour(new Proton.Gravity(8));
+            emitter.addBehaviour(new Proton.Scale(new Proton.Span(1, 3), 0.3));
+            emitter.addBehaviour(new Proton.Alpha(1, 0.5));
+            emitter.addBehaviour(new Proton.Rotate(0, Proton.getSpan(-8, 9), 'add'));
+
+            emitter.p.x = 1003 / 2;
+            emitter.p.y = 100;
+            emitter.emit();
+            proton.addEmitter(emitter);
+            proton.addRenderer(new Proton.PixiRenderer(app.stage));
+
+            emitter.addSelfBehaviour(new Proton.Gravity(5));
+            emitter.addSelfBehaviour(new Proton.RandomDrift(30, 30, .1));
+            emitter.addSelfBehaviour(new Proton.CrossZone(new Proton.RectZone(50, 0, 953, 610), 'bound'));
+        }
+
+        function transformSprite(particleSprite, particle) {
+            particleSprite.position.x = particle.p.x;
+            particleSprite.position.y = particle.p.y;
+            particleSprite.scale.x = particle.scale;
+            particleSprite.scale.y = particle.scale;
+
+            particleSprite.anchor.x = 0.5;
+            particleSprite.anchor.y = 0.5;
+            particleSprite.alpha = particle.alpha;
+            particleSprite.rotation = particle.rotation * Math.PI / 180;
+        }
+
+        function tick() {
+            requestAnimationFrame(tick);
+
+            stats.begin();
+            proton.update();
+            proton.stats.update();
+            sprite.position.x = emitter.p.x;
+            sprite.position.y = emitter.p.y;
+
+            stats.end();
+        }
+    </script>
+</body>
+
+</html>

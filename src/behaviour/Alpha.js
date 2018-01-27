@@ -1,4 +1,7 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Behaviour from './Behaviour';
+
+export default class Alpha extends Behaviour {
 
 	/**
 	 * @memberof! Proton#
@@ -11,18 +14,16 @@
 	 * @param {Number} a
 	 * @param {String} b
 	 * @param {Number} [life=Infinity] 				this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {String} name The Behaviour name
 	 */
-	function Alpha(a, b, life, easing) {
-		Alpha._super_.call(this, life, easing);
+	constructor(a, b, life, easing) {
+		super(life, easing);
+
 		this.reset(a, b);
 		this.name = "Alpha";
 	}
-
-
-	Proton.Util.inherits(Alpha, Proton.Behaviour);
 
 	/**
 	 * Reset this behaviour's parameters
@@ -36,19 +37,16 @@
 	 * @param {Number} a
 	 * @param {String} b
 	 * @param {Number} [life=Infinity] 				this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 */
-	Alpha.prototype.reset = function(a, b, life, easing) {
-		if (b == null || b == undefined)
-			this.same = true;
-		else
-			this.same = false;
-		this.a = Proton.Util.setSpanValue(Proton.Util.initValue(a, 1));
-		this.b = Proton.Util.setSpanValue(b);
-		if (life)
-			Alpha._super_.prototype.reset.call(this, life, easing);
-	}
+	reset(a, b, life, easing) {
+		this.same = b === null || b === undefined ? true : false;
+		this.a = Util.setSpanValue(Util.initValue(a, 1));
+		this.b = Util.setSpanValue(b);
 
+		life && super.reset(life, easing);
+	}
+	
 	/**
 	 * Sets the new alpha value of the particle
 	 *
@@ -58,13 +56,14 @@
 	 *
 	 * @param {Proton.Particle} particle A single Proton generated particle
 	 */
-	Alpha.prototype.initialize = function(particle) {
+	initialize(particle) {
 		particle.transform.alphaA = this.a.getValue();
+
 		if (this.same)
 			particle.transform.alphaB = particle.transform.alphaA;
 		else
 			particle.transform.alphaB = this.b.getValue();
-	};
+	}
 
 	/**
 	 * @method applyBehaviour
@@ -75,12 +74,10 @@
 	 * @param {Number} 			time the integrate time 1/ms
 	 * @param {Int} 			index the particle index
  	 */
-	Alpha.prototype.applyBehaviour = function(particle, time, index) {
-		Alpha._super_.prototype.applyBehaviour.call(this, particle, time, index);
+	applyBehaviour(particle, time, index) {
+		this.calculate(particle, time, index);
+		
 		particle.alpha = particle.transform.alphaB + (particle.transform.alphaA - particle.transform.alphaB) * this.energy;
-		if (particle.alpha < 0.001)
-			particle.alpha = 0;
-	};
-
-	Proton.Alpha = Alpha;
-})(Proton);
+		if (particle.alpha < 0.001) particle.alpha = 0;
+	}
+}

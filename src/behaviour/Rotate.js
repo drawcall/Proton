@@ -1,4 +1,7 @@
-(function(Proton, undefined) {
+import Util from '../utils/Util';
+import Behaviour from './Behaviour';
+
+export default class Rotate extends Behaviour {
 
 	/**
 	 * @memberof! Proton#
@@ -12,17 +15,16 @@
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 *
 	 * @property {String} name The Behaviour name
 	 */
-	function Rotate(a, b, style, life, easing) {
-		Rotate._super_.call(this, life, easing);
+	constructor(a, b, style, life, easing) {
+		super(life, easing);
+
 		this.reset(a, b, style);
 		this.name = "Rotate";
 	}
-
-	Proton.Util.inherits(Rotate, Proton.Behaviour);
 
 	/**
 	 * Reset this behaviour's parameters
@@ -37,18 +39,16 @@
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
-	 * @param {String} [easing=Proton.easeLinear] 	this behaviour's easing
+	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
 	 */
-	Rotate.prototype.reset = function(a, b, style, life, easing) {
-		if (b == null || b == undefined)
-			this.same = true;
-		else
-			this.same = false;
-		this.a = Proton.Util.setSpanValue(Proton.Util.initValue(a, "Velocity"));
-		this.b = Proton.Util.setSpanValue(Proton.Util.initValue(b, 0));
-		this.style = Proton.Util.initValue(style, 'to');
-		if (life)
-			Rotate._super_.prototype.reset.call(this, life, easing);
+	reset(a, b, style, life, easing) {
+		this.same = b === null || b === undefined ? true : false;
+
+		this.a = Util.setSpanValue(Util.initValue(a, "Velocity"));
+		this.b = Util.setSpanValue(Util.initValue(b, 0));
+		this.style = Util.initValue(style, 'to');
+
+		life && super.reset(life, easing);
 	}
 
 	/**
@@ -60,11 +60,11 @@
 	 *
 	 * @param {Proton.Particle} particle
 	 */
-	Rotate.prototype.initialize = function(particle) {
+	initialize(particle) {
 		particle.rotation = this.a.getValue();
 		particle.transform.rotationA = this.a.getValue();
-		if (!this.same)
-			particle.transform.rotationB = this.b.getValue();
+
+		if (!this.same) particle.transform.rotationB = this.b.getValue();
 	};
 
 	/**
@@ -78,8 +78,9 @@
 	 * @param {Number} 			time the integrate time 1/ms
 	 * @param {Int} 			index the particle index
 	 */
-	Rotate.prototype.applyBehaviour = function(particle, time, index) {
-		Rotate._super_.prototype.applyBehaviour.call(this, particle, time, index);
+	applyBehaviour(particle, time, index) {
+		this.calculate(particle, time, index);
+
 		if (!this.same) {
 			if (this.style == 'to' || this.style == 'TO' || this.style == '_') {
 				particle.rotation += particle.transform.rotationB + (particle.transform.rotationA - particle.transform.rotationB) * this.energy
@@ -90,7 +91,6 @@
 			//beta...
 			particle.rotation = particle.getDirection();
 		}
-	};
+	}
 
-	Proton.Rotate = Rotate;
-})(Proton);
+}
