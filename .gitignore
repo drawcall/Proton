@@ -1,0 +1,7 @@
+# node modules
+node_modules
+
+# documentation
+build/docs/
+
+package-lock.json
