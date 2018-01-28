@@ -117,10 +117,10 @@ $(document).ready(function () {
 		src: 'emitter',
 		url: 'helloworld/emitter/emitter'
 	}, {
-		src: 'followemitter',
+		src: 'follow-emitter',
 		url: 'emitter/followEmitter/followEmitter'
 	}, {
-		src: 'mousedown',
+		src: 'mouse-emitter',
 		url: 'emitter/followEmitter/mouseDown'
 	}, {
 		src: 'Spitfire',
