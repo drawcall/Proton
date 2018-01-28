@@ -125,8 +125,14 @@ $(document).ready(function () {
 		src: 'pointzone',
 		url: 'zone/pointzone/pointzone'
 	}];
+
+
+
+	////////////////////////////// INIT //////////////////////////////
 	function init() {
 		hljs.initHighlightingOnLoad();
+
+		// set example
 		setExample('Sparks', sparksArr);
 		setExample('Behaviour', behaviourArr);
 		setExample('Game', gameArr);
@@ -134,25 +140,47 @@ $(document).ready(function () {
 		setExample('Emitter', emitterArr);
 		setExample('Zone', zoneArr);
 
+		// set scroll 
 		setScrollTo($('#about'), $('#about-page'));
 		setScrollTo($('#examples'), $('#examples-page'), 400);
 		setScrollTo($('#demo2'), $('#examples-page'), 400);
 		setScrollTo($('#home'), 0);
+
+		setHeadBtn();
+	}
+
+	function setHeadBtn() {
+		$('.head-btn').on('mouseenter', function () {
+			//AniX.to($(this).find('span')[0], .35, { scale: .88, color: '#eee' });
+			AniX.to($(this)[0], .35, { y: 4 });
+		});
+
+		$('.head-btn').on('mouseleave', function () {
+			//AniX.to($(this).find('span')[0], .2, { scale: 1, color: '#fff'  });
+			AniX.to($(this)[0], .35, { y: 0 });
+		});
 	}
 
 	function setExample(bt, demos) {
 		var container = $('<div class="container all_demos"></div>');
 		var bT = $('<h3>' + bt + '</h3>');
 		container.append(bT);
+
 		for (var i = 0; i < demos.length; i++) {
-			var image = $('<img src=image/examples/' + demos[i].src + '.jpg>');
+			var demoImgCon = $('<div class="demo-pic"><img src="image/examples/' + demos[i].src + '.jpg"></img></div>').css({
+				width: '210px',
+				height: '120px',
+				overflow: 'hidden'
+			});
 			var div = $('<div class="span3 demo"></div>');
-			var title = $('<span>' + demos[i].src + '</span>');
+			var title = $('<span class="demo-title">' + demos[i].src + '</span>');
 			var src = './example/' + demos[i].url + '.html';
-			div.append(image);
+
+			div.append(demoImgCon);
 			div.append(title);
 			container.append(div);
 
+			makeButton(div);
 			div.click({
 				src: src
 			}, function (e) {
@@ -160,6 +188,28 @@ $(document).ready(function () {
 			});
 		}
 		$('#demos').append(container);
+	}
+
+	function makeButton(div) {
+		div.on('mouseenter', function () {
+			var time = .5;
+			var img = $(this).find('.demo-pic img');
+			var title = $(this).find('.demo-title');
+
+			AniX.to(this, time, { opacity: .75 });
+			AniX.to(img[0], time, { scale: 1.3 });
+			AniX.to(title[0], time, { color: '#000' });
+		});
+
+		div.on('mouseleave', function () {
+			var time = .3;
+			var img = $(this).find('.demo-pic img');
+			var title = $(this).find('.demo-title');
+
+			AniX.to(this, time, { opacity: 1 });
+			AniX.to(img[0], time, { scale: 1 });
+			AniX.to(title[0], time, { color: '#999' });
+		});
 	}
 
 	function setScrollTo($btn, $target, $time) {

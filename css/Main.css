@@ -242,3 +242,7 @@ footer .footer-bottom {
 .about-txt {
 	padding-top: 20px;
 }
+
+.head-btn span{
+	display: inline-block;
+}
