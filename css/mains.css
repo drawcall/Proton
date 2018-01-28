@@ -56,6 +56,7 @@ body {
 #cta-content {
 	height: 500px;
 	width: 100%;
+	overflow: hidden;
 	background: url('../image/main_bg_image.jpg') repeat-x transparent 50% 50%;
 	color: #fff;
 }
@@ -65,7 +66,8 @@ body {
 }
 
 .wrapped-content {
-	width: 1024px;
+	width: 100%;
+	max-width: 1024px;
 }
 
 .main_title h1 {
@@ -245,4 +247,14 @@ footer .footer-bottom {
 
 .head-btn span{
 	display: inline-block;
+}
+
+.body-con{
+	width:100%;
+	max-width: 940px;
+}
+
+.code-con{
+	width:95%;
+	max-width: 860px;
 }
