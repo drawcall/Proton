@@ -117,10 +117,10 @@ $(document).ready(function () {
 		src: 'emitter',
 		url: 'helloworld/emitter/emitter'
 	}, {
-		src: 'followEmitter',
+		src: 'followemitter',
 		url: 'emitter/followEmitter/followEmitter'
 	}, {
-		src: 'mouseDown',
+		src: 'mousedown',
 		url: 'emitter/followEmitter/mouseDown'
 	}, {
 		src: 'Spitfire',
@@ -128,6 +128,9 @@ $(document).ready(function () {
 	}, {
 		src: 'imagetarget',
 		url: 'initialize/imagetarget/imagetarget'
+	}, {
+		src: 'rock',
+		url: 'initialize/imagetarget/fire2'
 	}];
 
 	var zoneArr = [{
