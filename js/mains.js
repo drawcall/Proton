@@ -7,7 +7,7 @@ $(document).ready(function () {
 		src: 'fireball',
 		url: 'sparks/sun/fireball'
 	}, {
-		src: 'eightDiagrams',
+		src: 'eight-diagrams',
 		url: 'sparks/eightDiagrams/eightDiagrams'
 	}, {
 		src: 'bomb',
@@ -24,16 +24,16 @@ $(document).ready(function () {
 	}];
 
 	var behaviourArr = [{
-		src: 'attraction1',
+		src: 'attraction',
 		url: 'behaviour/attraction/attraction1'
 	}, {
-		src: 'attraction2',
+		src: 'gravitation',
 		url: 'behaviour/attraction/attraction2'
 	}, {
 		src: 'collision',
 		url: 'behaviour/collision/collision'
 	}, {
-		src: 'collisionBall',
+		src: 'collision-ball',
 		url: 'behaviour/collision/collisionBall'
 	}, {
 		src: 'circle',
@@ -59,6 +59,9 @@ $(document).ready(function () {
 	}, {
 		src: 'color',
 		url: 'behaviour/color/color'
+	}, {
+		src: 'linebug',
+		url: 'behaviour/gravitywell/linebug'
 	}];
 
 	var gameArr = [{
@@ -68,7 +71,7 @@ $(document).ready(function () {
 		src: 'easeljs',
 		url: 'game/easeljs/easeljs'
 	}, {
-		src: 'pixijs-game',
+		src: 'pixijs',
 		url: 'game/pixijs/pixi-game'
 	}, {
 		src: 'asteroids',
@@ -79,23 +82,35 @@ $(document).ready(function () {
 	}];
 
 	var renderArr = [{
-		src: 'pixelrender',
+		src: 'pixelrenderer',
 		url: 'render/pixel/pixelrender'
 	}, {
-		src: 'google',
+		src: 'pixelrenderer-2',
 		url: 'render/pixel/google'
 	}, {
-		src: 'dom',
+		src: 'pixelrenderer-3',
+		url: 'render/pixel/thousand'
+	}, {
+		src: 'canvasrenderer',
+		url: 'render/dom/canvasVSdom'
+	}, {
+		src: 'domrenderer',
 		url: 'render/dom/domrender'
 	}, {
-		src: 'createjs',
+		src: 'easelrenderer',
 		url: 'render/easeljs/easeljs'
 	}, {
-		src: 'webglrender',
+		src: 'webglrenderer',
 		url: 'render/webgl/webglrender'
 	}, {
-		src: 'pixijs',
+		src: 'pixirenderer',
 		url: 'render/pixi/pixirender'
+	}, {
+		src: 'pixirenderer-2',
+		url: 'render/pixi/pixi-mulirender'
+	}, {
+		src: 'customrenderer',
+		url: 'render/custom/custom-renderer'
 	}];
 
 	var emitterArr = [{
