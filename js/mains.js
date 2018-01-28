@@ -68,6 +68,9 @@ $(document).ready(function () {
 		src: 'easeljs',
 		url: 'game/easeljs/easeljs'
 	}, {
+		src: 'pixijs-game',
+		url: 'game/pixijs/pixi-game'
+	}, {
 		src: 'asteroids',
 		url: 'game/crafty/asteroids'
 	}, {
