@@ -1,5 +1,4 @@
 # Proton
-======
 
 > See the detailed documentation please visit [here](https://projects.jpeer.at/proton/)
 
