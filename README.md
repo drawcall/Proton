@@ -1,23 +1,24 @@
-Proton
+# Proton
 ======
 
-> The documentation is available [here](https://projects.jpeer.at/proton/)
+> See the detailed documentation please visit [here](https://projects.jpeer.at/proton/)
 
-Proton is a lightweight and powerful javascript particle engine including six different types of renderers. <br>
-Check out examples at http://a-jie.github.io/Proton/
+Proton is a lightweight and powerful javascript particle engine. With it you can easily create countless cool effects.   
+#### Check out examples at: [http://a-jie.github.io/Proton/](http://a-jie.github.io/Proton/)
 
 ## Features
-- Six kinds of renderers
-  - canvas 
-  - dom 
-  - webgl 
-  - pixel
-  - easeljs 
-  - pixijs
-- Create cool effects like the demo of <a href="http://www.71squared.com/">71squared's ParticleDesigner</a> in 10 lines of code.
-- Integratable into any game engine
-- Veriety of behaviors
-- Three kinds of emitters which can simulate many different physical effects
+- Seven kinds of renderers
+  - canvas - CanvasRenderer 
+  - dom - DomRenderer 
+  - webgl - WebGLRenderer 
+  - pixel - PixelRenderer
+  - easeljs - EaselRenderer 
+  - pixi.js - PixiRenderer
+  - custom - CustomRenderer
+- Create cool effects like the demo of [71squared's ParticleDesigner](https://www.71squared.com/particledesigner) in 10 lines of code.
+- Integratable into any game engine.
+- Veriety of behaviors which can simulate many different physical effects.
+- Three kinds of emitters and can be easily expanded.
 - The __3D version__ of the proton engine is here [https://a-jie.github.io/three.proton/](https://a-jie.github.io/three.proton/)
 
 ## Installation
@@ -31,7 +32,7 @@ npm install proton-js --save
 import Proton from 'proton-js';
 ```
 
-#### Include in html
+#### OR include in html
 ``` 
 <script type="text/javascript" src="js/proton.min.js"></script> 
 ```
@@ -69,7 +70,13 @@ proton.addRenderer(renderer);
 Proton.USE_CLOCK = false or true;
 ```
 
-## Building Proton
+## Description
+`Proton.Span (or Proton.getSpan)` is a very important concept of the Proton engine, it's everywhere. If you understand its usage, you can create almost any desired effect!
+  
+Proton has now been upgraded to the __v3__ version. Performance has been greatly improved and api also has some improvements. For more details, please check [here](https://github.com/a-jie/Proton/releases).
+
+
+## Building
 Node is a dependency, use terminal to install it with:   
 
 ```javascript
