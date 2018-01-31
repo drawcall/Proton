@@ -131,6 +131,9 @@ $(document).ready(function () {
 	}, {
 		src: 'rock',
 		url: 'initialize/imagetarget/fire2'
+	}, {
+		src: 'bg-particle',
+		url: 'initialize/position/bg-particle'
 	}];
 
 	var zoneArr = [{
