@@ -50,10 +50,10 @@ export default class FollowEmitter extends Emitter {
 	}
 
 	mousemove(e) {
-		if (e.layerX || e.layerX == 0) {
+		if (e.layerX || e.layerX === 0) {
 			this.p.x += (e.layerX - this.p.x) * this.ease;
 			this.p.y += (e.layerY - this.p.y) * this.ease;
-		} else if (e.offsetX || e.offsetX == 0) {
+		} else if (e.offsetX || e.offsetX === 0) {
 			this.p.x += (e.offsetX - this.p.x) * this.ease;
 			this.p.y += (e.offsetY - this.p.y) * this.ease;
 		}
