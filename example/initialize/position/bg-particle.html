@@ -6,28 +6,72 @@
     <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8">
     <style type="text/css">
+        html,
         body {
-            background-color: #333333;
-            margin: 0px;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
 
-        #container {
-            width: 1003px;
-            margin-top: 50px;
-            margin-left: -501px;
-            left: 50%;
+        .h1 {
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        .h3 {
+            font-size: 20px;
+            font-weight: lighter;
+        }
+
+        .hr {
+            width: 400px;
+            height: 1px;
+            background: #fff;
+            margin: 6px auto;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container .title {
+            pointer-events: none;
+            z-index: 10;
             position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            font-family: Helvetica, Tahoma, Arial;
+            text-align: center;
+            width: 100%;
+            color: #fff;
         }
 
         #canvas {
+            display: block;
+            position: relative;
+            z-index: 0;
+            top: 0;
+            left: 0;
             background: #16a085;
         }
     </style>
 </head>
 
+
 <body>
-    <canvas id="canvas"></canvas>
+    <div class="container">
+        <div class="title">
+            <div class="h1">Proton</div>
+            <div class="hr"></div>
+            <div class="h3">a javascript particle engine</div>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
     <script src="../../lib/stats.min.js"></script>
     <script src="../../../build/proton.min.js"></script>
     <script>
