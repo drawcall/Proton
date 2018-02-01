@@ -1101,7 +1101,7 @@ var Stats = function () {
                 this.type = 1;
 
                 this.container = document.createElement('div');
-                this.container.style.cssText = ['position:absolute;bottom:0px;left:0;cursor:pointer;', 'opacity:0.9;z-index:10000;padding:10px;font-size:12px;', 'width:120px;height:50px;background-color:#002;color:#0ff;'].join('');
+                this.container.style.cssText = ['position:absolute;bottom:0px;left:0;cursor:pointer;', 'opacity:0.9;z-index:10000;padding:10px;font-size:12px;font-family:Helvetica,Arial,sans-serif;', 'width:120px;height:50px;background-color:#002;color:#0ff;'].join('');
 
                 this.container.addEventListener('click', function (e) {
                     _this.type++;
