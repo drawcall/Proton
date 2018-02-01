@@ -74,7 +74,7 @@
             emitter.addInitialize(pointZone);
             emitter.addInitialize(new Proton.Velocity(new Proton.Span(.3, .6), new Proton.Span(0, 360), 'polar'));
 
-            emitter.addBehaviour(new Proton.Alpha(Proton.getSpan(0.3, 1)));
+            emitter.addBehaviour(new Proton.Alpha(Proton.getSpan(0.2, .9)));
             emitter.addBehaviour(new Proton.Color('#ffffff'));
             emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'cross'));
 
@@ -115,12 +115,14 @@
             emitter.removeInitialize(pointZone);
 
             canvas.addEventListener('mousedown', function (e) {
-                emitter.p.x = getPos(e).x;
-                emitter.p.y = getPos(e).y;
-                emitter.emit('once');
-
                 for (var i = 0; i < 3; i++)
                     emitter.particles[i].dead = true;
+
+                setTimeout(function () {
+                    emitter.p.x = getPos(e).x;
+                    emitter.p.y = getPos(e).y;
+                    emitter.emit('once');
+                }, 60);
             });
 
             canvas.addEventListener('mouseup', function (e) {
