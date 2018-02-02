@@ -129,8 +129,8 @@
             proton.addEmitter(emitter);
 
             renderer = new Proton.CanvasRenderer(canvas);
-
             proton.addRenderer(renderer);
+            emitter.preEmit(1);
         }
 
         function tick() {

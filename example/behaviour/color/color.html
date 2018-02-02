@@ -11,7 +11,7 @@
             margin: 0px;
             overflow: hidden;
         }
-        
+
         #container {
             width: 1003px;
             margin-top: 50px;
@@ -19,7 +19,7 @@
             left: 50%;
             position: absolute;
         }
-        
+
         #testCanvas {
             background: #fff;
         }
@@ -82,6 +82,8 @@
 
             renderer = new Proton.CanvasRenderer(canvas);
             proton.addRenderer(renderer);
+
+            emitter.preEmit(0.5);
         }
 
         function tick() {
