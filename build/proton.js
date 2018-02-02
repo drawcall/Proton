@@ -3634,8 +3634,8 @@ var Emitter = function (_Particle) {
 		_this.behaviours = [];
 
 		_this.emitSpeed = 0;
-		_this.currentEmitTime = 0;
-		_this.totalEmitTimes = -1;
+		_this.emitTime = 0;
+		_this.totalTime = -1;
 
 		/**
    * The friction coefficient for all particle emit by This;
@@ -3669,20 +3669,20 @@ var Emitter = function (_Particle) {
 	/**
   * start emit particle
   * @method emit
-  * @param {Number} currentEmitTime begin emit time;
+  * @param {Number} emitTime begin emit time;
   * @param {String} life the life of this emitter
   */
 
 
 	createClass(Emitter, [{
 		key: 'emit',
-		value: function emit(totalEmitTimes, life) {
+		value: function emit(totalTime, life) {
 			this.stoped = false;
-			this.currentEmitTime = 0;
-			this.totalEmitTimes = Util.initValue(totalEmitTimes, Infinity);
+			this.emitTime = 0;
+			this.totalTime = Util.initValue(totalTime, Infinity);
 
 			if (life == true || life == 'life' || life == 'destroy') {
-				this.life = totalEmitTimes == 'once' ? 1 : this.totalEmitTimes;
+				this.life = totalTime == 'once' ? 1 : this.totalTime;
 			} else if (!isNaN(life)) {
 				this.life = life;
 			}
@@ -3698,9 +3698,31 @@ var Emitter = function (_Particle) {
 	}, {
 		key: 'stop',
 		value: function stop() {
-			this.totalEmitTimes = -1;
-			this.currentEmitTime = 0;
+			this.totalTime = -1;
+			this.emitTime = 0;
 			this.stoped = true;
+		}
+	}, {
+		key: 'preEmit',
+		value: function preEmit(time) {
+			var oldStoped = this.stoped;
+			var oldEmitTime = this.emitTime;
+			var oldTotalTime = this.totalTime;
+
+			this.stoped = false;
+			this.emitTime = 0;
+			this.totalTime = time;
+			this.rate.init();
+
+			var step = 0.0167;
+			while (time > step) {
+				time -= step;
+				this.update(step);
+			}
+
+			this.stoped = oldStoped;
+			this.emitTime = oldEmitTime + Math.max(time, 0);
+			this.totalTime = oldTotalTime;
 		}
 
 		/**
@@ -3880,18 +3902,18 @@ var Emitter = function (_Particle) {
 	}, {
 		key: 'emitting',
 		value: function emitting(time) {
-			if (this.totalEmitTimes == 'once') {
+			if (this.totalTime == 'once') {
 				var i = void 0;
 				var length = this.rate.getValue(99999);
 
 				if (length > 0) this.emitSpeed = length;
 				for (i = 0; i < length; i++) {
 					this.createParticle();
-				}this.totalEmitTimes = 'none';
+				}this.totalTime = 'none';
 			} else {
-				this.currentEmitTime += time;
+				this.emitTime += time;
 
-				if (this.currentEmitTime < this.totalEmitTimes) {
+				if (this.emitTime < this.totalTime) {
 					var _length = this.rate.getValue(time);
 					var _i = void 0;
 

@@ -30,8 +30,8 @@ export default class Emitter extends Particle {
 		this.behaviours = [];
 
 		this.emitSpeed = 0;
-		this.currentEmitTime = 0;
-		this.totalEmitTimes = -1;
+		this.emitTime = 0;
+		this.totalTime = -1;
 
 		/**
 		 * The friction coefficient for all particle emit by This;
@@ -64,16 +64,16 @@ export default class Emitter extends Particle {
 	/**
 	 * start emit particle
 	 * @method emit
-	 * @param {Number} currentEmitTime begin emit time;
+	 * @param {Number} emitTime begin emit time;
 	 * @param {String} life the life of this emitter
 	 */
-	emit(totalEmitTimes, life) {
+	emit(totalTime, life) {
 		this.stoped = false;
-		this.currentEmitTime = 0;
-		this.totalEmitTimes = Util.initValue(totalEmitTimes, Infinity);
+		this.emitTime = 0;
+		this.totalTime = Util.initValue(totalTime, Infinity);
 
 		if (life == true || life == 'life' || life == 'destroy') {
-			this.life = totalEmitTimes == 'once' ? 1 : this.totalEmitTimes;
+			this.life = totalTime == 'once' ? 1 : this.totalTime;
 		} else if (!isNaN(life)) {
 			this.life = life;
 		}
@@ -86,9 +86,30 @@ export default class Emitter extends Particle {
 	 * @method stop
 	 */
 	stop() {
-		this.totalEmitTimes = -1;
-		this.currentEmitTime = 0;
+		this.totalTime = -1;
+		this.emitTime = 0;
 		this.stoped = true;
+	}
+
+	preEmit(time) {
+		let oldStoped = this.stoped;
+		let oldEmitTime = this.emitTime;
+		let oldTotalTime = this.totalTime;
+
+		this.stoped = false;
+		this.emitTime = 0;
+		this.totalTime = time;
+		this.rate.init();
+
+		const step = 0.0167;
+		while (time > step) {
+			time -= step;
+			this.update(step);
+		}
+
+		this.stoped = oldStoped;
+		this.emitTime = oldEmitTime + Math.max(time, 0);
+		this.totalTime = oldTotalTime;
 	}
 
 	/**
@@ -226,19 +247,19 @@ export default class Emitter extends Particle {
 	}
 
 	emitting(time) {
-		if (this.totalEmitTimes == 'once') {
+		if (this.totalTime == 'once') {
 			let i;
 			const length = this.rate.getValue(99999);
 
 			if (length > 0) this.emitSpeed = length;
 			for (i = 0; i < length; i++) this.createParticle();
-			this.totalEmitTimes = 'none';
+			this.totalTime = 'none';
 		}
 
 		else {
-			this.currentEmitTime += time;
+			this.emitTime += time;
 
-			if (this.currentEmitTime < this.totalEmitTimes) {
+			if (this.emitTime < this.totalTime) {
 				const length = this.rate.getValue(time)
 				let i;
 
@@ -282,7 +303,7 @@ export default class Emitter extends Particle {
 		this.particles.push(particle);
 	}
 
-	remove(){
+	remove() {
 		this.stop();
 		Util.destroy(this.particles);
 	}
