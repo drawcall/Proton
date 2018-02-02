@@ -5132,13 +5132,13 @@ var CustomRenderer = function (_BaseRenderer) {
     return CustomRenderer;
 }(BaseRenderer);
 
-var CircleZone = function (_Zone) {
-	inherits(CircleZone, _Zone);
+var LineZone = function (_Zone) {
+	inherits(LineZone, _Zone);
 
-	function CircleZone(x1, y1, x2, y2, direction) {
-		classCallCheck(this, CircleZone);
+	function LineZone(x1, y1, x2, y2, direction) {
+		classCallCheck(this, LineZone);
 
-		var _this = possibleConstructorReturn(this, (CircleZone.__proto__ || Object.getPrototypeOf(CircleZone)).call(this));
+		var _this = possibleConstructorReturn(this, (LineZone.__proto__ || Object.getPrototypeOf(LineZone)).call(this));
 
 		if (x2 - x1 >= 0) {
 			_this.x1 = x1;
@@ -5169,7 +5169,7 @@ var CircleZone = function (_Zone) {
 		return _this;
 	}
 
-	createClass(CircleZone, [{
+	createClass(LineZone, [{
 		key: 'getPosition',
 		value: function getPosition() {
 			this.random = Math.random();
@@ -5267,10 +5267,10 @@ var CircleZone = function (_Zone) {
 			}
 		}
 	}]);
-	return CircleZone;
+	return LineZone;
 }(Zone);
 
-var CircleZone$1 = function (_Zone) {
+var CircleZone = function (_Zone) {
     inherits(CircleZone, _Zone);
 
     function CircleZone(x, y, radius) {
@@ -5342,13 +5342,13 @@ var CircleZone$1 = function (_Zone) {
     return CircleZone;
 }(Zone);
 
-var PointZoneRectZone = function (_Zone) {
-	inherits(PointZoneRectZone, _Zone);
+var RectZone = function (_Zone) {
+	inherits(RectZone, _Zone);
 
-	function PointZoneRectZone(x, y, width, height) {
-		classCallCheck(this, PointZoneRectZone);
+	function RectZone(x, y, width, height) {
+		classCallCheck(this, RectZone);
 
-		var _this = possibleConstructorReturn(this, (PointZoneRectZone.__proto__ || Object.getPrototypeOf(PointZoneRectZone)).call(this));
+		var _this = possibleConstructorReturn(this, (RectZone.__proto__ || Object.getPrototypeOf(RectZone)).call(this));
 
 		_this.x = x;
 		_this.y = y;
@@ -5357,7 +5357,7 @@ var PointZoneRectZone = function (_Zone) {
 		return _this;
 	}
 
-	createClass(PointZoneRectZone, [{
+	createClass(RectZone, [{
 		key: "getPosition",
 		value: function getPosition() {
 			this.vector.x = this.x + Math.random() * this.width;
@@ -5395,7 +5395,7 @@ var PointZoneRectZone = function (_Zone) {
 			}
 		}
 	}]);
-	return PointZoneRectZone;
+	return RectZone;
 }(Zone);
 
 var ImageZone = function (_Zone) {
@@ -5502,20 +5502,20 @@ var Debug = {
 				context.arc(zone.x, zone.y, 10, 0, Math.PI * 2, true);
 				context.fill();
 				context.closePath();
-			} else if (zone instanceof CircleZone) {
+			} else if (zone instanceof LineZone) {
 				context.beginPath();
 				context.strokeStyle = style;
 				context.moveTo(zone.x1, zone.y1);
 				context.lineTo(zone.x2, zone.y2);
 				context.stroke();
 				context.closePath();
-			} else if (zone instanceof PointZoneRectZone) {
+			} else if (zone instanceof RectZone) {
 				context.beginPath();
 				context.strokeStyle = style;
 				context.drawRect(zone.x, zone.y, zone.width, zone.height);
 				context.stroke();
 				context.closePath();
-			} else if (zone instanceof CircleZone$1) {
+			} else if (zone instanceof CircleZone) {
 				context.beginPath();
 				context.strokeStyle = style;
 				context.arc(zone.x, zone.y, zone.radius, 0, Math.PI * 2, true);
@@ -5616,10 +5616,10 @@ Proton$1.BehaviourEmitter = BehaviourEmitter;
 Proton$1.FollowEmitter = FollowEmitter;
 
 Proton$1.Zone = Zone;
-Proton$1.LineZone = CircleZone;
-Proton$1.CircleZone = CircleZone$1;
+Proton$1.LineZone = LineZone;
+Proton$1.CircleZone = CircleZone;
 Proton$1.PointZone = PointZone;
-Proton$1.RectZone = PointZoneRectZone;
+Proton$1.RectZone = RectZone;
 Proton$1.ImageZone = ImageZone;
 
 Proton$1.CanvasRenderer = CanvasRenderer;
