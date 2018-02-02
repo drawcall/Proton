@@ -2,7 +2,7 @@ import Zone from './Zone';
 import Util from '../utils/Util';
 import MathUtils from '../math/MathUtils';
 
-export default class CircleZone extends Zone {
+export default class LineZone extends Zone {
 
 	constructor(x1, y1, x2, y2, direction) {
 		super();
@@ -91,7 +91,7 @@ export default class CircleZone extends Zone {
 		} else {
 			if (particle.p.y <= this.maxy && particle.p.y >= this.miny) return true;
 		}
-		
+
 		return false;
 	}
 

@@ -1,6 +1,6 @@
 import Zone from './Zone';
 
-export default class PointZoneRectZone extends Zone {
+export default class RectZone extends Zone {
 
 	constructor(x, y, width, height) {
 		super();
