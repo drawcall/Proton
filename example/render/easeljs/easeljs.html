@@ -78,7 +78,7 @@
             emitter.addInitialize(new Proton.Position(new Proton.LineZone(0, -40, canvas.width, -40)));
             emitter.addInitialize(new Proton.V(0, new Proton.Span(.1, 1)));
 
-            emitter.addBehaviour(new Proton.CrossZone(new Proton.LineZone(0, canvas.height, canvas.width, canvas.height + 20, 'down'), 'dead'));
+            emitter.addBehaviour(new Proton.CrossZone(new Proton.LineZone(-300, canvas.height + 40, canvas.width + 300, canvas.height + 40, 'down'), 'dead'));
             emitter.addBehaviour(new Proton.Rotate(new Proton.Span(0, 360), new Proton.Span(-.5, .5), 'add'));
             emitter.addBehaviour(new Proton.Scale(new Proton.Span(.2, 1)));
             emitter.addBehaviour(new Proton.RandomDrift(10, 0, .09));
