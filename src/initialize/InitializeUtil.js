@@ -1,4 +1,5 @@
 import Util from '../utils/Util';
+import Initialize from './Initialize';
 import MathUtils from '../math/MathUtils';
 
 export default {
@@ -8,7 +9,7 @@ export default {
 		let i;
 
 		for (i = 0; i < length; i++) {
-			if (initializes[i] instanceof Proton.Initialize)
+			if (initializes[i] instanceof Initialize)
 				initializes[i].init(emitter, particle);
 			else
 				this.init(emitter, particle, initializes[i]);

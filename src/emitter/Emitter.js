@@ -243,7 +243,7 @@ export default class Emitter extends Particle {
 
 	dispatch(event, target) {
 		this.parent && this.parent.dispatchEvent(event, target);
-		Proton.bindEmtterEvent && this.dispatchEvent(event, target);
+		this.bindEvent && this.dispatchEvent(event, target);
 	}
 
 	emitting(time) {

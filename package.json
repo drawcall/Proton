@@ -1,6 +1,6 @@
 {
   "name": "proton-js",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Proton is an easily customizable html5 particle engine including six different types of renderers.",
   "main": "./build/proton.min.js",
   "scripts": {

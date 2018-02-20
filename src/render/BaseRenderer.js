@@ -34,29 +34,29 @@ export default class BaseRenderer {
     init(proton) {
         this.parent = proton;
 
-        proton.addEventListener(Proton.PROTON_UPDATE, this._protonUpdateHandler);
-        proton.addEventListener(Proton.PROTON_UPDATE_AFTER, this._protonUpdateAfterHandler);
+        proton.addEventListener('PROTON_UPDATE', this._protonUpdateHandler);
+        proton.addEventListener('PROTON_UPDATE_AFTER', this._protonUpdateAfterHandler);
 
-        proton.addEventListener(Proton.EMITTER_ADDED, this._emitterAddedHandler);
-        proton.addEventListener(Proton.EMITTER_REMOVED, this._emitterRemovedHandler);
+        proton.addEventListener('EMITTER_ADDED', this._emitterAddedHandler);
+        proton.addEventListener('EMITTER_REMOVED', this._emitterRemovedHandler);
 
-        proton.addEventListener(Proton.PARTICLE_CREATED, this._particleCreatedHandler);
-        proton.addEventListener(Proton.PARTICLE_UPDATE, this._particleUpdateHandler);
-        proton.addEventListener(Proton.PARTICLE_DEAD, this._particleDeadHandler);
+        proton.addEventListener('PARTICLE_CREATED', this._particleCreatedHandler);
+        proton.addEventListener('PARTICLE_UPDATE', this._particleUpdateHandler);
+        proton.addEventListener('PARTICLE_DEAD', this._particleDeadHandler);
     }
 
     resize(width, height) {}
 
     remove(proton) {
-        this.parent.removeEventListener(Proton.PROTON_UPDATE, this._protonUpdateHandler);
-        this.parent.removeEventListener(Proton.PROTON_UPDATE_AFTER, this._protonUpdateAfterHandler);
+        this.parent.removeEventListener('PROTON_UPDATE', this._protonUpdateHandler);
+        this.parent.removeEventListener('PROTON_UPDATE_AFTER', this._protonUpdateAfterHandler);
 
-        this.parent.removeEventListener(Proton.EMITTER_ADDED, this._emitterAddedHandler);
-        this.parent.removeEventListener(Proton.EMITTER_REMOVED, this._emitterRemovedHandler);
+        this.parent.removeEventListener('EMITTER_ADDED', this._emitterAddedHandler);
+        this.parent.removeEventListener('EMITTER_REMOVED', this._emitterRemovedHandler);
 
-        this.parent.removeEventListener(Proton.PARTICLE_CREATED, this._particleCreatedHandler);
-        this.parent.removeEventListener(Proton.PARTICLE_UPDATE, this._particleUpdateHandler);
-        this.parent.removeEventListener(Proton.PARTICLE_DEAD, this._particleDeadHandler);
+        this.parent.removeEventListener('PARTICLE_CREATED', this._particleCreatedHandler);
+        this.parent.removeEventListener('PARTICLE_UPDATE', this._particleUpdateHandler);
+        this.parent.removeEventListener('PARTICLE_DEAD', this._particleDeadHandler);
 
         this.parent = null;
     }

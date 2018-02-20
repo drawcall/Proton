@@ -23,7 +23,6 @@ export default class Proton {
     static EMITTER_REMOVED = 'EMITTER_REMOVED';
 
     static amendChangeTabsBug = true;
-    static bindEmtterEvent = false;
 
     /**
      * The constructor to add emitters
