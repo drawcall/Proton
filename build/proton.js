@@ -1304,7 +1304,7 @@ var Integration = function () {
 	return Integration;
 }();
 
-var Proton$1 = function () {
+var Proton = function () {
 
     /**
      * The constructor to add emitters
@@ -1323,6 +1323,9 @@ var Proton$1 = function () {
      * @property {Number} time      The active time
      * @property {Number} oldtime   The old time
      */
+
+
+    //1:100
     function Proton(integrationType) {
         classCallCheck(this, Proton);
 
@@ -1350,9 +1353,6 @@ var Proton$1 = function () {
     *
     * @param {Renderer} render
     */
-
-
-    //1:100
 
 
     createClass(Proton, [{
@@ -1524,21 +1524,20 @@ var Proton$1 = function () {
     return Proton;
 }();
 
-Proton$1.USE_CLOCK = false;
-Proton$1.MEASURE = 100;
-Proton$1.EULER = 'euler';
-Proton$1.RK2 = 'runge-kutta2';
-Proton$1.PARTICLE_CREATED = 'PARTICLE_CREATED';
-Proton$1.PARTICLE_UPDATE = 'PARTICLE_UPDATE';
-Proton$1.PARTICLE_SLEEP = 'PARTICLE_SLEEP';
-Proton$1.PARTICLE_DEAD = 'PARTICLE_DEAD';
-Proton$1.PROTON_UPDATE = 'PROTON_UPDATE';
-Proton$1.PROTON_UPDATE_AFTER = 'PROTON_UPDATE_AFTER';
-Proton$1.EMITTER_ADDED = 'EMITTER_ADDED';
-Proton$1.EMITTER_REMOVED = 'EMITTER_REMOVED';
-Proton$1.amendChangeTabsBug = true;
-Proton$1.bindEmtterEvent = false;
-EventDispatcher.bind(Proton$1);
+Proton.USE_CLOCK = false;
+Proton.MEASURE = 100;
+Proton.EULER = 'euler';
+Proton.RK2 = 'runge-kutta2';
+Proton.PARTICLE_CREATED = 'PARTICLE_CREATED';
+Proton.PARTICLE_UPDATE = 'PARTICLE_UPDATE';
+Proton.PARTICLE_SLEEP = 'PARTICLE_SLEEP';
+Proton.PARTICLE_DEAD = 'PARTICLE_DEAD';
+Proton.PROTON_UPDATE = 'PROTON_UPDATE';
+Proton.PROTON_UPDATE_AFTER = 'PROTON_UPDATE_AFTER';
+Proton.EMITTER_ADDED = 'EMITTER_ADDED';
+Proton.EMITTER_REMOVED = 'EMITTER_REMOVED';
+Proton.amendChangeTabsBug = true;
+EventDispatcher.bind(Proton);
 
 var ease = {
     easeLinear: function easeLinear(value) {
@@ -2267,7 +2266,7 @@ var Velocity = function (_Initialize) {
     }, {
         key: 'normalizeVelocity',
         value: function normalizeVelocity(vr) {
-            return vr * Proton$1.MEASURE;
+            return vr * Proton.MEASURE;
         }
     }, {
         key: 'initialize',
@@ -2441,7 +2440,7 @@ var Behaviour = function () {
     }, {
         key: 'normalizeForce',
         value: function normalizeForce(force) {
-            return force.multiplyScalar(Proton$1.MEASURE);
+            return force.multiplyScalar(Proton.MEASURE);
         }
 
         /**
@@ -2457,7 +2456,7 @@ var Behaviour = function () {
     }, {
         key: 'normalizeValue',
         value: function normalizeValue(value) {
-            return value * Proton$1.MEASURE;
+            return value * Proton.MEASURE;
         }
 
         /**
@@ -3585,7 +3584,7 @@ var InitializeUtil = {
 		var i = void 0;
 
 		for (i = 0; i < length; i++) {
-			if (initializes[i] instanceof Proton.Initialize) initializes[i].init(emitter, particle);else this.init(emitter, particle, initializes[i]);
+			if (initializes[i] instanceof Initialize) initializes[i].init(emitter, particle);else this.init(emitter, particle, initializes[i]);
 		}
 
 		this.bindEmitter(emitter, particle);
@@ -3897,7 +3896,7 @@ var Emitter = function (_Particle) {
 		key: 'dispatch',
 		value: function dispatch(event, target) {
 			this.parent && this.parent.dispatchEvent(event, target);
-			Proton.bindEmtterEvent && this.dispatchEvent(event, target);
+			this.bindEvent && this.dispatchEvent(event, target);
 		}
 	}, {
 		key: 'emitting',
@@ -4214,15 +4213,15 @@ var BaseRenderer = function () {
         value: function init(proton) {
             this.parent = proton;
 
-            proton.addEventListener(Proton.PROTON_UPDATE, this._protonUpdateHandler);
-            proton.addEventListener(Proton.PROTON_UPDATE_AFTER, this._protonUpdateAfterHandler);
+            proton.addEventListener('PROTON_UPDATE', this._protonUpdateHandler);
+            proton.addEventListener('PROTON_UPDATE_AFTER', this._protonUpdateAfterHandler);
 
-            proton.addEventListener(Proton.EMITTER_ADDED, this._emitterAddedHandler);
-            proton.addEventListener(Proton.EMITTER_REMOVED, this._emitterRemovedHandler);
+            proton.addEventListener('EMITTER_ADDED', this._emitterAddedHandler);
+            proton.addEventListener('EMITTER_REMOVED', this._emitterRemovedHandler);
 
-            proton.addEventListener(Proton.PARTICLE_CREATED, this._particleCreatedHandler);
-            proton.addEventListener(Proton.PARTICLE_UPDATE, this._particleUpdateHandler);
-            proton.addEventListener(Proton.PARTICLE_DEAD, this._particleDeadHandler);
+            proton.addEventListener('PARTICLE_CREATED', this._particleCreatedHandler);
+            proton.addEventListener('PARTICLE_UPDATE', this._particleUpdateHandler);
+            proton.addEventListener('PARTICLE_DEAD', this._particleDeadHandler);
         }
     }, {
         key: 'resize',
@@ -4230,15 +4229,15 @@ var BaseRenderer = function () {
     }, {
         key: 'remove',
         value: function remove(proton) {
-            this.parent.removeEventListener(Proton.PROTON_UPDATE, this._protonUpdateHandler);
-            this.parent.removeEventListener(Proton.PROTON_UPDATE_AFTER, this._protonUpdateAfterHandler);
+            this.parent.removeEventListener('PROTON_UPDATE', this._protonUpdateHandler);
+            this.parent.removeEventListener('PROTON_UPDATE_AFTER', this._protonUpdateAfterHandler);
 
-            this.parent.removeEventListener(Proton.EMITTER_ADDED, this._emitterAddedHandler);
-            this.parent.removeEventListener(Proton.EMITTER_REMOVED, this._emitterRemovedHandler);
+            this.parent.removeEventListener('EMITTER_ADDED', this._emitterAddedHandler);
+            this.parent.removeEventListener('EMITTER_REMOVED', this._emitterRemovedHandler);
 
-            this.parent.removeEventListener(Proton.PARTICLE_CREATED, this._particleCreatedHandler);
-            this.parent.removeEventListener(Proton.PARTICLE_UPDATE, this._particleUpdateHandler);
-            this.parent.removeEventListener(Proton.PARTICLE_DEAD, this._particleDeadHandler);
+            this.parent.removeEventListener('PARTICLE_CREATED', this._particleCreatedHandler);
+            this.parent.removeEventListener('PARTICLE_UPDATE', this._particleUpdateHandler);
+            this.parent.removeEventListener('PARTICLE_DEAD', this._particleDeadHandler);
 
             this.parent = null;
         }
@@ -5570,71 +5569,71 @@ var Debug = {
 
 // import 
 // namespace
-Proton$1.Particle = Proton$1.P = Particle;
-Proton$1.Pool = Pool;
+Proton.Particle = Proton.P = Particle;
+Proton.Pool = Pool;
 
-Proton$1.Util = Util;
-Proton$1.ColorUtil = ColorUtil;
-Proton$1.MathUtils = MathUtils;
-Proton$1.Vector2D = Proton$1.Vector = Vector2D;
-Proton$1.Polar2D = Proton$1.Polar = Polar2D;
-Proton$1.ArraySpan = ArraySpan;
-Proton$1.Rectangle = Rectangle;
-Proton$1.Rate = Rate;
-Proton$1.ease = ease;
-Proton$1.Span = Span;
-Proton$1.Mat3 = Mat3;
-Proton$1.getSpan = function (a, b, center) {
+Proton.Util = Util;
+Proton.ColorUtil = ColorUtil;
+Proton.MathUtils = MathUtils;
+Proton.Vector2D = Proton.Vector = Vector2D;
+Proton.Polar2D = Proton.Polar = Polar2D;
+Proton.ArraySpan = ArraySpan;
+Proton.Rectangle = Rectangle;
+Proton.Rate = Rate;
+Proton.ease = ease;
+Proton.Span = Span;
+Proton.Mat3 = Mat3;
+Proton.getSpan = function (a, b, center) {
   return new Span(a, b, center);
 };
-Proton$1.createArraySpan = ArraySpan.createArraySpan;
+Proton.createArraySpan = ArraySpan.createArraySpan;
 
-Proton$1.Initialize = Proton$1.Init = Initialize;
-Proton$1.Life = Proton$1.L = Life;
-Proton$1.Position = Proton$1.P = Position;
-Proton$1.Velocity = Proton$1.V = Velocity;
-Proton$1.Mass = Proton$1.M = Mass;
-Proton$1.Radius = Proton$1.R = Radius;
-Proton$1.Body = Proton$1.B = Body;
+Proton.Initialize = Proton.Init = Initialize;
+Proton.Life = Proton.L = Life;
+Proton.Position = Proton.P = Position;
+Proton.Velocity = Proton.V = Velocity;
+Proton.Mass = Proton.M = Mass;
+Proton.Radius = Proton.R = Radius;
+Proton.Body = Proton.B = Body;
 
-Proton$1.Behaviour = Behaviour;
-Proton$1.Force = Proton$1.F = Force;
-Proton$1.Attraction = Proton$1.A = Attraction;
-Proton$1.RandomDrift = Proton$1.RD = RandomDrift;
-Proton$1.Gravity = Proton$1.G = Gravity;
-Proton$1.Collision = Collision;
-Proton$1.CrossZone = CrossZone;
-Proton$1.Alpha = Proton$1.A = Alpha;
-Proton$1.Scale = Proton$1.S = Scale;
-Proton$1.Rotate = Rotate;
-Proton$1.Color = Color;
-Proton$1.Repulsion = Repulsion;
-Proton$1.GravityWell = GravityWell;
+Proton.Behaviour = Behaviour;
+Proton.Force = Proton.F = Force;
+Proton.Attraction = Proton.A = Attraction;
+Proton.RandomDrift = Proton.RD = RandomDrift;
+Proton.Gravity = Proton.G = Gravity;
+Proton.Collision = Collision;
+Proton.CrossZone = CrossZone;
+Proton.Alpha = Proton.A = Alpha;
+Proton.Scale = Proton.S = Scale;
+Proton.Rotate = Rotate;
+Proton.Color = Color;
+Proton.Repulsion = Repulsion;
+Proton.GravityWell = GravityWell;
 
-Proton$1.Emitter = Emitter;
-Proton$1.BehaviourEmitter = BehaviourEmitter;
-Proton$1.FollowEmitter = FollowEmitter;
+Proton.Emitter = Emitter;
+Proton.BehaviourEmitter = BehaviourEmitter;
+Proton.FollowEmitter = FollowEmitter;
 
-Proton$1.Zone = Zone;
-Proton$1.LineZone = LineZone;
-Proton$1.CircleZone = CircleZone;
-Proton$1.PointZone = PointZone;
-Proton$1.RectZone = RectZone;
-Proton$1.ImageZone = ImageZone;
+Proton.Zone = Zone;
+Proton.LineZone = LineZone;
+Proton.CircleZone = CircleZone;
+Proton.PointZone = PointZone;
+Proton.RectZone = RectZone;
+Proton.ImageZone = ImageZone;
 
-Proton$1.CanvasRenderer = CanvasRenderer;
-Proton$1.DomRenderer = DomRenderer;
-Proton$1.EaselRenderer = EaselRenderer;
-Proton$1.PixiRenderer = PixiRenderer;
-Proton$1.PixelRenderer = PixelRenderer;
-Proton$1.WebGLRenderer = Proton$1.WebGlRenderer = WebGLRenderer;
-Proton$1.CustomRenderer = CustomRenderer;
+Proton.CanvasRenderer = CanvasRenderer;
+Proton.DomRenderer = DomRenderer;
+Proton.EaselRenderer = EaselRenderer;
+Proton.PixiRenderer = PixiRenderer;
+Proton.PixelRenderer = PixelRenderer;
+Proton.WebGLRenderer = Proton.WebGlRenderer = WebGLRenderer;
+Proton.CustomRenderer = CustomRenderer;
 
-Proton$1.Debug = Debug;
+Proton.Debug = Debug;
 
-Object.assign(Proton$1, ease);
+Object.assign(Proton, ease);
 
-return Proton$1;
+return Proton;
 
 })));
 //# sourceMappingURL=proton.js.map
