@@ -32,7 +32,7 @@ import Proton from 'proton-js';
 ```
 
 #### OR include in html
-``` 
+```html
 <script type="text/javascript" src="js/proton.min.js"></script> 
 ```
 
