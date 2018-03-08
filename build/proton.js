@@ -5628,6 +5628,7 @@ Proton.PixiRenderer = PixiRenderer;
 Proton.PixelRenderer = PixelRenderer;
 Proton.WebGLRenderer = Proton.WebGlRenderer = WebGLRenderer;
 Proton.CustomRenderer = CustomRenderer;
+Proton.BaseRenderer = BaseRenderer;
 
 Proton.Debug = Debug;
 

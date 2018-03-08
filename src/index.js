@@ -48,6 +48,7 @@ import PixelRenderer from "./render/PixelRenderer";
 import PixiRenderer from "./render/PixiRenderer";
 import WebGLRenderer from "./render/WebGLRenderer";
 import CustomRenderer from "./render/CustomRenderer";
+import BaseRenderer from "./render/BaseRenderer";
 
 import Zone from "./zone/Zone";
 import LineZone from "./zone/LineZone";
@@ -117,6 +118,7 @@ Proton.PixiRenderer = PixiRenderer;
 Proton.PixelRenderer = PixelRenderer;
 Proton.WebGLRenderer = Proton.WebGlRenderer = WebGLRenderer;
 Proton.CustomRenderer = CustomRenderer;
+Proton.BaseRenderer = BaseRenderer;
 
 Proton.Debug = Debug;
 
