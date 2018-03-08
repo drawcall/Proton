@@ -44,6 +44,15 @@
             loadImage();
         }
 
+        function resize() {
+            window.onresize = function () {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                renderer.resize(canvas.width, canvas.height);
+            }
+        }
+
         function addStats() {
             stats = new Stats();
             stats.setMode(2);
@@ -58,6 +67,7 @@
             image.onload = function (e) {
                 createProton(e.target);
                 tick();
+                resize();
             }
             image.src = 'image/particle.png';
         }

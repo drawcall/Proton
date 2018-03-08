@@ -33,12 +33,13 @@
         var proton;
         var renderer;
         var stats;
+        var emitter;
         var canvas;
         var context;
 
-        Main();
+        main();
 
-        function Main() {
+        function main() {
             canvas = document.getElementById("testCanvas");
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -46,6 +47,18 @@
 
             createProton();
             tick();
+            resize();
+        }
+
+        function resize() {
+            window.onresize = function () {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                emitter.p.x = canvas.width / 2;
+                emitter.p.y = canvas.height / 2;
+                renderer.resize(canvas.width, canvas.height);
+            }
         }
 
         function addStats() {
@@ -59,7 +72,7 @@
 
         function createProton() {
             proton = new Proton;
-            createImageEmitter();
+            emitter = createImageEmitter();
             //createColorEmitter();
 
             renderer = new Proton.WebGLRenderer(canvas);
@@ -87,6 +100,8 @@
             emitter.rotation = 48;
             emitter.emit();
             proton.addEmitter(emitter);
+
+            return emitter;
         }
 
         function createColorEmitter() {
