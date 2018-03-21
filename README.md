@@ -3,7 +3,7 @@
 > See the detailed documentation please visit [here](https://projects.jpeer.at/proton/)
 
 Proton is a lightweight and powerful javascript particle engine. With it you can easily create countless cool effects.   
-#### Check out examples at: [http://a-jie.github.io/Proton/](http://a-jie.github.io/Proton/)
+#### Check out examples at: [http://a-jie.github.io/Proton/](http://a-jie.github.io/Proton/). Check out the tutorial at: [https://qiita.com/matsu7089/items/dcb7d326e4ec1340eba6](https://qiita.com/matsu7089/items/dcb7d326e4ec1340eba6)
 
 ## Features
 - Seven kinds of renderers
@@ -19,6 +19,7 @@ Proton is a lightweight and powerful javascript particle engine. With it you can
 - Veriety of behaviors which can simulate many different physical effects.
 - Three kinds of emitters and can be easily expanded.
 - The __3D version__ of the proton engine is here [https://a-jie.github.io/three.proton/](https://a-jie.github.io/three.proton/)
+
 
 ## Installation
 
