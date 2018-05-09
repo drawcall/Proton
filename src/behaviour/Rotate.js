@@ -35,7 +35,7 @@ export default class Rotate extends Behaviour {
 	 *
 	 * @todo add description for 'a', 'b' and 'style'
 	 *
-	 * @param {String} a 
+	 * @param {String} a
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life

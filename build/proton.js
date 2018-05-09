@@ -2829,6 +2829,8 @@ var Gravity = function (_Force) {
 	return Gravity;
 }(Force);
 
+//can use Collision(emitter,true,function(){}) or Collision();
+
 var Collision = function (_Behaviour) {
 	inherits(Collision, _Behaviour);
 
@@ -3225,7 +3227,7 @@ var Rotate = function (_Behaviour) {
   *
   * @todo add description for 'a', 'b' and 'style'
   *
-  * @param {String} [influence="Velocity"] The rotation's influence
+  * @param {String} [influence=Velocity] The rotation's influence
   * @param {String} b
   * @param {String} [style=to]
   * @param {Number} [life=Infinity] 				this behaviour's life
@@ -3252,7 +3254,7 @@ var Rotate = function (_Behaviour) {
   *
   * @todo add description for 'a', 'b' and 'style'
   *
-  * @param {String} influence
+  * @param {String} a
   * @param {String} b
   * @param {String} [style=to]
   * @param {Number} [life=Infinity] 				this behaviour's life
@@ -5566,6 +5568,7 @@ var Debug = {
 })();
 
 // import 
+// namespace
 Proton.Particle = Proton.P = Particle;
 Proton.Pool = Pool;
 
@@ -5629,8 +5632,6 @@ Proton.CustomRenderer = CustomRenderer;
 Proton.Debug = Debug;
 
 Object.assign(Proton, ease);
-
-// export
 
 return Proton;
 
