@@ -11,7 +11,7 @@ export default class Rotate extends Behaviour {
 	 *
 	 * @todo add description for 'a', 'b' and 'style'
 	 *
-	 * @param {String} [influence="Velocity"] The rotation's influence
+	 * @param {String} [influence=Velocity] The rotation's influence
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
@@ -35,7 +35,7 @@ export default class Rotate extends Behaviour {
 	 *
 	 * @todo add description for 'a', 'b' and 'style'
 	 *
-	 * @param {String} influence
+	 * @param {String} a 
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
