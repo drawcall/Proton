@@ -11,7 +11,7 @@ export default class Rotate extends Behaviour {
 	 *
 	 * @todo add description for 'a', 'b' and 'style'
 	 *
-	 * @param {Number} a
+	 * @param {String} [influence=Velocity] The rotation's influence
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life
@@ -19,10 +19,10 @@ export default class Rotate extends Behaviour {
 	 *
 	 * @property {String} name The Behaviour name
 	 */
-	constructor(a, b, style, life, easing) {
+	constructor(influence, b, style, life, easing) {
 		super(life, easing);
 
-		this.reset(a, b, style);
+		this.reset(influence, b, style);
 		this.name = "Rotate";
 	}
 
@@ -35,7 +35,7 @@ export default class Rotate extends Behaviour {
 	 *
 	 * @todo add description for 'a', 'b' and 'style'
 	 *
-	 * @param {Number} a
+	 * @param {String} a
 	 * @param {String} b
 	 * @param {String} [style=to]
 	 * @param {Number} [life=Infinity] 				this behaviour's life

@@ -3227,7 +3227,7 @@ var Rotate = function (_Behaviour) {
   *
   * @todo add description for 'a', 'b' and 'style'
   *
-  * @param {Number} a
+  * @param {String} [influence=Velocity] The rotation's influence
   * @param {String} b
   * @param {String} [style=to]
   * @param {Number} [life=Infinity] 				this behaviour's life
@@ -3235,12 +3235,12 @@ var Rotate = function (_Behaviour) {
   *
   * @property {String} name The Behaviour name
   */
-	function Rotate(a, b, style, life, easing) {
+	function Rotate(influence, b, style, life, easing) {
 		classCallCheck(this, Rotate);
 
 		var _this = possibleConstructorReturn(this, (Rotate.__proto__ || Object.getPrototypeOf(Rotate)).call(this, life, easing));
 
-		_this.reset(a, b, style);
+		_this.reset(influence, b, style);
 		_this.name = "Rotate";
 		return _this;
 	}
@@ -3254,7 +3254,7 @@ var Rotate = function (_Behaviour) {
   *
   * @todo add description for 'a', 'b' and 'style'
   *
-  * @param {Number} a
+  * @param {String} a
   * @param {String} b
   * @param {String} [style=to]
   * @param {Number} [life=Infinity] 				this behaviour's life
