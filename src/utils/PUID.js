@@ -18,7 +18,6 @@ export default {
             obj = this.cache[id];
 
             if (obj === target) return id;
-            
             if (typeof obj === 'object' && typeof target === 'object' && obj.isInner && target.isInner) {
                 if (obj.src === target.src)
                     return id;

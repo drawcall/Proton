@@ -11,7 +11,7 @@ export default class GravityWell extends Behaviour {
 	 * @alias GravityWell
 	 *
 	 * @param {Vector2D} [centerPoint=new Vector2D] The point in the center
-	 * @param {Number} [force=100]					The force	
+	 * @param {Number} [force=100]					The force
 	 * @param {Number} [life=Infinity]				this behaviour's life
 	 * @param {String} [easing=easeLinear]	this behaviour's easing
 	 *
@@ -24,7 +24,7 @@ export default class GravityWell extends Behaviour {
 		this.centerPoint = Util.initValue(centerPoint, new Vector2D);
 		this.force = Util.initValue(this.normalizeValue(force), 100);
 
-		this.name = "GravityWell";
+		this.name = 'GravityWell';
 	}
 
 	/**
@@ -35,7 +35,7 @@ export default class GravityWell extends Behaviour {
 	 * @instance
 	 *
 	 * @param {Vector2D} [centerPoint=new Vector2D] The point in the center
-	 * @param {Number} [force=100]					The force	
+	 * @param {Number} [force=100]					The force
 	 * @param {Number} [life=Infinity]				this behaviour's life
 	 * @param {String} [easing=easeLinear]	this behaviour's easing
 	 */
@@ -43,7 +43,7 @@ export default class GravityWell extends Behaviour {
 		this.distanceVec = new Vector2D();
 		this.centerPoint = Util.initValue(centerPoint, new Vector2D);
 		this.force = Util.initValue(this.normalizeValue(force), 100);
-		
+
 		life && super.reset(life, easing);
 	};
 
@@ -68,7 +68,7 @@ export default class GravityWell extends Behaviour {
 		this.distanceVec.set(this.centerPoint.x - particle.p.x, this.centerPoint.y - particle.p.y);
 		const distanceSq = this.distanceVec.lengthSq();
 
-		if (distanceSq != 0) {
+		if (distanceSq !== 0) {
 			const distance = this.distanceVec.length();
 			const factor = (this.force * time) / (distanceSq * distance);
 

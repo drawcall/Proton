@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import ColorUtil from '../utils/ColorUtil';
 import ArraySpan from '../math/ArraySpan';
 import Behaviour from './Behaviour';
@@ -22,7 +21,7 @@ export default class Color extends Behaviour {
         super(life, easing);
 
         this.reset(a, b);
-        this.name = "Color";
+        this.name = 'Color';
     }
 
     /**

@@ -1,6 +1,4 @@
-import Util from '../utils/Util';
 import ColorUtil from '../utils/ColorUtil';
-import MathUtils from '../math/MathUtils';
 import CircleZone from '../zone/CircleZone';
 import PointZone from '../zone/PointZone';
 import LineZone from '../zone/LineZone';
@@ -8,14 +6,14 @@ import RectZone from '../zone/RectZone';
 
 export default {
 	addEventListener(proton, fun) {
-		proton.addEventListener("PROTON_UPDATE_AFTER", () => fun());
+		proton.addEventListener('PROTON_UPDATE_AFTER', () => fun());
 	},
 
 	getStyle(color) {
 		const rgb = ColorUtil.hexToRGB(color || '#ff0000');
 		return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`;
 	},
-	
+
 	drawZone(proton, canvas, zone, clear) {
 		const context = canvas.getContext('2d');
 		const style = this.getStyle();
@@ -52,20 +50,19 @@ export default {
 			}
 		});
 	},
-	
+
 	drawEmitter(proton, canvas, emitter, clear) {
 		const context = canvas.getContext('2d');
 		const style = this.getStyle();
 
 		this.addEventListener(proton, () => {
 			if (clear) context.clearRect(0, 0, canvas.width, canvas.height);
-			
+
 			context.beginPath();
 			context.fillStyle = style;
 			context.arc(emitter.p.x, emitter.p.y, 10, 0, Math.PI * 2, true);
 			context.fill();
 			context.closePath();
 		});
-	},
+	}
 }
-

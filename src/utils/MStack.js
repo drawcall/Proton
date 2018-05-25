@@ -10,7 +10,7 @@ export default class MStack {
 	}
 
 	set(m, i) {
-		if (i == 0)
+		if (i === 0)
 			Mat3.set(m, this.mats[0]);
 		else
 			Mat3.multiply(this.mats[i - 1], m, this.mats[i]);
@@ -19,7 +19,7 @@ export default class MStack {
 	}
 
 	push(m) {
-		if (this.size == 0)
+		if (this.size === 0)
 			Mat3.set(m, this.mats[0]);
 		else
 			Mat3.multiply(this.mats[this.size - 1], m, this.mats[this.size]);

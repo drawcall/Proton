@@ -11,7 +11,7 @@ export default class Life extends Initialize {
 	}
 
 	initialize(target) {
-		if (this.lifePan.a == Infinity)
+		if (this.lifePan.a === Infinity)
 			target.life = Infinity;
 		else
 			target.life = this.lifePan.getValue();

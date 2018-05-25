@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import Emitter from './Emitter';
 
 export default class BehaviourEmitter extends Emitter {
@@ -16,7 +15,7 @@ export default class BehaviourEmitter extends Emitter {
 
 		this.selfBehaviours = [];
 	};
-	
+
 	/**
 	 * add the Behaviour to emitter;
 	 *

@@ -63,14 +63,13 @@ export default class ImageZone extends Zone {
 	}
 
 	crossing(particle) {
-		if (this.crossType == "dead") {
+		if (this.crossType === 'dead') {
 			if (this.getBound(particle.p.x - this.x, particle.p.y - this.y))
 				particle.dead = true;
 			else
 				particle.dead = false;
-		} 
-		
-		else if (this.crossType == "bound") {
+		}
+		else if (this.crossType === 'bound') {
 			if (!this.getBound(particle.p.x - this.x, particle.p.y - this.y))
 				particle.v.negate();
 		}

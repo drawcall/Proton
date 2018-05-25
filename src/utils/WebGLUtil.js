@@ -12,7 +12,7 @@ export default {
      * @return {Boolean}
      */
     ipot(length) {
-        return (length & (length - 1)) == 0;
+        return (length & (length - 1)) === 0;
     },
 
     /**

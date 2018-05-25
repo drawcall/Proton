@@ -60,7 +60,7 @@ export default class Behaviour {
      * @memberof Proton.Behaviour
      * @instance
      *
-     * @param {Proton.Vector2D} force 
+     * @param {Proton.Vector2D} force
      */
     normalizeForce(force) {
         return force.multiplyScalar(Proton.MEASURE);

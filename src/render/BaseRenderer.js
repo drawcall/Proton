@@ -45,7 +45,11 @@ export default class BaseRenderer {
         proton.addEventListener('PARTICLE_DEAD', this._particleDeadHandler);
     }
 
-    resize(width, height) {}
+    resize(width, height) { }
+
+    destroy() {
+        this.remove();
+    }
 
     remove(proton) {
         this.parent.removeEventListener('PROTON_UPDATE', this._protonUpdateHandler);
@@ -61,17 +65,13 @@ export default class BaseRenderer {
         this.parent = null;
     }
 
-    destroy(){
-        this.remove();
-    }
-    
-    onProtonUpdate() {}
-    onProtonUpdateAfter() {}
+    onProtonUpdate() { }
+    onProtonUpdateAfter() { }
 
-    onEmitterAdded(emitter) {}
-    onEmitterRemoved(emitter) {}
+    onEmitterAdded(emitter) { }
+    onEmitterRemoved(emitter) { }
 
-    onParticleCreated(particle) {}
-    onParticleUpdate(particle) {}
-    onParticleDead(particle) {}
+    onParticleCreated(particle) { }
+    onParticleUpdate(particle) { }
+    onParticleDead(particle) { }
 }

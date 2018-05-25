@@ -1,5 +1,5 @@
 export default class Initialize {
-	
+
 	reset() {
 	}
 
@@ -11,7 +11,7 @@ export default class Initialize {
 		}
 	};
 
-	///sub class init
+	// sub class init
 	initialize(target) {
 	};
 }

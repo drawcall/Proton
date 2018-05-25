@@ -4,6 +4,7 @@ export default class PointZone extends Zone {
 
 	constructor(x, y) {
 		super();
+
 		this.x = x;
 		this.y = y;
 	}
@@ -11,12 +12,10 @@ export default class PointZone extends Zone {
 	getPosition() {
 		this.vector.x = this.x;
 		this.vector.y = this.y;
-
 		return this.vector;
 	}
 
 	crossing(particle) {
-		
 		if (this.alert) {
 			alert('Sorry PointZone does not support crossing method');
 			this.alert = false;

@@ -3,9 +3,9 @@
  *        -> cache[abc].         -> cache[abc] .pop()
  *                               -> create [new Body| clone]
  *        -> return p1: { __pid: abc }
- * 
+ *
  * expire -> cache[abc]= [p0, p1];
- * 
+ *
  */
 import Util from '../utils/Util';
 import PUID from '../utils/PUID';
@@ -69,7 +69,7 @@ export default class Pool {
     /**
      * Creates a new class instance
      *
-     * @todo add more documentation 
+     * @todo add more documentation
      *
      * @method create
      * @memberof Proton#Proton.Pool
@@ -84,7 +84,7 @@ export default class Pool {
 
         if (this.create) {
             return this.create(target, params);
-        } else if (typeof target == "function") {
+        } else if (typeof target === 'function') {
             return Util.classApply(target, params);
         } else {
             return target.clone();
@@ -105,7 +105,7 @@ export default class Pool {
         for (let id in this.cache)
             count += this.cache[id].length;
 
-        return count++;;
+        return count++;
     }
 
     /**
@@ -133,7 +133,7 @@ export default class Pool {
      * @return {Object}
      */
     getCache(uid) {
-        uid = uid || "default";
+        uid = uid || 'default';
 
         if (!this.cache[uid]) this.cache[uid] = [];
         return this.cache[uid];

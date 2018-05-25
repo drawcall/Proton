@@ -9,12 +9,12 @@ export default {
      * @param {String} $id the canvas' id
      * @param {Number} $width the canvas' width
      * @param {Number} $height the canvas' height
-     * @param {String} [$position=absolute] the canvas' position, default is 'absolute' 
+     * @param {String} [$position=absolute] the canvas' position, default is 'absolute'
      *
      * @return {Object}
      */
     createCanvas(id, width, height, position) {
-        const dom = document.createElement("canvas");
+        const dom = document.createElement('canvas');
         position = position || 'absolute';
 
         dom.id = id;
@@ -29,7 +29,7 @@ export default {
     },
 
     createDiv(id, width, height) {
-        const dom = document.createElement("div");
+        const dom = document.createElement('div');
 
         dom.id = id;
         dom.style.position = 'absolute';
@@ -51,11 +51,11 @@ export default {
      * @memberof Proton#Proton.DomUtil
      * @method transform
      *
-     * @param {HTMLDivElement} div 
-     * @param {Number} $x 
-     * @param {Number} $y 
-     * @param {Number} $scale 
-     * @param {Number} $rotate 
+     * @param {HTMLDivElement} div
+     * @param {Number} $x
+     * @param {Number} $y
+     * @param {Number} $scale
+     * @param {Number} $rotate
      */
     transform(div, x, y, scale, rotate) {
         const transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;

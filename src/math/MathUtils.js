@@ -26,7 +26,7 @@ const MathUtils = {
     },
 
     toColor16(num) {
-        return "#" + num.toString(16);
+        return '#' + num.toString(16);
     },
 
     randomColor() {

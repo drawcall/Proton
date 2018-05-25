@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import BaseRenderer from './BaseRenderer';
 
 export default class EaselRenderer extends BaseRenderer {

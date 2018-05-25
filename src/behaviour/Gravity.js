@@ -1,5 +1,3 @@
-import Util from '../utils/Util';
-import Vector2D from '../math/Vector2D';
 import Force from './Force';
 
 export default class Gravity extends Force {
@@ -18,7 +16,7 @@ export default class Gravity extends Force {
 	 */
 	constructor(g, life, easing) {
 		super(0, g, life, easing);
-		this.name = "Gravity";
+		this.name = 'Gravity';
 	}
 
 	/**

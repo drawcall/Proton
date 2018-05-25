@@ -34,7 +34,7 @@ export default class Rate {
 			this.startTime = 0;
 			this.nextTime = this.timePan.getValue();
 
-			if (this.numPan.b == 1) {
+			if (this.numPan.b === 1) {
 				if (this.numPan.getValue(false) > 0.5)
 					return 1;
 				else

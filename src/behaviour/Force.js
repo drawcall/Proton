@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import Vector2D from '../math/Vector2D';
 import Behaviour from './Behaviour';
 
@@ -21,7 +20,7 @@ export default class Force extends Behaviour {
 		super(life, easing);
 
 		this.force = this.normalizeForce(new Vector2D(fx, fy));
-		this.name = "Force";
+		this.name = 'Force';
 	}
 
 	/**

@@ -19,7 +19,7 @@ export default class FollowEmitter extends Emitter {
 		super(pObj);
 
 		this.mouseTarget = Util.initValue(mouseTarget, window);
-		this.ease = Util.initValue(ease, .7);
+		this.ease = Util.initValue(ease, 0.7);
 
 		this._allowEmitting = false;
 		this.initEventHandler();

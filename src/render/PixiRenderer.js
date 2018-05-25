@@ -1,5 +1,3 @@
-import Pool from '../core/Pool';
-import Util from '../utils/Util';
 import ColorUtil from '../utils/ColorUtil';
 import MathUtils from '../math/MathUtils';
 import BaseRenderer from './BaseRenderer';
@@ -92,8 +90,8 @@ export default class PixiRenderer extends BaseRenderer {
         const graphics = new PIXI.Graphics();
 
         if (this.stroke) {
-            let stroke = this.stroke instanceof String ? this.stroke : 0x000000;
-            graphics.beginStroke(this.stroke);
+            const stroke = this.stroke instanceof String ? this.stroke : 0x000000;
+            graphics.beginStroke(stroke);
         }
 
         graphics.beginFill(particle.color || 0x008ced);

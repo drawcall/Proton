@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import Rectangle from '../math/Rectangle';
 import BaseRenderer from './BaseRenderer';
 

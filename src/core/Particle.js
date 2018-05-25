@@ -35,7 +35,7 @@ export default class Particle {
         this.life = Infinity;
         this.age = 0;
 
-        //Energy loss
+        // Energy loss
         this.energy = 1;
         this.dead = false;
         this.sleep = false;
@@ -52,7 +52,7 @@ export default class Particle {
 
         this.easing = ease.easeLinear;
 
-        if (init == 'init') {
+        if (init === 'init') {
             this.transform = {};
             this.p = new Vector2D();
             this.v = new Vector2D();

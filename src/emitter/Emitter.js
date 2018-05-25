@@ -72,8 +72,8 @@ export default class Emitter extends Particle {
 		this.emitTime = 0;
 		this.totalTime = Util.initValue(totalTime, Infinity);
 
-		if (life == true || life == 'life' || life == 'destroy') {
-			this.life = totalTime == 'once' ? 1 : this.totalTime;
+		if (life === true || life === 'life' || life === 'destroy') {
+			this.life = totalTime === 'once' ? 1 : this.totalTime;
 		} else if (!isNaN(life)) {
 			this.life = life;
 		}
@@ -135,7 +135,7 @@ export default class Emitter extends Particle {
 
 	/**
 	 * add the Initialize to particles;
-	 * 
+	 *
 	 * you can use initializes array:for example emitter.addInitialize(initialize1,initialize2,initialize3);
 	 * @method addInitialize
 	 * @param {Initialize} initialize like this new Radius(1, 12)
@@ -166,7 +166,7 @@ export default class Emitter extends Particle {
 
 	/**
 	 * add the Behaviour to particles;
-	 * 
+	 *
 	 * you can use Behaviours array:emitter.addBehaviour(Behaviour1,Behaviour2,Behaviour3);
 	 * @method addBehaviour
 	 * @param {Behaviour} behaviour like this new Color('random')
@@ -205,7 +205,7 @@ export default class Emitter extends Particle {
 		Util.destroyArray(this.behaviours);
 	}
 
-	// emitter update 
+	// emitter update
 	update(time) {
 		this.age += time;
 		if (this.age >= this.life || this.dead) this.destroy();
@@ -229,11 +229,11 @@ export default class Emitter extends Particle {
 			// particle update
 			particle.update(time, i);
 			this.parent.integrator.calculate(particle, time, damping);
-			this.dispatch("PARTICLE_UPDATE", particle);
+			this.dispatch('PARTICLE_UPDATE', particle);
 
 			// check dead
 			if (particle.dead) {
-				this.dispatch("PARTICLE_DEAD", particle);
+				this.dispatch('PARTICLE_DEAD', particle);
 
 				this.parent.pool.expire(particle);
 				this.particles.splice(i, 1);
@@ -247,7 +247,7 @@ export default class Emitter extends Particle {
 	}
 
 	emitting(time) {
-		if (this.totalTime == 'once') {
+		if (this.totalTime === 'once') {
 			let i;
 			const length = this.rate.getValue(99999);
 
@@ -271,14 +271,14 @@ export default class Emitter extends Particle {
 
 	/**
 	 * create single particle;
-	 * 
+	 *
 	 * can use emit({x:10},new Gravity(10),{'particleUpdate',fun}) or emit([{x:10},new Initialize],new Gravity(10),{'particleUpdate',fun})
 	 * @method removeAllParticles
 	 */
 	createParticle(initialize, behaviour) {
 		const particle = this.parent.pool.get(Particle);
 		this.setupParticle(particle, initialize, behaviour);
-		this.dispatch("PARTICLE_CREATED", particle);
+		this.dispatch('PARTICLE_CREATED', particle);
 
 		return particle;
 	}

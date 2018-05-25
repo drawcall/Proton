@@ -27,7 +27,7 @@ export default class Velocity extends Initialize {
     }
 
     initialize(target) {
-        if (this.type == 'p' || this.type == 'P' || this.type == 'polar') {
+        if (this.type === 'p' || this.type === 'P' || this.type === 'polar') {
             const polar2d = new Polar2D(this.normalizeVelocity(this.rPan.getValue()), this.thaPan.getValue() * MathUtils.PI_180);
 
             target.v.x = polar2d.getX();

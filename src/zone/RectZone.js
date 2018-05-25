@@ -19,7 +19,7 @@ export default class RectZone extends Zone {
 	}
 
 	crossing(particle) {
-		if (this.crossType == "dead") {
+		if (this.crossType === 'dead') {
 			if (particle.p.x + particle.radius < this.x)
 				particle.dead = true;
 			else if (particle.p.x - particle.radius > this.x + this.width)
@@ -31,7 +31,7 @@ export default class RectZone extends Zone {
 				particle.dead = true;
 		}
 
-		else if (this.crossType == "bound") {
+		else if (this.crossType === 'bound') {
 			if (particle.p.x - particle.radius < this.x) {
 				particle.p.x = this.x + particle.radius;
 				particle.v.x *= -1;
@@ -49,7 +49,7 @@ export default class RectZone extends Zone {
 			}
 		}
 
-		else if (this.crossType == "cross") {
+		else if (this.crossType === 'cross') {
 			if (particle.p.x + particle.radius < this.x && particle.v.x <= 0)
 				particle.p.x = this.x + this.width + particle.radius;
 			else if (particle.p.x - particle.radius > this.x + this.width && particle.v.x >= 0)

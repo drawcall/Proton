@@ -18,12 +18,12 @@ export default {
 		this.bindEmitter(emitter, particle);
 	},
 
-	//////////////////////init//////////////////////
+	// init
 	init(emitter, particle, initialize) {
 		Util.setPrototypeByObject(particle, initialize);
 		Util.setVector2DByObject(particle, initialize);
 	},
-	
+
 	bindEmitter(emitter, particle) {
 		if (emitter.bindEmitter) {
 			particle.p.add(emitter.p);

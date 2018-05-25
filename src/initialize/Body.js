@@ -16,8 +16,8 @@ export default class Body extends Initialize {
     initialize(particle) {
         const imagetarget = this.image.getValue();
 
-        if (typeof(imagetarget) == 'string') {
-            particle.body = { width: this.w, height: this.h, src: imagetarget , isInner: true, inner: true };
+        if (typeof (imagetarget) === 'string') {
+            particle.body = { width: this.w, height: this.h, src: imagetarget, isInner: true, inner: true };
         } else {
             particle.body = imagetarget;
         }

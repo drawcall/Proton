@@ -24,7 +24,7 @@ export default class Vector2D {
     }
 
     getGradient() {
-        if (this.x != 0)
+        if (this.x !== 0)
             return Math.atan2(this.y, this.x);
         else if (this.y > 0)
             return MathUtils.PI_2;

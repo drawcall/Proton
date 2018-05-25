@@ -1,7 +1,5 @@
-import Vector2D from '../math/Vector2D';
 import Span from '../math/Span';
 import ImgUtil from './ImgUtil';
-import DomUtil from './DomUtil';
 
 export default {
 
@@ -27,7 +25,7 @@ export default {
      *
      * @param {Array} value Any array
      *
-     * @returns {Boolean} 
+     * @returns {Boolean}
      */
     isArray(value) {
         return Object.prototype.toString.call(value) === '[object Array]';
@@ -75,8 +73,8 @@ export default {
         if (!args) return new constructor;
 
         args = [null].concat(args);
-        const factoryFunction = constructor.bind.apply(constructor, args);
-        return new factoryFunction();
+        const FactoryFunc = constructor.bind.apply(constructor, args);
+        return new FactoryFunc();
     },
 
     /**
@@ -100,13 +98,13 @@ export default {
         if (this.hasProp(pOBJ, 'ax')) target.a.x = pOBJ['ax'];
         if (this.hasProp(pOBJ, 'ay')) target.a.y = pOBJ['ay'];
 
-        if (this.hasProp(pOBJ, 'p')) particle.p.copy(pOBJ['p']);
-        if (this.hasProp(pOBJ, 'v')) particle.v.copy(pOBJ['v']);
-        if (this.hasProp(pOBJ, 'a')) particle.a.copy(pOBJ['a']);
+        if (this.hasProp(pOBJ, 'p')) target.p.copy(pOBJ['p']);
+        if (this.hasProp(pOBJ, 'v')) target.v.copy(pOBJ['v']);
+        if (this.hasProp(pOBJ, 'a')) target.a.copy(pOBJ['a']);
 
-        if (this.hasProp(pOBJ, 'position')) particle.p.copy(pOBJ['position']);
-        if (this.hasProp(pOBJ, 'velocity')) particle.v.copy(pOBJ['velocity']);
-        if (this.hasProp(pOBJ, 'accelerate')) particle.a.copy(pOBJ['accelerate']);
+        if (this.hasProp(pOBJ, 'position')) target.p.copy(pOBJ['position']);
+        if (this.hasProp(pOBJ, 'velocity')) target.v.copy(pOBJ['velocity']);
+        if (this.hasProp(pOBJ, 'accelerate')) target.a.copy(pOBJ['accelerate']);
     },
 
     hasProp(obj, key) {

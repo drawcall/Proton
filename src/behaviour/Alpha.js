@@ -22,7 +22,7 @@ export default class Alpha extends Behaviour {
 		super(life, easing);
 
 		this.reset(a, b);
-		this.name = "Alpha";
+		this.name = 'Alpha';
 	}
 
 	/**
@@ -46,7 +46,7 @@ export default class Alpha extends Behaviour {
 
 		life && super.reset(life, easing);
 	}
-	
+
 	/**
 	 * Sets the new alpha value of the particle
 	 *
@@ -76,7 +76,6 @@ export default class Alpha extends Behaviour {
  	 */
 	applyBehaviour(particle, time, index) {
 		this.calculate(particle, time, index);
-		
 		particle.alpha = particle.transform.alphaB + (particle.transform.alphaA - particle.transform.alphaB) * this.energy;
 		if (particle.alpha < 0.001) particle.alpha = 0;
 	}

@@ -1,7 +1,5 @@
-import Util from '../utils/Util';
 import DomUtil from '../utils/DomUtil';
 import ImgUtil from '../utils/ImgUtil';
-import MathUtils from '../math/MathUtils';
 import BaseRenderer from './BaseRenderer';
 
 export default class DomRenderer extends BaseRenderer {
@@ -53,7 +51,7 @@ export default class DomRenderer extends BaseRenderer {
         return typeof particle.body === 'object' && particle.body && !particle.body.isInner;
     }
 
-    // private 
+    // private
     addImg2Body(img, particle) {
         if (particle.dead) return;
         particle.body = this.pool.get(img, particle);

@@ -8,7 +8,7 @@ export default class Proton {
 
     static USE_CLOCK = false;
 
-    //1:100
+    // 1:100
     static MEASURE = 100;
     static EULER = 'euler';
     static RK2 = 'runge-kutta2';
@@ -157,7 +157,7 @@ export default class Proton {
      * @instance
      */
     amendChangeTabsBug() {
-        if (this.elapsed > .5) {
+        if (this.elapsed > 0.5) {
             this.oldTime = (new Date()).getTime();
             this.elapsed = 0;
         }

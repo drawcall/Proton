@@ -14,7 +14,7 @@ export default class WebGLRenderer extends BaseRenderer {
         super(element);
 
         this.gl = this.element.getContext('experimental-webgl', { antialias: true, stencil: false, depth: false });
-        if (!this.gl) alert("Sorry your browser do not suppest WebGL!");
+        if (!this.gl) alert('Sorry your browser do not suppest WebGL!');
 
         this.initVar();
         this.setMaxRadius();
@@ -55,12 +55,12 @@ export default class WebGLRenderer extends BaseRenderer {
     }
 
     getVertexShader() {
-        const vsSource = ["uniform vec2 viewport;", "attribute vec2 aVertexPosition;", "attribute vec2 aTextureCoord;", "uniform mat3 tMat;", "varying vec2 vTextureCoord;", "varying float alpha;", "void main() {", "vec3 v = tMat * vec3(aVertexPosition, 1.0);", "gl_Position = vec4(v.x, v.y, 0, 1);", "vTextureCoord = aTextureCoord;", "alpha = tMat[0][2];", "}"].join("\n");
+        const vsSource = ['uniform vec2 viewport;', 'attribute vec2 aVertexPosition;', 'attribute vec2 aTextureCoord;', 'uniform mat3 tMat;', 'varying vec2 vTextureCoord;', 'varying float alpha;', 'void main() {', 'vec3 v = tMat * vec3(aVertexPosition, 1.0);', 'gl_Position = vec4(v.x, v.y, 0, 1);', 'vTextureCoord = aTextureCoord;', 'alpha = tMat[0][2];', '}'].join('\n');
         return vsSource;
     }
 
     getFragmentShader() {
-        const fsSource = ["precision mediump float;", "varying vec2 vTextureCoord;", "varying float alpha;", "uniform sampler2D uSampler;", "uniform vec4 color;", "uniform bool useTexture;", "uniform vec3 uColor;", "void main() {", "vec4 textureColor = texture2D(uSampler, vTextureCoord);", "gl_FragColor = textureColor * vec4(uColor, 1.0);", "gl_FragColor.w *= alpha;", "}"].join("\n");
+        const fsSource = ['precision mediump float;', 'varying vec2 vTextureCoord;', 'varying float alpha;', 'uniform sampler2D uSampler;', 'uniform vec4 color;', 'uniform bool useTexture;', 'uniform vec3 uColor;', 'void main() {', 'vec4 textureColor = texture2D(uSampler, vTextureCoord);', 'gl_FragColor = textureColor * vec4(uColor, 1.0);', 'gl_FragColor.w *= alpha;', '}'].join('\n');
         return fsSource;
     }
 
@@ -103,18 +103,18 @@ export default class WebGLRenderer extends BaseRenderer {
         this.gl.linkProgram(this.sprogram);
 
         if (!this.gl.getProgramParameter(this.sprogram, this.gl.LINK_STATUS))
-            alert("Could not initialise shaders");
+            alert('Could not initialise shaders');
 
         this.gl.useProgram(this.sprogram);
-        this.sprogram.vpa = this.gl.getAttribLocation(this.sprogram, "aVertexPosition");
-        this.sprogram.tca = this.gl.getAttribLocation(this.sprogram, "aTextureCoord");
+        this.sprogram.vpa = this.gl.getAttribLocation(this.sprogram, 'aVertexPosition');
+        this.sprogram.tca = this.gl.getAttribLocation(this.sprogram, 'aTextureCoord');
         this.gl.enableVertexAttribArray(this.sprogram.tca);
         this.gl.enableVertexAttribArray(this.sprogram.vpa);
 
-        this.sprogram.tMatUniform = this.gl.getUniformLocation(this.sprogram, "tMat");
-        this.sprogram.samplerUniform = this.gl.getUniformLocation(this.sprogram, "uSampler");
-        this.sprogram.useTex = this.gl.getUniformLocation(this.sprogram, "useTexture");
-        this.sprogram.color = this.gl.getUniformLocation(this.sprogram, "uColor");
+        this.sprogram.tMatUniform = this.gl.getUniformLocation(this.sprogram, 'tMat');
+        this.sprogram.samplerUniform = this.gl.getUniformLocation(this.sprogram, 'uSampler');
+        this.sprogram.useTex = this.gl.getUniformLocation(this.sprogram, 'useTexture');
+        this.sprogram.color = this.gl.getUniformLocation(this.sprogram, 'uColor');
         this.gl.uniform1i(this.sprogram.useTex, 1);
     };
 
@@ -195,8 +195,8 @@ export default class WebGLRenderer extends BaseRenderer {
     }
 
     onProtonUpdate() {
-        //this.gl.clearColor(0, 0, 0, 1);
-        //this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        // this.gl.clearColor(0, 0, 0, 1);
+        // this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     }
 
     onParticleCreated(particle) {
@@ -214,10 +214,9 @@ export default class WebGLRenderer extends BaseRenderer {
         }
     }
 
-    // private 
+    // private
     addImg2Body(img, particle) {
         if (particle.dead) return;
-        
         particle.body = img;
         particle.transform.src = img.src;
         particle.transform.canvas = ImgUtil.getCanvasFromCache(img);

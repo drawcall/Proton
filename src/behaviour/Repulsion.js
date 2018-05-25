@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import Attraction from './Attraction';
 
 export default class Repulsion extends Attraction {
@@ -26,7 +25,7 @@ export default class Repulsion extends Attraction {
 		super(targetPosition, force, radius, life, easing);
 
 		this.force *= -1;
-		this.name = "Repulsion";
+		this.name = 'Repulsion';
 	}
 
 	/**

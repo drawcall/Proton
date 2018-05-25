@@ -23,7 +23,7 @@ export default class Rotate extends Behaviour {
 		super(life, easing);
 
 		this.reset(influence, b, style);
-		this.name = "Rotate";
+		this.name = 'Rotate';
 	}
 
 	/**
@@ -44,7 +44,7 @@ export default class Rotate extends Behaviour {
 	reset(a, b, style, life, easing) {
 		this.same = b === null || b === undefined ? true : false;
 
-		this.a = Util.setSpanValue(Util.initValue(a, "Velocity"));
+		this.a = Util.setSpanValue(Util.initValue(a, 'Velocity'));
 		this.b = Util.setSpanValue(Util.initValue(b, 0));
 		this.style = Util.initValue(style, 'to');
 
@@ -82,13 +82,13 @@ export default class Rotate extends Behaviour {
 		this.calculate(particle, time, index);
 
 		if (!this.same) {
-			if (this.style == 'to' || this.style == 'TO' || this.style == '_') {
+			if (this.style === 'to' || this.style === 'TO' || this.style === '_') {
 				particle.rotation += particle.transform.rotationB + (particle.transform.rotationA - particle.transform.rotationB) * this.energy
 			} else {
 				particle.rotation += particle.transform.rotationB;
 			}
-		} else if (this.a.a == "V" || this.a.a == "Velocity" || this.a.a == "v") {
-			//beta...
+		} else if (this.a.a === 'V' || this.a.a === 'Velocity' || this.a.a === 'v') {
+			// beta...
 			particle.rotation = particle.getDirection();
 		}
 	}

@@ -2,7 +2,6 @@ import Util from '../utils/Util';
 import Vector2D from '../math/Vector2D';
 import Behaviour from './Behaviour';
 
-//can use Collision(emitter,true,function(){}) or Collision();
 export default class Collision extends Behaviour {
 
 	/**
@@ -22,7 +21,7 @@ export default class Collision extends Behaviour {
 	 * @todo add description to mass
 	 *
 	 * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
-	 * @param {Boolean} 		[mass=true]			
+	 * @param {Boolean} 		[mass=true]
 	 * @param {Callback}	 	[callback=null]		the callback after the collision
 	 * @param {Number} [life=Infinity] 				this behaviour's life
 	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
@@ -33,7 +32,7 @@ export default class Collision extends Behaviour {
 		super(life, easing);
 
 		this.reset(emitter, mass, callback);
-		this.name = "Collision";
+		this.name = 'Collision';
 	}
 
 	/**
@@ -46,7 +45,7 @@ export default class Collision extends Behaviour {
 	 * @todo add description to mass
 	 *
 	 * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
-	 * @param {Boolean} 		[mass=true]			
+	 * @param {Boolean} 		[mass=true]
 	 * @param {Callback}	 	[callback=null]		the callback after the collision
 	 * @param {Number} 			[life=Infinity] 	this behaviour's life
 	 * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
@@ -101,7 +100,7 @@ export default class Collision extends Behaviour {
 					totalMass = particle.mass + otherParticle.mass;
 					averageMass1 = this.mass ? otherParticle.mass / totalMass : 0.5;
 					averageMass2 = this.mass ? particle.mass / totalMass : 0.5;
-					
+
 					particle.p.add(this.delta.clone().normalize().multiplyScalar(overlap * -averageMass1));
 					otherParticle.p.add(this.delta.normalize().multiplyScalar(overlap * averageMass2));
 
@@ -111,4 +110,3 @@ export default class Collision extends Behaviour {
 		}
 	}
 }
-

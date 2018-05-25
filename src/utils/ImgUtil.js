@@ -38,7 +38,7 @@ export default {
      * @param {Boolean}             func
      */
     getImgFromCache(img, callback, param) {
-        const src = typeof (img) == 'string' ? img : img.src;
+        const src = typeof (img) === 'string' ? img : img.src;
 
         if (IMG_CACHE[src]) {
             callback(IMG_CACHE[src], param);

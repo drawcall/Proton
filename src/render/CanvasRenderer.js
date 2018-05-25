@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import ImgUtil from '../utils/ImgUtil';
 import ColorUtil from '../utils/ColorUtil';
 import MathUtils from '../math/MathUtils';
@@ -10,7 +9,7 @@ export default class CanvasRenderer extends BaseRenderer {
         super(element);
 
         this.stroke = null;
-        this.context = this.element.getContext("2d");
+        this.context = this.element.getContext('2d');
         this.bufferCache = {};
 
         this.name = 'CanvasRenderer';
@@ -44,13 +43,12 @@ export default class CanvasRenderer extends BaseRenderer {
         particle.body = null;
     }
 
-
-    // private 
+    // private
     addImg2Body(img, particle) {
         particle.body = img;
     }
 
-    // private drawCircle --
+    // private drawCircle
     drawImage(particle) {
         const w = particle.body.width * particle.scale | 0;
         const h = particle.body.height * particle.scale | 0;
@@ -58,17 +56,17 @@ export default class CanvasRenderer extends BaseRenderer {
         const y = particle.p.y - h / 2;
 
         if (!!particle.color) {
-            if (!particle.transform["buffer"]) particle.transform.buffer = this.createBuffer(particle.body);
+            if (!particle.transform['buffer']) particle.transform.buffer = this.createBuffer(particle.body);
 
             const bufferContext = particle.transform.buffer.getContext('2d');
             bufferContext.clearRect(0, 0, particle.transform.buffer.width, particle.transform.buffer.height);
             bufferContext.globalAlpha = particle.alpha;
             bufferContext.drawImage(particle.body, 0, 0);
 
-            bufferContext.globalCompositeOperation = "source-atop";
+            bufferContext.globalCompositeOperation = 'source-atop';
             bufferContext.fillStyle = ColorUtil.rgbToHex(particle.transform.rgb);
             bufferContext.fillRect(0, 0, particle.transform.buffer.width, particle.transform.buffer.height);
-            bufferContext.globalCompositeOperation = "source-over";
+            bufferContext.globalCompositeOperation = 'source-over';
             bufferContext.globalAlpha = 1;
 
             this.context.drawImage(particle.transform.buffer, 0, 0, particle.transform.buffer.width, particle.transform.buffer.height, x, y, w, h);
@@ -88,7 +86,7 @@ export default class CanvasRenderer extends BaseRenderer {
 
     // private drawCircle --
     drawCircle(particle) {
-        if (particle.transform["rgb"])
+        if (particle.transform['rgb'])
             this.context.fillStyle = 'rgba(' + particle.transform.rgb.r + ',' + particle.transform.rgb.g + ',' + particle.transform.rgb.b + ',' + particle.alpha + ')';
         else
             this.context.fillStyle = particle.color;

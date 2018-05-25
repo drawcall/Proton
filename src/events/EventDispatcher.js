@@ -10,7 +10,7 @@ export default class EventDispatcher {
         this._listeners = null;
     }
 
-    static bind(TargetClass){
+    static bind(TargetClass) {
         TargetClass.prototype.dispatchEvent = EventDispatcher.prototype.dispatchEvent;
         TargetClass.prototype.hasEventListener = EventDispatcher.prototype.hasEventListener;
         TargetClass.prototype.addEventListener = EventDispatcher.prototype.addEventListener;
@@ -38,9 +38,9 @@ export default class EventDispatcher {
         const arr = this._listeners[type];
         const length = arr.length;
 
-        for (let i = 0;i < length; i++) {
-            if (arr[i] == listener) {
-                if (length == 1) {
+        for (let i = 0; i < length; i++) {
+            if (arr[i] === listener) {
+                if (length === 1) {
                     delete (this._listeners[type]);
                 }
 
@@ -69,7 +69,7 @@ export default class EventDispatcher {
             let arr = listeners[type];
             if (!arr) return result;
 
-            //arr = arr.slice();
+            // arr = arr.slice();
             // to avoid issues with items being removed or added during the dispatch
 
             let handler;

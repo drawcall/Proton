@@ -22,7 +22,7 @@ export default class CrossZone extends Behaviour {
         super(life, easing);
 
         this.reset(zone, crossType);
-        this.name = "CrossZone";
+        this.name = 'CrossZone';
     }
 
     /**
@@ -39,7 +39,7 @@ export default class CrossZone extends Behaviour {
      */
     reset(zone, crossType, life, easing) {
         this.zone = zone;
-        this.zone.crossType = Util.initValue(crossType, "dead");
+        this.zone.crossType = Util.initValue(crossType, 'dead');
 
         life && super.reset(life, easing);
     }

@@ -17,7 +17,7 @@ export default {
      * @return {rgbObject}
      */
     hexToRGB(h) {
-        const hex16 = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
+        const hex16 = (h.charAt(0) === '#') ? h.substring(1, 7) : h;
         const r = parseInt(hex16.substring(0, 2), 16);
         const g = parseInt(hex16.substring(2, 4), 16);
         const b = parseInt(hex16.substring(4, 6), 16);

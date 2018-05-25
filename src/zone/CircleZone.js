@@ -32,13 +32,13 @@ export default class CircleZone extends Zone {
     crossing(particle) {
         const d = particle.p.distanceTo(this.center);
 
-        if (this.crossType == "dead") {
+        if (this.crossType === 'dead') {
             if (d - particle.radius > this.radius)
                 particle.dead = true;
-        } else if (this.crossType == "bound") {
+        } else if (this.crossType === 'bound') {
             if (d + particle.radius >= this.radius)
                 this.getSymmetric(particle);
-        } else if (this.crossType == "cross") {
+        } else if (this.crossType === 'cross') {
             if (this.alert) {
                 alert('Sorry CircleZone does not support cross method');
                 this.alert = false;

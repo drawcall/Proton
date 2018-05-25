@@ -14,31 +14,31 @@ export default class Stats {
 
         const emitter = this.getEmitter();
         const renderer = this.getRenderer();
-        let str = "";
+        let str = '';
 
         switch (this.type) {
             case 2:
-                str += "emitter:" + this.proton.emitters.length + "<br>";
-                if (emitter) str += "em speed:" + emitter.emitSpeed + "<br>";
-                if (emitter) str += "pos:" + this.getEmitterPos(emitter);
+                str += 'emitter:' + this.proton.emitters.length + '<br>';
+                if (emitter) str += 'em speed:' + emitter.emitSpeed + '<br>';
+                if (emitter) str += 'pos:' + this.getEmitterPos(emitter);
                 break;
 
             case 3:
-                if (emitter) str += "initializes:" + emitter.initializes.length + "<br>";
-                if (emitter) str += "<span style='display:inline-block;'>" + this.concatArr(emitter.initializes) + "</span><br>";
-                if (emitter) str += "behaviours:" + emitter.behaviours.length + "<br>";
-                if (emitter) str += "<span style='display:inline-block;'>" + this.concatArr(emitter.behaviours) + "</span><br>";
+                if (emitter) str += 'initializes:' + emitter.initializes.length + '<br>';
+                if (emitter) str += '<span style="display:inline-block;">' + this.concatArr(emitter.initializes) + '</span><br>';
+                if (emitter) str += 'behaviours:' + emitter.behaviours.length + '<br>';
+                if (emitter) str += '<span style="display:inline-block;">' + this.concatArr(emitter.behaviours) + '</span><br>';
                 break;
 
             case 4:
-                if (renderer) str += renderer.name + "<br>";
-                if (renderer) str += "body:" + this.getCreatedNumber(renderer) + "<br>";
+                if (renderer) str += renderer.name + '<br>';
+                if (renderer) str += 'body:' + this.getCreatedNumber(renderer) + '<br>';
                 break;
 
             default:
-                str += "particles:" + this.proton.getCount() + "<br>";
-                str += "pool:" + this.proton.pool.getCount() + "<br>";
-                str += "total:" + this.proton.pool.total;
+                str += 'particles:' + this.proton.getCount() + '<br>';
+                str += 'pool:' + this.proton.pool.getCount() + '<br>';
+                str += 'total:' + this.proton.pool.total;
         }
 
         this.container.innerHTML = str;
@@ -63,22 +63,22 @@ export default class Stats {
             let bg, color;
             switch (style) {
                 case 2:
-                    bg = "#201";
-                    color = "#f08";
+                    bg = '#201';
+                    color = '#f08';
                     break;
 
                 case 3:
-                    bg = "#020";
-                    color = "#0f0";
+                    bg = '#020';
+                    color = '#0f0';
                     break;
 
                 default:
-                    bg = "#002";
-                    color = "#0ff";
+                    bg = '#002';
+                    color = '#0ff';
             }
 
-            this.container.style["background-color"] = bg;
-            this.container.style["color"] = color;
+            this.container.style['background-color'] = bg;
+            this.container.style['color'] = color;
         }
 
         if (!this.container.parentNode) {
@@ -111,6 +111,6 @@ export default class Stats {
     }
 
     getEmitterPos(e) {
-        return Math.round(e.p.x) + "," + Math.round(e.p.y);
+        return Math.round(e.p.x) + ',' + Math.round(e.p.y);
     }
 }

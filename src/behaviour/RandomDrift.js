@@ -1,4 +1,3 @@
-import Util from '../utils/Util';
 import Vector2D from '../math/Vector2D';
 import MathUtils from '../math/MathUtils';
 import Behaviour from './Behaviour';
@@ -25,7 +24,7 @@ export default class RandomDrift extends Behaviour {
 
 		this.reset(driftX, driftY, delay);
 		this.time = 0;
-		this.name = "RandomDrift";
+		this.name = 'RandomDrift';
 	}
 
 	/**

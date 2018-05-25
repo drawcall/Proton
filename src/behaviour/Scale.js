@@ -22,7 +22,7 @@ export default class Scale extends Behaviour {
 		super(life, easing);
 
 		this.reset(a, b);
-		this.name = "Scale";
+		this.name = 'Scale';
 	}
 
 	/**

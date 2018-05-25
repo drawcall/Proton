@@ -1,5 +1,3 @@
-import Util from '../utils/Util';
-
 export default class Integration {
 
 	constructor(type) {
