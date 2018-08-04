@@ -4,7 +4,7 @@
   "description": "Proton is an easily customizable html5 particle engine including six different types of renderers.",
   "main": "./build/proton.min.js",
   "scripts": {
-    "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 3001\"",
+    "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 3001\"",
     "page": "node ./script/makeexamplepage",
     "lint": "eslint ./src --config=eslintrc.json",
     "build": "rollup -c --pub"
@@ -37,6 +37,6 @@
     "rollup-plugin-license": "^0.5.0",
     "rollup-plugin-uglify": "^2.0.1",
     "rollup-watch": "^4.3.1",
-    "serve": "^6.4.8"
+    "serve": "^8.2.0"
   }
 }
