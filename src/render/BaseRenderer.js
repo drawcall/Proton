@@ -27,8 +27,8 @@ export default class BaseRenderer {
         this._emitterAddedHandler = (emitter) => { this.onEmitterAdded.call(this, emitter) };
         this._emitterRemovedHandler = (emitter) => { this.onEmitterRemoved.call(this, emitter) };
         this._particleCreatedHandler = (particle) => { this.onParticleCreated.call(this, particle) };
-        this._particleUpdateHandler = (particle) => { this.onParticleUpdate.call(this, particle) };
-        this._particleDeadHandler = (particle) => { this.onParticleDead.call(this, particle) };
+        this._particleUpdateHandler = this.onParticleUpdate.bind(this);
+        this._particleDeadHandler = this.onParticleDead.bind(this);
     }
 
     init(proton) {

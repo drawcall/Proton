@@ -1,15 +1,18 @@
 import ColorUtil from '../utils/ColorUtil';
 import MathUtils from '../math/MathUtils';
 import BaseRenderer from './BaseRenderer';
+import FastPool from "../core/FastPool";
 
 export default class PixiRenderer extends BaseRenderer {
 
+    // element must be Particle Container
     constructor(element, stroke) {
         super(element);
 
         this.stroke = stroke;
         this.setColor = false;
-        this.pool.create = (body, particle) => this.createBody(body, particle);
+
+        this.fastPool = new FastPool();
         this.name = 'PixiRenderer';
     }
 
@@ -19,13 +22,13 @@ export default class PixiRenderer extends BaseRenderer {
      * @param particle
      */
     onParticleCreated(particle) {
-        if (particle.body) {
-            particle.body = this.pool.get(particle.body, particle);
+        if (this.fastPool.count > 0) {
+            particle.body = this.fastPool.get();
+            particle.body.visible = true;
         } else {
-            particle.body = this.pool.get(this.circleConf, particle);
+            particle.body = this.createSprite(particle.body);
+            this.element.addChild(particle.body);
         }
-
-        this.element.addChild(particle.body);
     }
 
     /**
@@ -40,14 +43,13 @@ export default class PixiRenderer extends BaseRenderer {
      * @param particle
      */
     onParticleDead(particle) {
-        this.element.removeChild(particle.body);
-        this.pool.expire(particle.body);
-        particle.body = null;
+        particle.body.alpha = 0;
+        this.fastPool.add(particle.body);
     }
 
     destroy(particles) {
         super.destroy();
-        this.pool.destroy();
+        this.fastPool.destroy();
 
         let i = particles.length;
         while (i--) {
@@ -71,33 +73,11 @@ export default class PixiRenderer extends BaseRenderer {
         target.rotation = particle.rotation * MathUtils.PI_180; // MathUtils.PI_180;
     }
 
-    createBody(body, particle) {
-        if (body.isCircle)
-            return this.createCircle(particle);
-        else
-            return this.createSprite(body);
-    }
-
     createSprite(body) {
-        const sprite = body.isInner ? PIXI.Sprite.fromImage(body.src) : new PIXI.Sprite(body);
+        const sprite = body.isInner ? PIXI.Sprite.from(body.src) : new PIXI.Sprite(body);
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
 
         return sprite;
-    }
-
-    createCircle(particle) {
-        const graphics = new PIXI.Graphics();
-
-        if (this.stroke) {
-            const stroke = this.stroke instanceof String ? this.stroke : 0x000000;
-            graphics.beginStroke(stroke);
-        }
-
-        graphics.beginFill(particle.color || 0x008ced);
-        graphics.drawCircle(0, 0, particle.radius);
-        graphics.endFill();
-
-        return graphics;
     }
 }

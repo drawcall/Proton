@@ -30,7 +30,7 @@
     </div>
     <script src="../../lib/stats.min.js"></script>
     <script src="//localhost:3001/build/proton.js"></script>
-    <script src="../../lib/pixi.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pixi.js/5.0.2/pixi.js"></script>
     <script>
         var canvas;
         var context;
@@ -60,7 +60,7 @@
         }
 
         function createPixi(){
-            app = new PIXI.Application(1003, 650, {backgroundColor : 0x1099bb});
+            app = new PIXI.Application({backgroundColor : 0x1099bb, width: 1003,  height: 650});
             document.getElementById('container').appendChild(app.view);
 
             sprite = new PIXI.Sprite(new PIXI.Texture.fromImage("image/eggHead.png"));
@@ -73,7 +73,7 @@
             proton = new Proton();
             proton.stats.add(2, document.getElementById('container'));
             emitter = new Proton.BehaviourEmitter();
-            emitter.rate = new Proton.Rate(new Proton.Span(25, 40), new Proton.Span(.2, .5));
+            emitter.rate = new Proton.Rate(new Proton.Span(2000, 2000), new Proton.Span(.2, .5));
 
             emitter.addInitialize(new Proton.Mass(1));
             emitter.addInitialize(new Proton.Body("image/bunny.png"));
@@ -89,7 +89,10 @@
             emitter.p.y = 100;
             emitter.emit();
             proton.addEmitter(emitter);
-            proton.addRenderer(new Proton.PixiRenderer(app.stage));
+
+            var container = new PIXI.ParticleContainer(100000, {rotation: true, tint: true, vertices: true});
+            proton.addRenderer(new Proton.PixiRenderer(container));
+            app.stage.addChild(container);
 
             emitter.addSelfBehaviour(new Proton.Gravity(5));
             emitter.addSelfBehaviour(new Proton.RandomDrift(30, 30, .1));

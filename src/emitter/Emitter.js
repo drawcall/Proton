@@ -220,10 +220,9 @@ export default class Emitter extends Particle {
 		const damping = 1 - this.damping;
 		this.parent.integrator.calculate(this, time, damping);
 
-		const length = this.particles.length;
 		let i, particle;
 
-		for (i = length - 1; i >= 0; i--) {
+		for (i = 0; i < this.particles.length; i++) {
 			particle = this.particles[i];
 
 			// particle update
@@ -236,7 +235,9 @@ export default class Emitter extends Particle {
 				this.dispatch('PARTICLE_DEAD', particle);
 
 				this.parent.pool.expire(particle);
-				this.particles.splice(i, 1);
+				this.particles[i] = this.particles[this.particles.length - 1];
+				this.particles.pop();
+				i --;
 			}
 		}
 	}

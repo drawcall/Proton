@@ -3865,11 +3865,10 @@ var Emitter = function (_Particle) {
 			var damping = 1 - this.damping;
 			this.parent.integrator.calculate(this, time, damping);
 
-			var length = this.particles.length;
 			var i = void 0,
 			    particle = void 0;
 
-			for (i = length - 1; i >= 0; i--) {
+			for (i = 0; i < this.particles.length; i++) {
 				particle = this.particles[i];
 
 				// particle update
@@ -3882,7 +3881,9 @@ var Emitter = function (_Particle) {
 					this.dispatch('PARTICLE_DEAD', particle);
 
 					this.parent.pool.expire(particle);
-					this.particles.splice(i, 1);
+					this.particles[i] = this.particles[this.particles.length - 1];
+					this.particles.pop();
+					i--;
 				}
 			}
 		}
@@ -4195,12 +4196,8 @@ var BaseRenderer = function () {
             this._particleCreatedHandler = function (particle) {
                 _this.onParticleCreated.call(_this, particle);
             };
-            this._particleUpdateHandler = function (particle) {
-                _this.onParticleUpdate.call(_this, particle);
-            };
-            this._particleDeadHandler = function (particle) {
-                _this.onParticleDead.call(_this, particle);
-            };
+            this._particleUpdateHandler = this.onParticleUpdate.bind(this);
+            this._particleDeadHandler = this.onParticleDead.bind(this);
         }
     }, {
         key: 'init',
@@ -4659,9 +4656,50 @@ var PixelRenderer = function (_BaseRenderer) {
     return PixelRenderer;
 }(BaseRenderer);
 
+/**
+ * get    -> PUID :: uid-> Body
+ *        -> cache[abc].         -> cache[abc] .pop()
+ *                               -> create [new Body| clone]
+ *        -> return p1: { __pid: abc }
+ *
+ * expire -> cache[abc]= [p0, p1];
+ *
+ */
+var FastPool = function () {
+    function FastPool(num) {
+        classCallCheck(this, FastPool);
+
+        this.pool = [];
+    }
+
+    createClass(FastPool, [{
+        key: 'add',
+        value: function add(element) {
+            this.pool.push(element);
+        }
+    }, {
+        key: 'get',
+        value: function get$$1() {
+            return this.pool.pop();
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.pool.length = 0;
+        }
+    }, {
+        key: 'count',
+        get: function get$$1() {
+            return this.pool.length;
+        }
+    }]);
+    return FastPool;
+}();
+
 var PixiRenderer = function (_BaseRenderer) {
     inherits(PixiRenderer, _BaseRenderer);
 
+    // element must be Particle Container
     function PixiRenderer(element, stroke) {
         classCallCheck(this, PixiRenderer);
 
@@ -4669,9 +4707,8 @@ var PixiRenderer = function (_BaseRenderer) {
 
         _this.stroke = stroke;
         _this.setColor = false;
-        _this.pool.create = function (body, particle) {
-            return _this.createBody(body, particle);
-        };
+
+        _this.fastPool = new FastPool();
         _this.name = 'PixiRenderer';
         return _this;
     }
@@ -4687,13 +4724,13 @@ var PixiRenderer = function (_BaseRenderer) {
     }, {
         key: 'onParticleCreated',
         value: function onParticleCreated(particle) {
-            if (particle.body) {
-                particle.body = this.pool.get(particle.body, particle);
+            if (this.fastPool.count > 0) {
+                particle.body = this.fastPool.get();
+                particle.body.visible = true;
             } else {
-                particle.body = this.pool.get(this.circleConf, particle);
+                particle.body = this.createSprite(particle.body);
+                this.element.addChild(particle.body);
             }
-
-            this.element.addChild(particle.body);
         }
 
         /**
@@ -4714,15 +4751,14 @@ var PixiRenderer = function (_BaseRenderer) {
     }, {
         key: 'onParticleDead',
         value: function onParticleDead(particle) {
-            this.element.removeChild(particle.body);
-            this.pool.expire(particle.body);
-            particle.body = null;
+            particle.body.alpha = 0;
+            this.fastPool.add(particle.body);
         }
     }, {
         key: 'destroy',
         value: function destroy(particles) {
             get(PixiRenderer.prototype.__proto__ || Object.getPrototypeOf(PixiRenderer.prototype), 'destroy', this).call(this);
-            this.pool.destroy();
+            this.fastPool.destroy();
 
             var i = particles.length;
             while (i--) {
@@ -4747,34 +4783,13 @@ var PixiRenderer = function (_BaseRenderer) {
             target.rotation = particle.rotation * MathUtils.PI_180; // MathUtils.PI_180;
         }
     }, {
-        key: 'createBody',
-        value: function createBody(body, particle) {
-            if (body.isCircle) return this.createCircle(particle);else return this.createSprite(body);
-        }
-    }, {
         key: 'createSprite',
         value: function createSprite(body) {
-            var sprite = body.isInner ? PIXI.Sprite.fromImage(body.src) : new PIXI.Sprite(body);
+            var sprite = body.isInner ? PIXI.Sprite.from(body.src) : new PIXI.Sprite(body);
             sprite.anchor.x = 0.5;
             sprite.anchor.y = 0.5;
 
             return sprite;
-        }
-    }, {
-        key: 'createCircle',
-        value: function createCircle(particle) {
-            var graphics = new PIXI.Graphics();
-
-            if (this.stroke) {
-                var stroke = this.stroke instanceof String ? this.stroke : 0x000000;
-                graphics.beginStroke(stroke);
-            }
-
-            graphics.beginFill(particle.color || 0x008ced);
-            graphics.drawCircle(0, 0, particle.radius);
-            graphics.endFill();
-
-            return graphics;
         }
     }]);
     return PixiRenderer;
@@ -5560,7 +5575,6 @@ var Debug = {
 	};
 })();
 
-// namespace
 Proton.Particle = Proton.P = Particle;
 Proton.Pool = Pool;
 
@@ -5624,6 +5638,8 @@ Proton.CustomRenderer = CustomRenderer;
 Proton.Debug = Debug;
 
 Object.assign(Proton, ease);
+
+// export
 
 return Proton;
 
