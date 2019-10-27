@@ -24,12 +24,14 @@ Proton is a lightweight and powerful javascript particle engine. With it you can
 ## Installation
 
 #### Install using npm 
-[![anix](https://nodei.co/npm/proton-js.png)](https://npmjs.org/package/proton-js)
+[![anix](https://nodei.co/npm/proton-engine.png)](https://npmjs.org/package/proton-engine)
+
+##### Note: NPM package-name has been changed from `proton-js` to `proton-engine`
 
 ``` 
-npm install proton-js --save
+npm install proton-engine --save
 ... 
-import Proton from 'proton-js';
+import Proton from 'proton-engine';
 ```
 
 #### OR include in html
