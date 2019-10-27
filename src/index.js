@@ -56,7 +56,6 @@ import RectZone from './zone/RectZone';
 import ImageZone from './zone/ImageZone';
 
 import Debug from './debug/Debug';
-import './polyfill/requestAnimationFrame';
 
 // namespace
 Proton.Particle = Proton.P = Particle;
