@@ -16,7 +16,7 @@
             -khtml-user-select: none;
             user-select: none;
         }
-        
+
         #testCanvas {
             background: #000;
         }
@@ -25,6 +25,7 @@
 
 <body>
     <canvas id="testCanvas"></canvas>
+    <script src="../../lib/requestAnimationFrame.min.js"></script>
     <script src="../../lib/stats.min.js"></script>
     <script src="../../lib/profiler.js"></script>
     <script src="//localhost:3001/build/proton.js"></script>
@@ -54,7 +55,7 @@
             canvas.addEventListener('mousedown', mousedownHandler, false);
             canvas.addEventListener('mouseup', mouseupHandler, false);
             canvas.addEventListener('mousemove', mousemoveHandler, false);
-            
+
             window.onresize = function(e) {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
