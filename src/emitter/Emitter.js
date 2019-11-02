@@ -292,7 +292,7 @@ export default class Emitter extends Particle {
 		}
 
 		if (behaviour) {
-			behaviour = Util.isArray(behaviour) ? behaviour : [behaviour];
+			behaviours = Util.isArray(behaviour) ? behaviour : [behaviour];
 		}
 
 		particle.reset();
