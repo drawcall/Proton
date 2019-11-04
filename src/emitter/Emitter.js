@@ -113,12 +113,36 @@ export default class Emitter extends Particle {
 	}
 
 	/**
+	 * remove a particle
+	 */
+	removeParticle(particle) {
+		const index = this.particles.indexOf(particle);
+		this.removeParticleAtIndex(index);
+	}
+
+	/**
+	 * remove a particle at specific index
+	 */
+	removeParticleAtIndex(index) {
+		if (index < 0 || index >= this.particles.length) {
+			return;
+		}
+		const particle = this.particles[index];
+		particle.destroy();
+		this.dispatch('PARTICLE_DEAD', particle);
+		this.parent.pool.expire(particle);
+		this.particles.splice(index, 1);
+	}
+
+	/**
 	 * remove current all particles
 	 * @method removeAllParticles
 	 */
 	removeAllParticles() {
 		let i = this.particles.length;
-		while (i--) this.particles[i].dead = true;
+		while (i--) {
+			this.removeParticleAtIndex(i);
+		}
 	}
 
 	/**
@@ -233,10 +257,7 @@ export default class Emitter extends Particle {
 
 			// check dead
 			if (particle.dead) {
-				this.dispatch('PARTICLE_DEAD', particle);
-
-				this.parent.pool.expire(particle);
-				this.particles.splice(i, 1);
+				this.removeParticleAtIndex(i);
 			}
 		}
 	}
@@ -305,7 +326,7 @@ export default class Emitter extends Particle {
 
 	remove() {
 		this.stop();
-		Util.destroy(this.particles);
+		this.removeAllParticles();
 	}
 
 	/**
