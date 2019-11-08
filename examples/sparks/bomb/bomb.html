@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>sparks-bomb</title>
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <style type="text/css">
+        body {
+            background-color: #333333;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #testCanvas {
+            background: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <canvas id="testCanvas"></canvas>
+    </div>
+    <script src="../../lib/stats.min.js"></script>
+    <script src="../../lib/proton.min.js"></script>
+    <script>
+        var proton;
+        var renderer;
+        var stats;
+        var emitter;
+        var canvas;
+        var context;
+
+        main();
+
+        function main() {
+            canvas = document.getElementById("testCanvas");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            addStats();
+
+            createProton();
+            tick();
+            resize();
+        }
+
+        function resize() {
+            window.onresize = function () {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                emitter.p.x = canvas.width / 2;
+                emitter.p.y = canvas.height / 2;
+                renderer.resize(canvas.width, canvas.height);
+            }
+        }
+
+        function addStats() {
+            stats = new Stats();
+            stats.setMode(2);
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+            document.getElementById('container').appendChild(stats.domElement);
+        }
+
+        function createProton() {
+            proton = new Proton;
+            emitter = createImageEmitter();
+            //createColorEmitter();
+
+            renderer = new Proton.WebGLRenderer(canvas);
+            renderer.blendFunc("SRC_ALPHA", "ONE");
+            proton.addRenderer(renderer);
+        }
+
+        function createImageEmitter() {
+            var emitter = new Proton.Emitter();
+            emitter.rate = new Proton.Rate(new Proton.Span(15, 50), new Proton.Span(.1, .2));
+
+            emitter.addInitialize(new Proton.Mass(1));
+            emitter.addInitialize(new Proton.Life(1, 2));
+            emitter.addInitialize(new Proton.Body(['image/particle.png'], 32));
+            emitter.addInitialize(new Proton.Radius(40));
+            emitter.addInitialize(new Proton.V(new Proton.Span(3, 6), new Proton.Span(0, 360), 'polar'));
+
+            emitter.addBehaviour(new Proton.Alpha(1, 0));
+            emitter.addBehaviour(new Proton.Color('#E38F5C', '#BD4F00'));
+            emitter.addBehaviour(new Proton.Scale(Proton.getSpan(0.3, 4), 0));
+            emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'dead'));
+
+            emitter.p.x = canvas.width / 2;
+            emitter.p.y = canvas.height / 2;
+            emitter.rotation = 48;
+            emitter.emit();
+            proton.addEmitter(emitter);
+
+            return emitter;
+        }
+
+        function createColorEmitter() {
+            var emitter = new Proton.Emitter();
+            emitter.rate = new Proton.Rate(new Proton.Span(6, 9), new Proton.Span(.1, .2));
+
+            emitter.addInitialize(new Proton.Mass(1));
+            emitter.addInitialize(new Proton.Radius(1, 20));
+            emitter.addInitialize(new Proton.Life(1, 2));
+            emitter.addInitialize(new Proton.V(new Proton.Span(1, 4), new Proton.Span(0, 360), 'polar'));
+
+            emitter.addBehaviour(new Proton.Alpha(1, 0));
+            emitter.addBehaviour(new Proton.Scale(1, 0));
+            emitter.addBehaviour(new Proton.Color('#ff0000', 'random'));
+            emitter.addBehaviour(new Proton.CrossZone(new Proton.CircleZone(canvas.width / 2, canvas.height / 2, 250), 'dead'));
+
+            emitter.p.x = canvas.width / 2;
+            emitter.p.y = canvas.height / 2;
+            emitter.emit();
+            proton.addEmitter(emitter);
+        }
+
+        function tick() {
+            requestAnimationFrame(tick);
+
+            stats.begin();
+            proton.update();
+            proton.stats.update(1, document.body);
+            stats.end();
+        }
+    </script>
+</body>
+
+</html>

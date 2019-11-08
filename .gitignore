@@ -1,7 +1,13 @@
-# node modules
-node_modules
-
-# documentation
-build/docs/
-
-package-lock.json
+/package-lock.json
+/node_modules/
+/build/
+source/node_modules/
+source/package-lock.json
+source/.DS_Store
+source/build/
+.DS_Store
+src/node_modules/
+src/node_modules/
+src/package-lock.json
+src/.DS_Store
+source-back/

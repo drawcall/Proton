@@ -1,0 +1,17 @@
+.feature{
+	background-color: #fff !important;
+}
+
+.feature-message{
+	color: #777777;
+}
+
+.feature-img{
+	padding-top: 1.2rem;
+	cursor: pointer;
+}
+
+.feature-icon{
+	height:100px;
+	margin: 0 auto;
+}

@@ -1,0 +1,26 @@
+.footer {
+  background-color: #000 !important;
+  color: #fff;
+  padding: 3.5rem 1.5rem 4rem;
+}
+
+.footer a {
+  color: #bbb;
+}
+
+.footer-center {
+  font-size: 14px;
+  text-align: left;
+}
+
+.footer-center h2 {
+  font-size: 16px;
+}
+
+.footer-center div {
+  margin: 12px 0;
+}
+
+.footer-center strong {
+  color: #808080;
+}

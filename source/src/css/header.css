@@ -1,0 +1,17 @@
+.navbar {
+  /* background-color: #222 !important; */
+  box-shadow: 0 2px 8px rgba(255, 193, 193, 0.5);
+  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-item{
+  padding: 16px 20px !important;
+}
+
+.navbar-item img {
+  max-height: 2.2rem !important;
+}
+
+.navbar-item, .navbar-link{
+	
+}
