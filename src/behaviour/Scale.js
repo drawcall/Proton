@@ -1,3 +1,4 @@
+import Span from "../math/Span";
 import Util from '../utils/Util';
 import Behaviour from './Behaviour';
 
@@ -39,8 +40,8 @@ export default class Scale extends Behaviour {
 	 */
 	reset(a, b, life, easing) {
 		this.same = b === null || b === undefined ? true : false;
-		this.a = Util.setSpanValue(Util.initValue(a, 1));
-		this.b = Util.setSpanValue(b);
+		this.a = Span.setSpanValue(Util.initValue(a, 1));
+		this.b = Span.setSpanValue(b);
 
 		life && super.reset(life, easing);
 	}
@@ -55,9 +56,9 @@ export default class Scale extends Behaviour {
 	 * @param {Proton.Particle} particle
 	 */
 	initialize(particle) {
-		particle.transform.scaleA = this.a.getValue();
-		particle.transform.oldRadius = particle.radius;
-		particle.transform.scaleB = this.same ? particle.transform.scaleA : this.b.getValue();
+		particle.data.scaleA = this.a.getValue();
+		particle.data.oldRadius = particle.radius;
+		particle.data.scaleB = this.same ? particle.data.scaleA : this.b.getValue();
 	};
 
 	/**
@@ -73,9 +74,9 @@ export default class Scale extends Behaviour {
 	 */
 	applyBehaviour(particle, time, index) {
 		this.calculate(particle, time, index);
-		particle.scale = particle.transform.scaleB + (particle.transform.scaleA - particle.transform.scaleB) * this.energy;
+		particle.scale = particle.data.scaleB + (particle.data.scaleA - particle.data.scaleB) * this.energy;
 
 		if (particle.scale < 0.0001) particle.scale = 0;
-		particle.radius = particle.transform.oldRadius * particle.scale;
+		particle.radius = particle.data.oldRadius * particle.scale;
 	}
 }

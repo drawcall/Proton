@@ -6,7 +6,7 @@ import ImgUtil from '../utils/ImgUtil';
 import MStack from '../utils/MStack';
 import DomUtil from '../utils/DomUtil';
 import WebGLUtil from '../utils/WebGLUtil';
-import MathUtils from '../math/MathUtils';
+import MathUtil from '../math/MathUtil';
 
 export default class WebGLRenderer extends BaseRenderer {
 
@@ -168,30 +168,30 @@ export default class WebGLRenderer extends BaseRenderer {
         const _scaleX = particle.body.width / _width;
         const _scaleY = particle.body.height / _height;
 
-        if (!this.texturebuffers[particle.transform.src])
-            this.texturebuffers[particle.transform.src] = [this.gl.createTexture(), this.gl.createBuffer(), this.gl.createBuffer()];
+        if (!this.texturebuffers[particle.data.src])
+            this.texturebuffers[particle.data.src] = [this.gl.createTexture(), this.gl.createBuffer(), this.gl.createBuffer()];
 
-        particle.transform.texture = this.texturebuffers[particle.transform.src][0];
-        particle.transform.vcBuffer = this.texturebuffers[particle.transform.src][1];
-        particle.transform.tcBuffer = this.texturebuffers[particle.transform.src][2];
+        particle.data.texture = this.texturebuffers[particle.data.src][0];
+        particle.data.vcBuffer = this.texturebuffers[particle.data.src][1];
+        particle.data.tcBuffer = this.texturebuffers[particle.data.src][2];
 
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.transform.tcBuffer);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.tcBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, _scaleX, 0.0, 0.0, _scaleY, _scaleY, _scaleY]), this.gl.STATIC_DRAW);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.transform.vcBuffer);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.vcBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, _w, 0.0, 0.0, _h, _w, _h]), this.gl.STATIC_DRAW);
 
-        const context = particle.transform.canvas.getContext('2d');
+        const context = particle.data.canvas.getContext('2d');
         const data = context.getImageData(0, 0, _width, _height);
 
-        this.gl.bindTexture(this.gl.TEXTURE_2D, particle.transform.texture);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, particle.data.texture);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, data);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
         this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
-        particle.transform.textureLoaded = true;
-        particle.transform.textureWidth = _w;
-        particle.transform.textureHeight = _h;
+        particle.data.textureLoaded = true;
+        particle.data.textureWidth = _w;
+        particle.data.textureHeight = _h;
     }
 
     onProtonUpdate() {
@@ -200,17 +200,17 @@ export default class WebGLRenderer extends BaseRenderer {
     }
 
     onParticleCreated(particle) {
-        particle.transform.textureLoaded = false;
-        particle.transform.tmat = Mat3.create();
-        particle.transform.tmat[8] = 1;
-        particle.transform.imat = Mat3.create();
-        particle.transform.imat[8] = 1;
+        particle.data.textureLoaded = false;
+        particle.data.tmat = Mat3.create();
+        particle.data.tmat[8] = 1;
+        particle.data.imat = Mat3.create();
+        particle.data.imat[8] = 1;
 
         if (particle.body) {
             ImgUtil.getImgFromCache(particle.body, this.addImg2Body, particle);
         } else {
             ImgUtil.getImgFromCache(this.circleCanvasURL, this.addImg2Body, particle);
-            particle.transform.oldScale = particle.radius / this.circleCanvasRadius;
+            particle.data.oldScale = particle.radius / this.circleCanvasRadius;
         }
     }
 
@@ -218,25 +218,25 @@ export default class WebGLRenderer extends BaseRenderer {
     addImg2Body(img, particle) {
         if (particle.dead) return;
         particle.body = img;
-        particle.transform.src = img.src;
-        particle.transform.canvas = ImgUtil.getCanvasFromCache(img);
-        particle.transform.oldScale = 1;
+        particle.data.src = img.src;
+        particle.data.canvas = ImgUtil.getCanvasFromCache(img);
+        particle.data.oldScale = 1;
 
         this.drawImg2Canvas(particle);
     }
 
     onParticleUpdate(particle) {
-        if (particle.transform.textureLoaded) {
+        if (particle.data.textureLoaded) {
             this.updateMatrix(particle);
 
-            this.gl.uniform3f(this.sprogram.color, particle.transform.rgb.r / 255, particle.transform.rgb.g / 255, particle.transform.rgb.b / 255);
+            this.gl.uniform3f(this.sprogram.color, particle.rgb.r / 255, particle.rgb.g / 255, particle.rgb.b / 255);
             this.gl.uniformMatrix3fv(this.sprogram.tMatUniform, false, this.mstack.top());
 
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.transform.vcBuffer);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.vcBuffer);
             this.gl.vertexAttribPointer(this.sprogram.vpa, 2, this.gl.FLOAT, false, 0, 0);
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.transform.tcBuffer);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.tcBuffer);
             this.gl.vertexAttribPointer(this.sprogram.tca, 2, this.gl.FLOAT, false, 0, 0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, particle.transform.texture);
+            this.gl.bindTexture(this.gl.TEXTURE_2D, particle.data.texture);
             this.gl.uniform1i(this.sprogram.samplerUniform, 0);
             this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitIBuffer);
 
@@ -249,20 +249,20 @@ export default class WebGLRenderer extends BaseRenderer {
     onParticleDead(particle) { }
 
     updateMatrix(particle) {
-        const moveOriginMatrix = WebGLUtil.makeTranslation(-particle.transform.textureWidth / 2, -particle.transform.textureHeight / 2);
+        const moveOriginMatrix = WebGLUtil.makeTranslation(-particle.data.textureWidth / 2, -particle.data.textureHeight / 2);
         const translationMatrix = WebGLUtil.makeTranslation(particle.p.x, particle.p.y);
 
-        const angel = particle.rotation * (MathUtils.PI_180);
+        const angel = particle.rotation * (MathUtil.PI_180);
         const rotationMatrix = WebGLUtil.makeRotation(angel);
 
-        const scale = particle.scale * particle.transform.oldScale;
+        const scale = particle.scale * particle.data.oldScale;
         const scaleMatrix = WebGLUtil.makeScale(scale, scale);
         let matrix = WebGLUtil.matrixMultiply(moveOriginMatrix, scaleMatrix);
 
         matrix = WebGLUtil.matrixMultiply(matrix, rotationMatrix);
         matrix = WebGLUtil.matrixMultiply(matrix, translationMatrix);
 
-        Mat3.inverse(matrix, particle.transform.imat);
+        Mat3.inverse(matrix, particle.data.imat);
         matrix[2] = particle.alpha;
 
         this.mstack.push(matrix);

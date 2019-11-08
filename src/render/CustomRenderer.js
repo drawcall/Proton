@@ -1,11 +1,9 @@
-import BaseRenderer from './BaseRenderer';
+import BaseRenderer from "./BaseRenderer";
 
 export default class CustomRenderer extends BaseRenderer {
+  constructor(element) {
+    super(element);
 
-    constructor(element) {
-        super(element);
-
-        this.name = 'CustomRenderer';
-    }
-
+    this.name = "CustomRenderer";
+  }
 }

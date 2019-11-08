@@ -1,17 +1,14 @@
 export default class Initialize {
+  reset() {}
 
-	reset() {
-	}
+  init(emitter, particle) {
+    if (particle) {
+      this.initialize(particle);
+    } else {
+      this.initialize(emitter);
+    }
+  }
 
-	init(emitter, particle) {
-		if (particle) {
-			this.initialize(particle);
-		} else {
-			this.initialize(emitter);
-		}
-	};
-
-	// sub class init
-	initialize(target) {
-	};
+  // sub class init
+  initialize(target) {}
 }

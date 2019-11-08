@@ -1,33 +1,49 @@
-export default {
-    id: 0,
-    cache: {},
+const IdsMap = {};
 
-    getID(target) {
-        let uid = this.getCacheID(target);
-        if (uid) return uid;
+const Puid = {
+  _index: 0,
+  _cache: {},
 
-        uid = `PUID_${this.id++}`;
-        this.cache[uid] = target;
+  id(type) {
+    if (IdsMap[type] === undefined || IdsMap[type] === null) IdsMap[type] = 0;
+    return `${type}_${IdsMap[type]++}`;
+  },
 
-        return uid;
-    },
+  getId(target) {
+    let uid = this.getIdFromCache(target);
+    if (uid) return uid;
 
-    getCacheID(target) {
-        let obj;
-        for (let id in this.cache) {
-            obj = this.cache[id];
+    uid = `PUID_${this._index++}`;
+    this._cache[uid] = target;
 
-            if (obj === target) return id;
-            if (typeof obj === 'object' && typeof target === 'object' && obj.isInner && target.isInner) {
-                if (obj.src === target.src)
-                    return id;
-            }
-        }
+    return uid;
+  },
 
-        return null;
-    },
+  getIdFromCache(target) {
+    let obj, id;
 
-    getTarget(uid) {
-        return this.cache[uid];
+    for (id in this._cache) {
+      obj = this._cache[id];
+
+      if (obj === target) return id;
+      if (this.isBody(obj, target) && obj.src === target.src) return id;
     }
-}
+
+    return null;
+  },
+
+  isBody(obj, target) {
+    return (
+      typeof obj === "object" &&
+      typeof target === "object" &&
+      obj.isInner &&
+      target.isInner
+    );
+  },
+
+  getTarget(uid) {
+    return this._cache[uid];
+  }
+};
+
+export default Puid;

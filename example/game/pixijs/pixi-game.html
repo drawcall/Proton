@@ -30,7 +30,6 @@
 <body>
     <div id="container" class="shadow">
     </div>
-    <script src="../../lib/requestAnimationFrame.min.js"></script>
     <script src="../../lib/stats.min.js"></script>
     <script src="../../lib/pixi.min.js"></script>
     <script src="../../lib/pixi-spine.js"></script>
@@ -210,6 +209,7 @@
 
             emitter.emit();
             proton.addEmitter(emitter);
+
             emitter.preEmit(1.2);
         }
 

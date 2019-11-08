@@ -11,7 +11,7 @@
             margin: 0px;
             overflow: hidden;
         }
-        
+
         #container {
             width: 1003px;
             height: 610px;
@@ -22,7 +22,7 @@
             background: #000;
             overflow: hidden;
         }
-        
+
         #testCanvas {
             background: #000;
         }
@@ -59,7 +59,7 @@
         main();
 
         function main() {
-            
+
             canvas = document.getElementById("testCanvas");
             canvas.width = 1003;
             canvas.height = 610;
@@ -150,9 +150,9 @@
 
                         particle.p.x += (x - particle.p.x) * 0.05;
                         particle.p.y += (y - particle.p.y) * 0.05;
-                        particle.transform.rgb.r = particle.colors[index].r;
-                        particle.transform.rgb.g = particle.colors[index].g;
-                        particle.transform.rgb.b = particle.colors[index].b;
+                        particle.rgb.r = particle.colors[index].r;
+                        particle.rgb.g = particle.colors[index].g;
+                        particle.rgb.b = particle.colors[index].b;
                     }
                 }
             }

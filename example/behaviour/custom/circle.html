@@ -1,205 +1,229 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>behaviour-custom</title>
-    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta charset="utf-8">
+    <meta
+      name="viewport"
+      id="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta charset="utf-8" />
     <style type="text/css">
-        body {
-            background-color: #333333;
-            margin: 0px;
-            overflow: hidden;
-        }
-        
-        #container {
-            width: 100%;
-            height: 100%;
-        }
-        
-        #testCanvas {
-            background: #000000;
-        }
-        
-        .shadow {
-            box-shadow: 0 0 10px #000;
-        }
+      body {
+        background-color: #333333;
+        margin: 0px;
+        overflow: hidden;
+      }
+      #container {
+        width: 100%;
+        height: 100%;
+      }
+      #canvas {
+        background: #000000;
+      }
+      .shadow {
+        box-shadow: 0 0 10px #000;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="container">
-        <canvas id="testCanvas"></canvas>
+      <canvas id="canvas"></canvas>
     </div>
+
     <script src="../../lib/requestAnimationFrame.min.js"></script>
     <script src="../../lib/stats.min.js"></script>
     <script src="//localhost:3001/build/proton.js"></script>
-    <script src="js/color.min.js"></script>
+    <script src="./js/color.min.js"></script>
     <script>
-        var canvas;
-        var context;
-        var proton;
-        var renderer;
-        var emitter;
-        var stats;
-        var colors;
-        var hcolor = 0;
-        
-        var colorBehaviour;
-        var circleBehaviour;
-        var _currentBehaviour;
-        var rouletteBehaviour;
-        var _over = false;
+      var canvas;
+      var context;
+      var proton;
+      var renderer;
+      var emitter;
+      var stats;
+      var colors;
+      var hcolor = 0;
 
-        main();
+      var colorBehaviour;
+      var circleBehaviour;
+      var _currentBehaviour;
+      var rouletteBehaviour;
+      var _over = false;
 
-        function main() {
-            canvas = document.getElementById("testCanvas");
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            context = canvas.getContext('2d');
-            addStats();
+      main();
 
-            customCircleBehaviour();
-            customRouletteBehaviour();
-            createProton();
+      function main() {
+        canvas = document.getElementById("canvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        context = canvas.getContext("2d");
+        addStats();
 
-            tick();
-        }
+        customCircleBehaviour();
+        customRouletteBehaviour();
+        createProton();
 
-        function addStats() {
-            stats = new Stats();
-            stats.setMode(2);
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-            document.getElementById('container').appendChild(stats.domElement);
-        }
+        tick();
+      }
 
-        function createProton() {
-            proton = new Proton;
-            emitter = new Proton.Emitter();
-            emitter.rate = new Proton.Rate(1, .3);
-            emitter.addInitialize(new Proton.Mass(1));
-            emitter.addInitialize(new Proton.Radius(3));
+      function addStats() {
+        stats = new Stats();
+        stats.setMode(2);
+        stats.domElement.style.position = "absolute";
+        stats.domElement.style.left = "0px";
+        stats.domElement.style.top = "0px";
+        document.getElementById("container").appendChild(stats.domElement);
+      }
 
-            emitter.addBehaviour(new Proton.Alpha(1, 0));
-            var color = Color.parse("hsl(" + hcolor + ", 100%, 50%)").hexTriplet();
-            colorBehaviour = new Proton.Color(color);
-            emitter.addBehaviour(colorBehaviour);
-            emitter.addBehaviour(circleBehaviour);
-            _currentBehaviour = circleBehaviour;
+      function createProton() {
+        proton = new Proton();
+        emitter = new Proton.Emitter();
+        emitter.rate = new Proton.Rate(1, 0.3);
+        emitter.addInitialize(new Proton.Mass(1));
+        emitter.addInitialize(new Proton.Radius(3));
 
-            emitter.p.x = canvas.width / 2;
-            emitter.p.y = canvas.height / 2;
-            emitter.emit();
-            proton.addEmitter(emitter);
+        emitter.addBehaviour(new Proton.Alpha(1, 0));
+        var color = Color.parse("hsl(" + hcolor + ", 100%, 50%)").hexTriplet();
+        colorBehaviour = new Proton.Color(color);
+        emitter.addBehaviour(colorBehaviour);
+        emitter.addBehaviour(circleBehaviour);
+        _currentBehaviour = circleBehaviour;
 
-            setInterval(function() {
-                hcolor++;
-                var color = Color.parse("hsl(" + (hcolor % 360) + ", 100%, 50%)").hexTriplet();
-                colorBehaviour.reset(color);
-            }, 100);
+        emitter.p.x = canvas.width / 2;
+        emitter.p.y = canvas.height / 2;
+        emitter.emit();
+        proton.addEmitter(emitter);
 
-            proton.addRenderer(createRender());
+        setInterval(function() {
+          hcolor++;
+          var color = Color.parse(
+            "hsl(" + (hcolor % 360) + ", 100%, 50%)"
+          ).hexTriplet();
+          colorBehaviour.reset(color);
+        }, 100);
 
-            proton.addEmitter(addDot());
-        }
+        proton.addRenderer(createRender());
+        proton.addEmitter(addDot());
+      }
 
-        function addDot() {
-            var emitter = new Proton.Emitter();
-            emitter.rate = new Proton.Rate(new Proton.Span(2, 4), new Proton.Span(.05, .2));
+      function addDot() {
+        var emitter = new Proton.Emitter();
+        emitter.rate = new Proton.Rate(
+          new Proton.Span(2, 4),
+          new Proton.Span(0.05, 0.2)
+        );
 
-            emitter.addInitialize(new Proton.Mass(1));
-            emitter.addInitialize(new Proton.Radius(10, 30));
-            emitter.addInitialize(new Proton.Life(2, 4));
-            emitter.addInitialize(new Proton.Position(new Proton.RectZone(0, 0, canvas.width, canvas.height)));
+        emitter.addInitialize(new Proton.Mass(1));
+        emitter.addInitialize(new Proton.Radius(10, 30));
+        emitter.addInitialize(new Proton.Life(2, 4));
+        emitter.addInitialize(
+          new Proton.Position(
+            new Proton.RectZone(0, 0, canvas.width, canvas.height)
+          )
+        );
 
-            emitter.addBehaviour(new Proton.Alpha(0, .4, Infinity, Proton.easeOutCubic));
-            emitter.addBehaviour(new Proton.Scale(1, 0, Infinity, Proton.easeOutCubic));
-            emitter.addBehaviour(new Proton.Color('random'));
+        emitter.addBehaviour(
+          new Proton.Alpha(0, 0.4, Infinity, Proton.easeOutCubic)
+        );
+        emitter.addBehaviour(
+          new Proton.Scale(1, 0, Infinity, Proton.easeOutCubic)
+        );
+        emitter.addBehaviour(new Proton.Color("random"));
 
-            emitter.emit();
-            return emitter;
-        }
+        emitter.emit();
+        return emitter;
+      }
 
-        function createRender() {
-            var renderer = new Proton.CanvasRenderer(canvas);
-            renderer.onProtonUpdate = function() {
-                context.fillStyle = "rgba(0, 0, 0, 0.03)";
-                context.fillRect(0, 0, canvas.width, canvas.height);
-            };
+      function createRender() {
+        var renderer = new Proton.CanvasRenderer(canvas);
+        renderer.onProtonUpdate = function() {
+          context.fillStyle = "rgba(0, 0, 0, 0.03)";
+          context.fillRect(0, 0, canvas.width, canvas.height);
+        };
 
-            return renderer;
-        }
+        return renderer;
+      }
 
-        function customCircleBehaviour() {
-            circleBehaviour = {
-                dead: false,
-                initialize: function(particle) {
-                    particle.theta = 0;
-                },
+      function customCircleBehaviour() {
+        circleBehaviour = {
+          dead: false,
+          initialize: function(particle) {
+            particle.theta = 0;
+          },
 
-                applyBehaviour: function(particle) {
-                    if (!this.dead) {
-                        particle.theta += Math.PI / 200;
-                        var b = 100;
-                        var a = 62.5;
-                        particle.p.x = emitter.p.x + (a + b) * Math.cos(particle.theta) - b * Math.cos((a / b + 1) * particle.theta)
-                        particle.p.y = emitter.p.y + (a + b) * Math.sin(particle.theta) - b * Math.sin((a / b + 1) * particle.theta)
-                        if (particle.theta > Math.PI * 16 * 3) {
-                            particle.dead = true;
-                            _over = true;
-                            changeBehaviour(rouletteBehaviour);
-                        }
-                    }
-                }
+          applyBehaviour: function(particle) {
+            if (!this.dead) {
+              particle.theta += Math.PI / 200;
+              var b = 100;
+              var a = 62.5;
+              particle.p.x =
+                emitter.p.x +
+                (a + b) * Math.cos(particle.theta) -
+                b * Math.cos((a / b + 1) * particle.theta);
+              particle.p.y =
+                emitter.p.y +
+                (a + b) * Math.sin(particle.theta) -
+                b * Math.sin((a / b + 1) * particle.theta);
+              if (particle.theta > Math.PI * 16 * 3) {
+                particle.dead = true;
+                _over = true;
+                changeBehaviour(rouletteBehaviour);
+              }
             }
-        }
+          }
+        };
+      }
 
-        function customRouletteBehaviour() {
-            rouletteBehaviour = {
-                dead: false,
-                initialize: function(particle) {
-                    particle.theta = 0;
-                },
+      function customRouletteBehaviour() {
+        rouletteBehaviour = {
+          dead: false,
+          initialize: function(particle) {
+            particle.theta = 0;
+          },
 
-                applyBehaviour: function(particle) {
-                    if (!this.dead) {
-                        particle.theta += Math.PI / 150;
-                        var a = 280;
-                        var b = 392;
-                        var c = 124;
-                        particle.p.x = emitter.p.x + (a - b) * Math.cos(particle.theta) + c * Math.cos((a / b - 1) * particle.theta);
-                        particle.p.y = emitter.p.y + (a - b) * Math.sin(particle.theta) - c * Math.sin((a / b - 1) * particle.theta);
-                        if (particle.theta > Math.PI * 14 * 2) {
-                            particle.dead = true;
-                            _over = true;
-                            changeBehaviour(circleBehaviour);
-                        }
-                    }
-                }
+          applyBehaviour: function(particle) {
+            if (!this.dead) {
+              particle.theta += Math.PI / 150;
+              var a = 280;
+              var b = 392;
+              var c = 124;
+              particle.p.x =
+                emitter.p.x +
+                (a - b) * Math.cos(particle.theta) +
+                c * Math.cos((a / b - 1) * particle.theta);
+              particle.p.y =
+                emitter.p.y +
+                (a - b) * Math.sin(particle.theta) -
+                c * Math.sin((a / b - 1) * particle.theta);
+              if (particle.theta > Math.PI * 14 * 2) {
+                particle.dead = true;
+                _over = true;
+                changeBehaviour(circleBehaviour);
+              }
             }
-        }
+          }
+        };
+      }
 
-        function changeBehaviour(be) {
-            if (_over) {
-                emitter.removeAllParticles();
-                emitter.removeBehaviour(_currentBehaviour);
-                emitter.addBehaviour(be);
-                _currentBehaviour = be;
-                _over = false;
-            }
+      function changeBehaviour(be) {
+        if (_over) {
+          emitter.removeAllParticles();
+          emitter.removeBehaviour(_currentBehaviour);
+          emitter.addBehaviour(be);
+          _currentBehaviour = be;
+          _over = false;
         }
+      }
 
-        function tick() {
-            requestAnimationFrame(tick);
+      function tick() {
+        requestAnimationFrame(tick);
 
-            stats.begin();
-            proton.update();
-            stats.end();
-        }
+        stats.begin();
+        proton.update();
+        stats.end();
+      }
     </script>
-</body>
-
+  </body>
 </html>

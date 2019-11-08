@@ -1,7 +1,7 @@
 {
   "name": "proton-engine",
-  "version": "3.3.0",
-  "description": "Proton is an easily customizable html5 particle engine including six different types of renderers.",
+  "version": "4.0.0",
+  "description": "Proton is a simple and powerful javascript particle animation engine.",
   "main": "./build/proton.min.js",
   "scripts": {
     "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 3001\"",
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/a-jie/Proton.git"
   },
   "authors": [
-    "a-jie <a-jie.cn@msn.com>"
+    "anonymous namespace <ajiemath@gmail.com>"
   ],
   "license": "MIT",
   "bugs": {

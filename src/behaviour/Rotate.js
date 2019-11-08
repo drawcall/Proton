@@ -1,3 +1,4 @@
+import Span from "../math/Span";
 import Util from '../utils/Util';
 import Behaviour from './Behaviour';
 
@@ -44,8 +45,8 @@ export default class Rotate extends Behaviour {
 	reset(a, b, style, life, easing) {
 		this.same = b === null || b === undefined ? true : false;
 
-		this.a = Util.setSpanValue(Util.initValue(a, 'Velocity'));
-		this.b = Util.setSpanValue(Util.initValue(b, 0));
+		this.a = Span.setSpanValue(Util.initValue(a, 'Velocity'));
+		this.b = Span.setSpanValue(Util.initValue(b, 0));
 		this.style = Util.initValue(style, 'to');
 
 		life && super.reset(life, easing);
@@ -62,9 +63,9 @@ export default class Rotate extends Behaviour {
 	 */
 	initialize(particle) {
 		particle.rotation = this.a.getValue();
-		particle.transform.rotationA = this.a.getValue();
+		particle.data.rotationA = this.a.getValue();
 
-		if (!this.same) particle.transform.rotationB = this.b.getValue();
+		if (!this.same) particle.data.rotationB = this.b.getValue();
 	};
 
 	/**
@@ -83,9 +84,9 @@ export default class Rotate extends Behaviour {
 
 		if (!this.same) {
 			if (this.style === 'to' || this.style === 'TO' || this.style === '_') {
-				particle.rotation += particle.transform.rotationB + (particle.transform.rotationA - particle.transform.rotationB) * this.energy
+				particle.rotation += particle.data.rotationB + (particle.data.rotationA - particle.data.rotationB) * this.energy
 			} else {
-				particle.rotation += particle.transform.rotationB;
+				particle.rotation += particle.data.rotationB;
 			}
 		} else if (this.a.a === 'V' || this.a.a === 'Velocity' || this.a.a === 'v') {
 			// beta...
