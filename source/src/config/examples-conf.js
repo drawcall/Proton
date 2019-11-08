@@ -1,6 +1,7 @@
 const SPARKS_ARR = [
   {
     thumb: "sun",
+    url: "https://codesandbox.io/s/proton-sun-fwyt8",
     local: "./examples/sparks/sun/sun.html"
   },
   {

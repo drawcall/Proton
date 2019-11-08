@@ -1,6 +1,7 @@
 /package-lock.json
 /node_modules/
 /build/
+/example/
 source/node_modules/
 source/package-lock.json
 source/.DS_Store
