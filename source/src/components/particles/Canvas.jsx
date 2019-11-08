@@ -7,6 +7,7 @@ export default class Canvas extends React.Component {
   constructor(props) {
     super(props);
 
+    this.size = { width: 0, height: 0 };
     this.canvasRef = React.createRef();
   }
 
@@ -15,7 +16,7 @@ export default class Canvas extends React.Component {
       this.initCanvas();
       this.resize = this.resize.bind(this);
       window.addEventListener("resize", this.resize);
-    }, 80);
+    }, 180);
   }
 
   initCanvas() {
@@ -26,7 +27,17 @@ export default class Canvas extends React.Component {
     }
 
     const { width, height } = this.setCanvasSize(canvas);
+    this.resetCanvasSize(canvas);
     this.props.onCanvasInited(canvas, width, height);
+  }
+
+  resetCanvasSize(canvas) {
+    setInterval(() => {
+      const height = this.canvasRef.current.clientHeight;
+      if (height != this.size.height) {
+        this.setCanvasSize(canvas);
+      }
+    }, 1000 / 10);
   }
 
   componentWillUnmount() {
@@ -42,9 +53,11 @@ export default class Canvas extends React.Component {
   setCanvasSize(canvas) {
     const width = this.canvasRef.current.clientWidth;
     const height = this.canvasRef.current.clientHeight;
+    this.size.width = width;
+    this.size.height = height;
     canvas.width = width;
     canvas.height = height;
-    
+
     return { width, height };
   }
 
