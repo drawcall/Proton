@@ -13,3 +13,5 @@ example/
 config.gypi
 CVS
 npm-debug.log
+source/
+source/build/
