@@ -27,11 +27,11 @@ export default class Canvas extends React.Component {
     }
 
     const { width, height } = this.setCanvasSize(canvas);
-    this.resetCanvasSize(canvas);
+    this.heartbeatDetectionCanvasSize(canvas);
     this.props.onCanvasInited(canvas, width, height);
   }
 
-  resetCanvasSize(canvas) {
+  heartbeatDetectionCanvasSize(canvas) {
     setInterval(() => {
       const height = this.canvasRef.current.clientHeight;
       if (height != this.size.height) {
