@@ -93,7 +93,7 @@ emitter.emit(5);
 proton.addEmitter(emitter);
 
 // add canvas renderer
-var renderer = new Proton.CanvasRenderer(canvas);
+const renderer = new Proton.CanvasRenderer(canvas);
 proton.addRenderer(renderer);
 ```
 
