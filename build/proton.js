@@ -690,15 +690,15 @@ var Util = {
   }
 };
 
-var IdsMap = {};
+var idsMap = {};
 
 var Puid = {
   _index: 0,
   _cache: {},
 
   id: function id(type) {
-    if (IdsMap[type] === undefined || IdsMap[type] === null) IdsMap[type] = 0;
-    return type + "_" + IdsMap[type]++;
+    if (idsMap[type] === undefined || idsMap[type] === null) idsMap[type] = 0;
+    return type + "_" + idsMap[type]++;
   },
   getId: function getId(target) {
     var uid = this.getIdFromCache(target);
