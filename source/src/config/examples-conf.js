@@ -1,11 +1,12 @@
 const SPARKS_ARR = [
   {
     thumb: "sun",
-    url: "https://codesandbox.io/s/proton-sun-fwyt8",
+    url: "https://codesandbox.io/s/proton-sun-fwyt8?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.jsx",
     local: "./examples/sparks/sun/sun.html"
   },
   {
     thumb: "fireball",
+    url: "https://rbbce.csb.app/",
     local: "./examples/sparks/sun/fireball.html"
   },
   {

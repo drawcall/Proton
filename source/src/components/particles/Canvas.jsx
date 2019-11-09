@@ -33,9 +33,10 @@ export default class Canvas extends React.Component {
 
   heartbeatDetectionCanvasSize(canvas) {
     setInterval(() => {
-      const height = this.canvasRef.current.clientHeight;
-      if (height != this.size.height) {
-        this.setCanvasSize(canvas);
+      const newHeight = this.canvasRef.current.clientHeight;
+      if (newHeight != this.size.height) {
+        const { width, height } = this.setCanvasSize(canvas);
+        this.props.onResize && this.props.onResize(width, height);
       }
     }, 1000 / 10);
   }
