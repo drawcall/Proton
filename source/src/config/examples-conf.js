@@ -6,7 +6,6 @@ const SPARKS_ARR = [
   },
   {
     thumb: "fireball",
-    url: "https://rbbce.csb.app/",
     local: "./examples/sparks/sun/fireball.html"
   },
   {
