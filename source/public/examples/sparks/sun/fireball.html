@@ -1,117 +1,129 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>sparks-fireball</title>
-    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta charset="utf-8">
+    <meta
+      name="viewport"
+      id="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta charset="utf-8" />
     <style type="text/css">
-        body {
-            font-family: Monospace;
-            background-color: #f0f0f0;
-            margin: 0px;
-            overflow: hidden;
-        }
+      body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        margin: 0px;
+        overflow: hidden;
+      }
 
-        #testCanvas {
-            background: #000000;
-        }
+      #canvas {
+        background: #000000;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <canvas id="testCanvas"></canvas>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script src="../../lib/info.js"></script>
     <script src="../../lib/stats.min.js"></script>
     <script src="../../lib/TweenLite.min.js"></script>
     <script src="../../lib/proton.min.js"></script>
     <script>
-        var canvas;
-        var context;
-        var proton;
-        var renderer;
-        var emitter, position;
-        var stats;
+      var canvas;
+      var context;
+      var proton;
+      var renderer;
+      var emitter, position;
+      var stats;
 
-        main();
+      main();
 
-        function main() {
-            canvas = document.getElementById("testCanvas");
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            canvas.addEventListener('mousedown', mouseDownHandler, false);
+      function main() {
+        canvas = document.getElementById("canvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.addEventListener("mousedown", mouseDownHandler, false);
 
-            addStats();
-            loadImage();
-        }
+        addStats();
+        loadImage();
 
-        function resize() {
-            window.onresize = function () {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+        appendInfo(
+          "https://codesandbox.io/s/proton-fireball-rbbce?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.jsx",
+          "https://github.com/a-jie/Proton/blob/master/example/sparks/sun/fireball.html"
+        );
+      }
 
-                renderer.resize(canvas.width, canvas.height);
-            }
-        }
+      function resize() {
+        window.onresize = function() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
 
-        function addStats() {
-            stats = new Stats();
-            stats.setMode(2);
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-            document.body.appendChild(stats.domElement);
-        }
+          renderer.resize(canvas.width, canvas.height);
+        };
+      }
 
-        function loadImage() {
-            var image = new Image()
-            image.onload = function (e) {
-                createProton(e.target);
-                tick();
-                resize();
-            }
-            image.src = 'image/particle.png';
-        }
+      function addStats() {
+        stats = new Stats();
+        stats.setMode(2);
+        stats.domElement.style.position = "absolute";
+        stats.domElement.style.left = "0px";
+        stats.domElement.style.top = "0px";
+        document.body.appendChild(stats.domElement);
+      }
 
-        function mouseDownHandler(e) {
-            TweenLite.to(position.zone, 1.5, {
-                x: e.offsetX,
-                y: e.offsetY,
-            });
-        }
+      function loadImage() {
+        var image = new Image();
+        image.onload = function(e) {
+          createProton(e.target);
+          tick();
+          resize();
+        };
+        image.src = "image/particle.png";
+      }
 
-        function createProton(image) {
-            proton = new Proton;
-            emitter = new Proton.Emitter();
-            emitter.rate = new Proton.Rate(new Proton.Span(10, 15), .1);
+      function mouseDownHandler(e) {
+        TweenLite.to(position.zone, 1.5, {
+          x: e.offsetX,
+          y: e.offsetY
+        });
+      }
 
-            emitter.addInitialize(new Proton.Mass(1));
-            emitter.addInitialize(new Proton.Body(image));
+      function createProton(image) {
+        proton = new Proton();
+        emitter = new Proton.Emitter();
+        emitter.rate = new Proton.Rate(new Proton.Span(10, 15), 0.1);
 
-            position = new Proton.Position(new Proton.PointZone(canvas.width / 2, canvas.height / 2));
-            emitter.addInitialize(position);
-            emitter.addInitialize(new Proton.Life(1, 1.5));
-            emitter.addInitialize(new Proton.V(new Proton.Span(1, 2), new Proton.Span(0, 360), 'polar'));
+        emitter.addInitialize(new Proton.Mass(1));
+        emitter.addInitialize(new Proton.Body(image));
 
-            emitter.addBehaviour(new Proton.Color('#C97024', '#290000'));
-            emitter.addBehaviour(new Proton.Scale(0, Proton.getSpan(5, 10)));
-            emitter.emit();
+        position = new Proton.Position(
+          new Proton.PointZone(canvas.width / 2, canvas.height / 2)
+        );
+        emitter.addInitialize(position);
+        emitter.addInitialize(new Proton.Life(1, 1.5));
+        emitter.addInitialize(
+          new Proton.V(new Proton.Span(1, 2), new Proton.Span(0, 360), "polar")
+        );
 
-            proton.addEmitter(emitter);
+        emitter.addBehaviour(new Proton.Color("#C97024", "#290000"));
+        emitter.addBehaviour(new Proton.Scale(0, Proton.getSpan(5, 10)));
+        emitter.emit();
 
-            renderer = new Proton.WebGlRenderer(canvas);
-            renderer.blendFunc("SRC_ALPHA", "ONE");
-            proton.addRenderer(renderer);
-        }
+        proton.addEmitter(emitter);
 
-        function tick() {
-            requestAnimationFrame(tick);
+        renderer = new Proton.WebGlRenderer(canvas);
+        renderer.blendFunc("SRC_ALPHA", "ONE");
+        proton.addRenderer(renderer);
+      }
 
-            stats.begin();
-            proton.update();
-            proton.stats.update(2, document.body);
-            stats.end();
-        }
+      function tick() {
+        requestAnimationFrame(tick);
+
+        stats.begin();
+        proton.update();
+        proton.stats.update(2, document.body);
+        stats.end();
+      }
     </script>
-</body>
-
+  </body>
 </html>

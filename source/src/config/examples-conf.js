@@ -14,6 +14,7 @@ const SPARKS_ARR = [
   },
   {
     thumb: "bomb",
+    url: "https://codesandbox.io/s/proton-bomb-iowjm?fontsize=14&hidenavigation=1&view=preview",
     local: "./examples/sparks/bomb/bomb.html"
   },
   {
