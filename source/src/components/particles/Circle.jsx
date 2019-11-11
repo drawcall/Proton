@@ -23,7 +23,11 @@ export default class Circle extends React.Component {
     this.renderProton();
   }
 
-  onResize() {}
+  onResize(width, height) {
+    this.crossZoneBehaviour.zone.width = width;
+    this.crossZoneBehaviour.zone.height = height;
+    this.proton.renderers[0].resize(width, height);
+  }
 
   createProton(canvas, width, height) {
     this.proton = new Proton();
@@ -47,12 +51,11 @@ export default class Circle extends React.Component {
       )
     );
 
-    emitter.addBehaviour(
-      new Proton.CrossZone(
-        new Proton.RectZone(0, 0, canvas.width, canvas.height),
-        "cross"
-      )
+    const crossZoneBehaviour = new Proton.CrossZone(
+      new Proton.RectZone(0, 0, canvas.width, canvas.height),
+      "cross"
     );
+    emitter.addBehaviour(crossZoneBehaviour);
     emitter.addBehaviour(new Proton.Alpha(Proton.getSpan(0.35, 0.55)));
     emitter.addBehaviour(new Proton.Color(this.colors, "random"));
     emitter.addBehaviour(new Proton.RandomDrift(50, 50, 0.5));
@@ -62,6 +65,8 @@ export default class Circle extends React.Component {
 
     const renderer = new Proton.CanvasRenderer(canvas);
     this.proton.addRenderer(renderer);
+
+    this.crossZoneBehaviour = crossZoneBehaviour;
   }
 
   renderProton() {

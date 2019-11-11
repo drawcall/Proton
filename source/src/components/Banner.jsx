@@ -5,10 +5,12 @@ import Rand from "../utils/Rand.js";
 import Ball from "./particles/Ball.jsx";
 import Color from "./particles/Color.jsx";
 import Lines from "./particles/Lines.jsx";
+import Square from "./particles/Square.jsx";
 import Cobweb from "./particles/Cobweb.jsx";
-import Flower from "./particles/Flower.jsx";
 import Circle from "./particles/Circle.jsx";
 import Mlines from "./particles/Mlines.jsx";
+import Tadpole from "./particles/Tadpole.jsx";
+import Polygon from "./particles/Polygon.jsx";
 import Fountain from "./particles/Fountain.jsx";
 
 import macbook from "../assets/images/banner/macbook.png";
@@ -23,10 +25,12 @@ class Banner extends React.Component {
     this.rand.set(0.3, <Color />);
     this.rand.set(0.2, <Ball />);
     this.rand.set(0.2, <Lines />);
+    this.rand.set(0.18, <Tadpole />);
     this.rand.set(0.15, <Mlines />);
     this.rand.set(0.15, <Circle />);
     this.rand.set(0.04, <Cobweb />);
-    this.rand.set(0.08, <Flower />);
+    this.rand.set(0.1, <Polygon />);
+    this.rand.set(0.08, <Square />);
     this.rand.set(0.15, <Fountain />);
   }
 

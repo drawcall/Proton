@@ -1,7 +1,8 @@
 const SPARKS_ARR = [
   {
     thumb: "sun",
-    url: "https://codesandbox.io/s/proton-sun-fwyt8?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.jsx",
+    url:
+      "https://codesandbox.io/s/proton-sun-fwyt8?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.jsx",
     local: "./examples/sparks/sun/sun.html"
   },
   {
@@ -14,7 +15,8 @@ const SPARKS_ARR = [
   },
   {
     thumb: "bomb",
-    url: "https://codesandbox.io/s/proton-bomb-iowjm?fontsize=14&hidenavigation=1&view=preview",
+    url:
+      "https://codesandbox.io/s/proton-bomb-iowjm?fontsize=14&hidenavigation=1&view=preview",
     local: "./examples/sparks/bomb/bomb.html"
   },
   {
@@ -41,6 +43,11 @@ const BEHAVIOUR_ARR = [
     local: "./examples/behaviour/attraction/attraction2.html"
   },
   {
+    thumb: "tadpole",
+    url:
+      "https://codesandbox.io/s/proton-tadpole-yt6qu?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.vue"
+  },
+  {
     thumb: "collision",
     local: "./examples/behaviour/collision/collision.html"
   },
@@ -62,11 +69,11 @@ const BEHAVIOUR_ARR = [
   },
   {
     thumb: "randomdirft3",
-    local: "./examples/behaviour/randomDirft/randomdirft3.html"
+    url: "https://codesandbox.io/s/proton-randomdirft3-syk9b?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.vue"
   },
   {
     thumb: "rotate",
-    local: "./examples/behaviour/rotate/rotate.html"
+    local: "./examples/behaviour/rotate/rotate.html",
   },
   {
     thumb: "fireflies",

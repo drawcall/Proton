@@ -17,6 +17,9 @@ export default class Canvas extends React.Component {
       this.resize = this.resize.bind(this);
       window.addEventListener("resize", this.resize);
     }, 180);
+
+    const canvas = this.canvasRef.current;
+    this.props.onCanvasDidMount && this.props.onCanvasDidMount(canvas);
   }
 
   initCanvas() {

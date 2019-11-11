@@ -18,7 +18,7 @@ const COLORS = {
 
 const getUrl = conf => {
   if (ppo.isMobile()) {
-    return conf.local;
+    return conf.local || conf.url;
   }
 
   return conf.url || conf.local;
