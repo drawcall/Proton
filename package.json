@@ -1,7 +1,14 @@
 {
   "name": "proton-engine",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Proton is a simple and powerful javascript particle animation engine.",
+  "keywords": [
+    "particle",
+    "particles",
+    "canvas",
+    "canvas-particle",
+    "webgl"
+  ],
   "main": "./build/proton.min.js",
   "scripts": {
     "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 3001\"",
@@ -11,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/a-jie/Proton.git"
+    "url": "https://github.com/a-jie/Proton.git"
   },
   "authors": [
     "anonymous namespace <ajiemath@gmail.com>"
