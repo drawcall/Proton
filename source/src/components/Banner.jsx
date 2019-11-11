@@ -25,12 +25,12 @@ class Banner extends React.Component {
     this.rand.set(0.3, <Color />);
     this.rand.set(0.2, <Ball />);
     this.rand.set(0.2, <Lines />);
-    this.rand.set(0.18, <Tadpole />);
     this.rand.set(0.15, <Mlines />);
     this.rand.set(0.15, <Circle />);
     this.rand.set(0.04, <Cobweb />);
     this.rand.set(0.1, <Polygon />);
     this.rand.set(0.08, <Square />);
+    this.rand.set(0.18, <Tadpole />);
     this.rand.set(0.15, <Fountain />);
   }
 
@@ -44,7 +44,6 @@ class Banner extends React.Component {
 
   isNarrow() {
     const width = document.getElementById("root").offsetWidth;
-
     if (width < 760 || ppo.isMobile()) return true;
     else return false;
   }
