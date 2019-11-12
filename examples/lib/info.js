@@ -24,23 +24,23 @@
     return span;
   }
 
-  function createSourceLink(url) {
+  function createSourceLink(url, style) {
     var link = document.createElement("a");
-    link.style.color = "#999";
+    link.style.color = style || "#999";
     link.target = "_blank";
     link.href = url;
     link.innerText = substrUrl(url);
     return link;
   }
 
-  function createEs5Link(url) {
+  function createEs5Link(url, style) {
     var icon = document.createElement("div");
     icon.style.marginLeft = "8px";
     icon.style.padding = "0 6px";
     icon.style.fontSize = "10px";
     icon.style.cursor = "pointer";
     icon.style.display = "inline-block";
-    icon.style.backgroundColor = "#1e90ff";
+    icon.style.backgroundColor = style || "#1e90ff";
 
     var link = document.createElement("a");
     link.style.color = "#000";
@@ -78,13 +78,14 @@
     }
   }
 
-  window.appendInfo = function(source, es5) {
+  window.appendInfo = function(source, es5, conf) {
     if (isMobile() || isMiniScreen()) return;
 
+    conf = conf || {};
     var con = createCon();
     var text = createText("Online code editing is here ");
-    var sourceLink = createSourceLink(source);
-    var es5Link = createEs5Link(es5);
+    var sourceLink = createSourceLink(source, conf.source);
+    var es5Link = createEs5Link(es5, conf.es5);
 
     con.appendChild(text);
     con.appendChild(sourceLink);
