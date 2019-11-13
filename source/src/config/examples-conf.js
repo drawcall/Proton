@@ -20,8 +20,8 @@ const SPARKS_ARR = [
     local: "./examples/sparks/bomb/bomb.html"
   },
   {
-    thumb: "drugs",
-    local: "./examples/sparks/drugs/drugs.html"
+    thumb: "fire-dragon",
+    url: "https://codesandbox.io/s/proton-fire-dragon-k6ozi"
   },
   {
     thumb: "fireworks",
@@ -30,6 +30,10 @@ const SPARKS_ARR = [
   {
     thumb: "bigfire",
     local: "./examples/sparks/bigfire/bigfire.html"
+  },
+  {
+    thumb: "drugs",
+    local: "./examples/sparks/drugs/drugs.html"
   }
 ];
 
@@ -69,11 +73,12 @@ const BEHAVIOUR_ARR = [
   },
   {
     thumb: "randomdirft3",
-    url: "https://codesandbox.io/s/proton-randomdirft3-syk9b?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.vue"
+    url:
+      "https://codesandbox.io/s/proton-randomdirft3-syk9b?fontsize=14&module=%2Fsrc%2Fcomponents%2FParticles.vue"
   },
   {
     thumb: "rotate",
-    local: "./examples/behaviour/rotate/rotate.html",
+    local: "./examples/behaviour/rotate/rotate.html"
   },
   {
     thumb: "fireflies",
@@ -121,6 +126,11 @@ const GAME_ARR = [
   {
     thumb: "quarkjs",
     local: "./examples/game/quarkjs/squirrel.html"
+  },
+  {
+    thumb: "threejs",
+    url:
+      "https://a-jie.github.io/three.proton/"
   }
 ];
 
