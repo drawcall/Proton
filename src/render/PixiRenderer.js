@@ -2,6 +2,7 @@ import ColorUtil from "../utils/ColorUtil";
 import MathUtil from "../math/MathUtil";
 import BaseRenderer from "./BaseRenderer";
 
+let PIXIClass;
 export default class PixiRenderer extends BaseRenderer {
   constructor(element, stroke) {
     super(element);
@@ -9,9 +10,17 @@ export default class PixiRenderer extends BaseRenderer {
     this.stroke = stroke;
     this.setColor = false;
     this.pool.create = (body, particle) => this.createBody(body, particle);
-    this.createFromImage = PIXI.Sprite.from || PIXI.Sprite.fromImage;
+    this.setPIXI(window.PIXI);
 
     this.name = "PixiRenderer";
+  }
+
+  setPIXI(PIXI) {
+    try {
+      PIXIClass = PIXI || { Sprite: {} };
+      this.createFromImage =
+        PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
+    } catch (e) {}
   }
 
   onProtonUpdate() {}
@@ -81,7 +90,7 @@ export default class PixiRenderer extends BaseRenderer {
   createSprite(body) {
     const sprite = body.isInner
       ? this.createFromImage(body.src)
-      : new PIXI.Sprite(body);
+      : new PIXIClass.Sprite(body);
 
     sprite.anchor.x = 0.5;
     sprite.anchor.y = 0.5;
@@ -90,7 +99,7 @@ export default class PixiRenderer extends BaseRenderer {
   }
 
   createCircle(particle) {
-    const graphics = new PIXI.Graphics();
+    const graphics = new PIXIClass.Graphics();
 
     if (this.stroke) {
       const stroke = this.stroke instanceof String ? this.stroke : 0x000000;

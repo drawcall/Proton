@@ -4745,6 +4745,8 @@ var PixelRenderer = function (_BaseRenderer) {
   return PixelRenderer;
 }(BaseRenderer);
 
+var PIXIClass = void 0;
+
 var PixiRenderer = function (_BaseRenderer) {
   inherits(PixiRenderer, _BaseRenderer);
 
@@ -4758,13 +4760,21 @@ var PixiRenderer = function (_BaseRenderer) {
     _this.pool.create = function (body, particle) {
       return _this.createBody(body, particle);
     };
-    _this.createFromImage = PIXI.Sprite.from || PIXI.Sprite.fromImage;
+    _this.setPIXI(window.PIXI);
 
     _this.name = "PixiRenderer";
     return _this;
   }
 
   createClass(PixiRenderer, [{
+    key: "setPIXI",
+    value: function setPIXI(PIXI) {
+      try {
+        PIXIClass = PIXI || { Sprite: {} };
+        this.createFromImage = PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
+      } catch (e) {}
+    }
+  }, {
     key: "onProtonUpdate",
     value: function onProtonUpdate() {}
 
@@ -4842,7 +4852,7 @@ var PixiRenderer = function (_BaseRenderer) {
   }, {
     key: "createSprite",
     value: function createSprite(body) {
-      var sprite = body.isInner ? this.createFromImage(body.src) : new PIXI.Sprite(body);
+      var sprite = body.isInner ? this.createFromImage(body.src) : new PIXIClass.Sprite(body);
 
       sprite.anchor.x = 0.5;
       sprite.anchor.y = 0.5;
@@ -4852,7 +4862,7 @@ var PixiRenderer = function (_BaseRenderer) {
   }, {
     key: "createCircle",
     value: function createCircle(particle) {
-      var graphics = new PIXI.Graphics();
+      var graphics = new PIXIClass.Graphics();
 
       if (this.stroke) {
         var stroke = this.stroke instanceof String ? this.stroke : 0x000000;

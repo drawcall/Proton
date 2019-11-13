@@ -12,7 +12,7 @@
   </a>
 
   <a href='#'>
-    <img src='https://img.shields.io/npm/l/Proton.svg' alt='license:MIT' height='18'>
+    <img src='https://img.shields.io/npm/l/proton-engine.svg' alt='license:MIT' height='18'>
   </a>
 
 </div>
