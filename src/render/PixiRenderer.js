@@ -8,7 +8,9 @@ export default class PixiRenderer extends BaseRenderer {
     super(element);
 
     this.stroke = stroke;
+    this.color = false;
     this.setColor = false;
+    this.blendMode = null;
     this.pool.create = (body, particle) => this.createBody(body, particle);
     this.setPIXI(window.PIXI);
 
@@ -35,6 +37,10 @@ export default class PixiRenderer extends BaseRenderer {
       particle.body = this.pool.get(this.circleConf, particle);
     }
 
+    if (this.blendMode) {
+      particle.body.blendMode = this.blendMode;
+    }
+
     this.element.addChild(particle.body);
   }
 
@@ -43,8 +49,10 @@ export default class PixiRenderer extends BaseRenderer {
    */
   onParticleUpdate(particle) {
     this.transform(particle, particle.body);
-    if (this.setColor)
+
+    if (this.setColor === true || this.color === true) {
       particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+    }
   }
 
   /**

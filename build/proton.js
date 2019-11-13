@@ -4756,7 +4756,9 @@ var PixiRenderer = function (_BaseRenderer) {
     var _this = possibleConstructorReturn(this, (PixiRenderer.__proto__ || Object.getPrototypeOf(PixiRenderer)).call(this, element));
 
     _this.stroke = stroke;
+    _this.color = false;
     _this.setColor = false;
+    _this.blendMode = null;
     _this.pool.create = function (body, particle) {
       return _this.createBody(body, particle);
     };
@@ -4791,6 +4793,10 @@ var PixiRenderer = function (_BaseRenderer) {
         particle.body = this.pool.get(this.circleConf, particle);
       }
 
+      if (this.blendMode) {
+        particle.body.blendMode = this.blendMode;
+      }
+
       this.element.addChild(particle.body);
     }
 
@@ -4802,7 +4808,10 @@ var PixiRenderer = function (_BaseRenderer) {
     key: "onParticleUpdate",
     value: function onParticleUpdate(particle) {
       this.transform(particle, particle.body);
-      if (this.setColor) particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+
+      if (this.setColor === true || this.color === true) {
+        particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+      }
     }
 
     /**
