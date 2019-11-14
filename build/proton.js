@@ -3499,6 +3499,132 @@ var Color = function (_Behaviour) {
   return Color;
 }(Behaviour);
 
+var CHANGING = "changing";
+
+var Cyclone = function (_Behaviour) {
+  inherits(Cyclone, _Behaviour);
+
+  /**
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.Cyclone
+   *
+   * @param {Number} fx
+   * @param {Number} fy
+   * @param {Number} [life=Infinity] 			this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Cyclone(angle, force, life, easing) {
+    classCallCheck(this, Cyclone);
+
+    var _this = possibleConstructorReturn(this, (Cyclone.__proto__ || Object.getPrototypeOf(Cyclone)).call(this, life, easing));
+
+    _this.setAngleAndForce(angle, force);
+    _this.name = "Cyclone";
+    return _this;
+  }
+
+  createClass(Cyclone, [{
+    key: "setAngleAndForce",
+    value: function setAngleAndForce(angle, force) {
+      this.force = CHANGING;
+      this.angle = MathUtil.PI / 2;
+
+      if (angle === "right") {
+        this.angle = MathUtil.PI / 2;
+      } else if (angle === "left") {
+        this.angle = -MathUtil.PI / 2;
+      } else if (angle === "random") {
+        this.angle = "random";
+      } else if (angle instanceof Span) {
+        this.angle = "span";
+        this.span = angle;
+      } else if (angle) {
+        this.angle = angle;
+      }
+
+      if (String(force).toLowerCase() === "changing" || String(force).toLowerCase() === "chang" || String(force).toLowerCase() === "auto") {
+        this.force = CHANGING;
+      } else if (force) {
+        this.force = force;
+      }
+    }
+
+    /**
+     * Reset this behaviour's parameters
+     *
+     * @method reset
+     * @memberof Proton#Proton.Cyclone
+     * @instance
+     *
+     * @param {Number} fx
+     * @param {Number} fy
+     * @param {Number} [life=Infinity] 			this behaviour's life
+     * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+     */
+
+  }, {
+    key: "reset",
+    value: function reset(angle, force, life, easing) {
+      this.angle = MathUtil.PI / 2;
+      this.setAngleAndForce(angle, force);
+      life && get(Cyclone.prototype.__proto__ || Object.getPrototypeOf(Cyclone.prototype), "reset", this).call(this, life, easing);
+    }
+  }, {
+    key: "initialize",
+    value: function initialize(particle) {
+      if (this.angle === "random") {
+        particle.data.cangle = MathUtil.randomAToB(-MathUtil.PI, MathUtil.PI);
+      } else if (this.angle === "span") {
+        particle.data.cangle = this.span.getValue();
+      }
+
+      particle.data.cyclone = new Vector2D(0, 0);
+    }
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton#Proton.Cyclone
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} the integrate time 1/ms
+     * @param {Int} the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.calculate(particle, time, index);
+
+      var length = void 0;
+      var gradient = particle.v.getGradient();
+      if (this.angle === "random" || this.angle === "span") {
+        gradient += particle.data.cangle;
+      } else {
+        gradient += this.angle;
+      }
+
+      if (this.force === CHANGING) {
+        length = particle.v.length() / 100;
+      } else {
+        length = this.force;
+      }
+
+      particle.data.cyclone.x = length * Math.cos(gradient);
+      particle.data.cyclone.y = length * Math.sin(gradient);
+      particle.data.cyclone = this.normalizeForce(particle.data.cyclone);
+      particle.a.add(particle.data.cyclone);
+    }
+  }]);
+  return Cyclone;
+}(Behaviour);
+
 var Repulsion = function (_Attraction) {
 	inherits(Repulsion, _Attraction);
 
@@ -4099,7 +4225,9 @@ var BehaviourEmitter = function (_Emitter) {
           length = rest.length;
 
       for (i = 0; i < length; i++) {
-        this.selfBehaviours.push(rest[i]);
+        var behaviour = rest[i];
+        this.selfBehaviours.push(behaviour);
+        behaviour.initialize(this);
       }
     }
 
@@ -5651,7 +5779,6 @@ var Debug = {
   }
 };
 
-// namespace
 Proton.Particle = Proton.P = Particle;
 Proton.Pool = Pool;
 
@@ -5691,6 +5818,7 @@ Proton.Scale = Proton.S = Scale;
 Proton.Rotate = Rotate;
 Proton.Color = Color;
 Proton.Repulsion = Repulsion;
+Proton.Cyclone = Cyclone;
 Proton.GravityWell = GravityWell;
 
 Proton.Emitter = Emitter;
@@ -5715,6 +5843,8 @@ Proton.CustomRenderer = CustomRenderer;
 Proton.Debug = Debug;
 
 Object.assign(Proton, ease);
+
+// export
 
 return Proton;
 

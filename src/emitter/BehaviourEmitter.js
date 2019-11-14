@@ -27,7 +27,9 @@ export default class BehaviourEmitter extends Emitter {
       length = rest.length;
 
     for (i = 0; i < length; i++) {
-      this.selfBehaviours.push(rest[i]);
+      let behaviour = rest[i];
+      this.selfBehaviours.push(behaviour);
+      behaviour.initialize(this);
     }
   }
 

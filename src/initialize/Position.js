@@ -15,7 +15,7 @@ export default class Position extends Initialize {
 
   initialize(target) {
     this.zone.getPosition();
-	
+
     target.p.x = this.zone.vector.x;
     target.p.y = this.zone.vector.y;
   }

@@ -3,7 +3,6 @@ import CircleZone from "../zone/CircleZone";
 import PointZone from "../zone/PointZone";
 import LineZone from "../zone/LineZone";
 import RectZone from "../zone/RectZone";
-import MathUtil from "../math/MathUtil";
 
 export default {
   addEventListener(proton, func) {

@@ -1,5 +1,4 @@
 import Pool from "../core/Pool";
-import Util from "../utils/Util";
 
 export default class BaseRenderer {
     constructor(element, stroke) {

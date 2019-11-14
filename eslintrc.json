@@ -146,7 +146,7 @@
     "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
     "padded-blocks": 0,
     "prefer-promise-reject-errors": "error",
-    "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+    "quotes": 0,
     "rest-spread-spacing": ["error", "never"],
     "semi": 0,
     "semi-spacing": ["error", { "before": false, "after": true }],
