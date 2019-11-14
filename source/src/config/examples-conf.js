@@ -192,7 +192,7 @@ const EMITTER_ARR = [
   },
   {
     thumb: "spitfire",
-    local: "./examples/initialize/imagetarget/spitfire.html"
+    local: "./examples/initialize/imagetarget/spitfires.html"
   },
   {
     thumb: "imagetarget",
