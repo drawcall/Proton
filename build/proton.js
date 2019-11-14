@@ -3510,8 +3510,8 @@ var Cyclone = function (_Behaviour) {
    * @constructor
    * @alias Proton.Cyclone
    *
-   * @param {Number} fx
-   * @param {Number} fy
+   * @param {Number} angle
+   * @param {Number} force
    * @param {Number} [life=Infinity] 			this behaviour's life
    * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
    *
@@ -3560,8 +3560,8 @@ var Cyclone = function (_Behaviour) {
      * @memberof Proton#Proton.Cyclone
      * @instance
      *
-     * @param {Number} fx
-     * @param {Number} fy
+     * @param {Number} angle
+     * @param {Number} force
      * @param {Number} [life=Infinity] 			this behaviour's life
      * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
      */

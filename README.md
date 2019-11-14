@@ -104,7 +104,9 @@ proton.addRenderer(renderer);
 
 * Use `Proton.Body` and `Proton.Color` at the same time. I suggest you'd better use the `WebGLRenderer` not `CanvasRenderer`.
 
-* Use Euler integration calculation is more accurate (default false) `Proton.USE_CLOCK = false or true;`
+* Added `Cyclone` behavior, you can make vortex effects with Cyclone. Demo please check [here](https://codesandbox.io/s/proton-cyclone-yvibu).
+
+* Use Euler integration calculation is more accurate (default false) `Proton.USE_CLOCK = false or true;`.
 
 Proton has now been upgraded to the __v4__ version. Performance has been greatly improved and api also has some improvements. For more details, please check [here](https://github.com/a-jie/Proton/releases).
 
