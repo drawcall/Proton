@@ -98,7 +98,7 @@ proton.addRenderer(renderer);
 ```
 
 ## Remarks
-* `Proton.Span (or Proton.getSpan)` is a very important concept of the Proton engine, it's everywhere. If you understand its usage, you can create almost any desired effect! 
+* `Proton.Span` (or `Proton.getSpan`) is a very important concept of the Proton engine, it's everywhere. If you understand its usage, you can create almost any desired effect! 
 
 * If you want to create wind, rain, or snow, etc, you can use the `emitter.preEmit` method to pre-render the scene.
 
