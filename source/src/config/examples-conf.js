@@ -93,8 +93,8 @@ const BEHAVIOUR_ARR = [
     local: "./examples/behaviour/color/color.html"
   },
   {
-    thumb: "linebug",
-    local: "./examples/behaviour/gravitywell/linebug.html"
+    thumb: "cyclone",
+    url: "https://codesandbox.io/s/proton-cyclone-rzweu?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fcomponents%2FParticles.vue&theme=dark"
   }
 ];
 
