@@ -191,12 +191,13 @@ const EMITTER_ARR = [
     local: "./examples/emitter/followEmitter/mouseDown.html"
   },
   {
-    thumb: "spitfire",
+    thumb: "behaviour-emitter",
+    url: "https://codesandbox.io/s/proton-behaviour-emitter-5nief",
     local: "./examples/initialize/imagetarget/spitfires.html"
   },
-  {
-    thumb: "imagetarget",
-    local: "./examples/initialize/imagetarget/imagetarget.html"
+  { 
+    thumb: "custom-emitter",
+    url: "https://codesandbox.io/s/proton-customemitter-dyom0"
   },
   {
     thumb: "rock",
