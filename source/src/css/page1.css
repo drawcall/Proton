@@ -1,0 +1,8 @@
+.features {
+}
+
+@media screen and (max-width: 768px) {
+  .features {
+    padding: 1.5rem !important;
+  }
+}

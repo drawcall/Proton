@@ -36,8 +36,8 @@ const getItemsList = () => {
         key={keys.toLowerCase()}
         className={
           index === 1
-            ? "column is-12 examples-list first-list"
-            : "column is-12 examples-list"
+            ? "column is-12 thumb-list first-list"
+            : "column is-12 thumb-list"
         }
       >
         <Title size="2">{`< ${keys} >`}</Title>

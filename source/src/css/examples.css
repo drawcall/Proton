@@ -1,7 +1,13 @@
-.examples-list {
+.thumb-list {
   margin: 6px 0 10px 0 !important;
 }
 
-.first-list{
+@media screen and (max-width: 768px) {
+  .thumb-list {
+    padding: 2rem !important;
+  }
+}
+
+.first-list {
   margin: -20px 0 10px 0 !important;
 }
