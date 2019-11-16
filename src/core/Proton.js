@@ -2,24 +2,29 @@ import Pool from "./Pool";
 import Util from "../utils/Util";
 import Stats from "../debug/Stats";
 import EventDispatcher from "../events/EventDispatcher";
+import MathUtil from "../math/MathUtil";
 import Integration from "../math/Integration";
 
 export default class Proton {
   static USE_CLOCK = false;
 
-  // 1:100
+  // measure 1:100
   static MEASURE = 100;
   static EULER = "euler";
   static RK2 = "runge-kutta2";
 
+  // event name
   static PARTICLE_CREATED = "PARTICLE_CREATED";
   static PARTICLE_UPDATE = "PARTICLE_UPDATE";
   static PARTICLE_SLEEP = "PARTICLE_SLEEP";
   static PARTICLE_DEAD = "PARTICLE_DEAD";
-  static PROTON_UPDATE = "PROTON_UPDATE";
-  static PROTON_UPDATE_AFTER = "PROTON_UPDATE_AFTER";
+
   static EMITTER_ADDED = "EMITTER_ADDED";
   static EMITTER_REMOVED = "EMITTER_REMOVED";
+
+  static PROTON_UPDATE = "PROTON_UPDATE";
+  static PROTON_UPDATE_AFTER = "PROTON_UPDATE_AFTER";
+  static DEFAULT_INTERVAL = 0.0167;
 
   static amendChangeTabsBug = true;
 
@@ -45,7 +50,8 @@ export default class Proton {
     this.renderers = [];
 
     this.time = 0;
-    this.oldTime = 0;
+    this.now = 0;
+    this.then = 0;
     this.elapsed = 0;
 
     this.stats = new Stats(this);
@@ -53,6 +59,19 @@ export default class Proton {
 
     this.integrationType = Util.initValue(integrationType, Proton.EULER);
     this.integrator = new Integration(this.integrationType);
+
+    this._fps = "auto";
+    this._interval = Proton.DEFAULT_INTERVAL;
+  }
+
+  set fps(fps) {
+    this._fps = fps;
+    this._interval =
+      fps === "auto" ? Proton.DEFAULT_INTERVAL : MathUtil.floor(1 / fps, 7);
+  }
+
+  get fps() {
+    return this._fps;
   }
 
   /**
@@ -122,24 +141,40 @@ export default class Proton {
    * @instance
    */
   update() {
-    this.dispatchEvent(Proton.PROTON_UPDATE);
+    // 'auto' is the default browser refresh rate, the vast majority is 60fps
+    if (this._fps === "auto") {
+      this.dispatchEvent(Proton.PROTON_UPDATE);
 
-    if (Proton.USE_CLOCK) {
-      if (!this.oldTime) this.oldTime = new Date().getTime();
+      if (Proton.USE_CLOCK) {
+        if (!this.then) this.then = new Date().getTime();
+        this.now = new Date().getTime();
+        this.elapsed = (this.now - this.then) * 0.001;
+        // Fix bugs such as chrome browser switching tabs causing excessive time difference
+        this.amendChangeTabsBug();
 
-      let time = new Date().getTime();
-      this.elapsed = (time - this.oldTime) / 1000;
-      Proton.amendChangeTabsBug && this.amendChangeTabsBug();
+        if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+        this.then = this.now;
+      } else {
+        this.emittersUpdate(Proton.DEFAULT_INTERVAL);
+      }
 
-      this.oldTime = time;
-    } else {
-      this.elapsed = 0.0167;
+      this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
     }
 
-    // emitter update
-    if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+    // If the fps frame rate is set
+    else {
+      if (!this.then) this.then = new Date().getTime();
+      this.now = new Date().getTime();
+      this.elapsed = (this.now - this.then) * 0.001;
 
-    this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+      if (this.elapsed > this._interval) {
+        this.dispatchEvent(Proton.PROTON_UPDATE);
+        this.emittersUpdate(this._interval);
+        // https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe
+        this.then = this.now - (this.elapsed % this._interval) * 1000;
+        this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+      }
+    }
   }
 
   emittersUpdate(elapsed) {
@@ -155,8 +190,9 @@ export default class Proton {
    * @instance
    */
   amendChangeTabsBug() {
+    if (!Proton.amendChangeTabsBug) return;
     if (this.elapsed > 0.5) {
-      this.oldTime = new Date().getTime();
+      this.then = new Date().getTime();
       this.elapsed = 0;
     }
   }
@@ -198,7 +234,7 @@ export default class Proton {
   destroy(remove = false) {
     const destroyOther = () => {
       this.time = 0;
-      this.oldTime = 0;
+      this.then = 0;
       this.pool.destroy();
 
       Util.destroyAll(this.emitters);

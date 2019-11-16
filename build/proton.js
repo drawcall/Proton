@@ -8,34 +8,40 @@ var PI = 3.1415926;
 var INFINITY = Infinity;
 
 var MathUtil = {
-    PI: PI,
-    PIx2: PI * 2,
-    PI_2: PI / 2,
-    PI_180: PI / 180,
-    N180_PI: 180 / PI,
-    Infinity: -999,
+  PI: PI,
+  PIx2: PI * 2,
+  PI_2: PI / 2,
+  PI_180: PI / 180,
+  N180_PI: 180 / PI,
+  Infinity: -999,
 
-    isInfinity: function isInfinity(num) {
-        return num === this.Infinity || num === INFINITY;
-    },
-    randomAToB: function randomAToB(a, b) {
-        var isInt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  isInfinity: function isInfinity(num) {
+    return num === this.Infinity || num === INFINITY;
+  },
+  randomAToB: function randomAToB(a, b) {
+    var isInt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-        if (!isInt) return a + Math.random() * (b - a);else return Math.floor(Math.random() * (b - a)) + a;
-    },
-    randomFloating: function randomFloating(center, f, isInt) {
-        return this.randomAToB(center - f, center + f, isInt);
-    },
-    randomZone: function randomZone(display) {},
-    degreeTransform: function degreeTransform(a) {
-        return a * PI / 180;
-    },
-    toColor16: function toColor16(num) {
-        return "#" + num.toString(16);
-    },
-    randomColor: function randomColor() {
-        return "#" + ("00000" + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
-    }
+    if (!isInt) return a + Math.random() * (b - a);else return Math.floor(Math.random() * (b - a)) + a;
+  },
+  randomFloating: function randomFloating(center, f, isInt) {
+    return this.randomAToB(center - f, center + f, isInt);
+  },
+  randomColor: function randomColor() {
+    return "#" + ("00000" + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
+  },
+  randomZone: function randomZone(display) {},
+  floor: function floor(num) {
+    var k = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4;
+
+    var digits = Math.pow(10, k);
+    return Math.floor(num * digits) / digits;
+  },
+  degreeTransform: function degreeTransform(a) {
+    return a * PI / 180;
+  },
+  toColor16: function toColor16(num) {
+    return "#" + num.toString(16);
+  }
 };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -1183,7 +1189,7 @@ var Proton = function () {
    */
 
 
-  // 1:100
+  // event name
   function Proton(integrationType) {
     classCallCheck(this, Proton);
 
@@ -1191,7 +1197,8 @@ var Proton = function () {
     this.renderers = [];
 
     this.time = 0;
-    this.oldTime = 0;
+    this.now = 0;
+    this.then = 0;
     this.elapsed = 0;
 
     this.stats = new Stats(this);
@@ -1199,21 +1206,27 @@ var Proton = function () {
 
     this.integrationType = Util.initValue(integrationType, Proton.EULER);
     this.integrator = new Integration(this.integrationType);
+
+    this._fps = "auto";
+    this._interval = Proton.DEFAULT_INTERVAL;
   }
 
-  /**
-   * add a type of Renderer
-   *
-   * @method addRenderer
-   * @memberof Proton
-   * @instance
-   *
-   * @param {Renderer} render
-   */
+  // measure 1:100
 
 
   createClass(Proton, [{
     key: "addRenderer",
+
+
+    /**
+     * add a type of Renderer
+     *
+     * @method addRenderer
+     * @memberof Proton
+     * @instance
+     *
+     * @param {Renderer} render
+     */
     value: function addRenderer(render) {
       render.init(this);
       this.renderers.push(render);
@@ -1284,24 +1297,40 @@ var Proton = function () {
   }, {
     key: "update",
     value: function update() {
-      this.dispatchEvent(Proton.PROTON_UPDATE);
+      // 'auto' is the default browser refresh rate, the vast majority is 60fps
+      if (this._fps === "auto") {
+        this.dispatchEvent(Proton.PROTON_UPDATE);
 
-      if (Proton.USE_CLOCK) {
-        if (!this.oldTime) this.oldTime = new Date().getTime();
+        if (Proton.USE_CLOCK) {
+          if (!this.then) this.then = new Date().getTime();
+          this.now = new Date().getTime();
+          this.elapsed = (this.now - this.then) * 0.001;
+          // Fix bugs such as chrome browser switching tabs causing excessive time difference
+          this.amendChangeTabsBug();
 
-        var time = new Date().getTime();
-        this.elapsed = (time - this.oldTime) / 1000;
-        Proton.amendChangeTabsBug && this.amendChangeTabsBug();
+          if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+          this.then = this.now;
+        } else {
+          this.emittersUpdate(Proton.DEFAULT_INTERVAL);
+        }
 
-        this.oldTime = time;
-      } else {
-        this.elapsed = 0.0167;
+        this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
       }
 
-      // emitter update
-      if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+      // If the fps frame rate is set
+      else {
+          if (!this.then) this.then = new Date().getTime();
+          this.now = new Date().getTime();
+          this.elapsed = (this.now - this.then) * 0.001;
 
-      this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+          if (this.elapsed > this._interval) {
+            this.dispatchEvent(Proton.PROTON_UPDATE);
+            this.emittersUpdate(this._interval);
+            // https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe
+            this.then = this.now - this.elapsed % this._interval * 1000;
+            this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+          }
+        }
     }
   }, {
     key: "emittersUpdate",
@@ -1323,8 +1352,9 @@ var Proton = function () {
   }, {
     key: "amendChangeTabsBug",
     value: function amendChangeTabsBug() {
+      if (!Proton.amendChangeTabsBug) return;
       if (this.elapsed > 0.5) {
-        this.oldTime = new Date().getTime();
+        this.then = new Date().getTime();
         this.elapsed = 0;
       }
     }
@@ -1380,7 +1410,7 @@ var Proton = function () {
 
       var destroyOther = function destroyOther() {
         _this.time = 0;
-        _this.oldTime = 0;
+        _this.then = 0;
         _this.pool.destroy();
 
         Util.destroyAll(_this.emitters);
@@ -1392,6 +1422,15 @@ var Proton = function () {
       } else {
         destroyOther();
       }
+    }
+  }, {
+    key: "fps",
+    set: function set$$1(fps) {
+      this._fps = fps;
+      this._interval = fps === "auto" ? Proton.DEFAULT_INTERVAL : MathUtil.floor(1 / fps, 7);
+    },
+    get: function get$$1() {
+      return this._fps;
     }
   }]);
   return Proton;
@@ -1405,10 +1444,11 @@ Proton.PARTICLE_CREATED = "PARTICLE_CREATED";
 Proton.PARTICLE_UPDATE = "PARTICLE_UPDATE";
 Proton.PARTICLE_SLEEP = "PARTICLE_SLEEP";
 Proton.PARTICLE_DEAD = "PARTICLE_DEAD";
-Proton.PROTON_UPDATE = "PROTON_UPDATE";
-Proton.PROTON_UPDATE_AFTER = "PROTON_UPDATE_AFTER";
 Proton.EMITTER_ADDED = "EMITTER_ADDED";
 Proton.EMITTER_REMOVED = "EMITTER_REMOVED";
+Proton.PROTON_UPDATE = "PROTON_UPDATE";
+Proton.PROTON_UPDATE_AFTER = "PROTON_UPDATE_AFTER";
+Proton.DEFAULT_INTERVAL = 0.0167;
 Proton.amendChangeTabsBug = true;
 EventDispatcher.bind(Proton);
 
