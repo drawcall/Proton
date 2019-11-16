@@ -17,9 +17,9 @@
     return con;
   }
 
-  function createText(text) {
+  function createText(text, style) {
     var span = document.createElement("span");
-    span.style.color = "#fff";
+    span.style.color = style || "#fff";
     span.innerText = text;
     return span;
   }
@@ -83,7 +83,7 @@
 
     conf = conf || {};
     var con = createCon();
-    var text = createText("Online code editing is here ");
+    var text = createText("Online code editing is here ", conf.title);
     var sourceLink = createSourceLink(source, conf.source);
     var es5Link = createEs5Link(es5, conf.es5);
 
