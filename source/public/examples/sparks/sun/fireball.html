@@ -25,6 +25,7 @@
   <body>
     <canvas id="canvas"></canvas>
     <script src="../../lib/info.js"></script>
+    <script src="../../lib/ppo.min.js"></script>
     <script src="../../lib/stats.min.js"></script>
     <script src="../../lib/TweenLite.min.js"></script>
     <script src="../../lib/proton.min.js"></script>
@@ -90,6 +91,10 @@
 
       function createProton(image) {
         proton = new Proton();
+        if (ppo.isMobile()) {
+          proton.fps = 60;
+        }
+
         emitter = new Proton.Emitter();
         emitter.rate = new Proton.Rate(new Proton.Span(10, 15), 0.1);
 

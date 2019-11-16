@@ -8,34 +8,40 @@ var PI = 3.1415926;
 var INFINITY = Infinity;
 
 var MathUtil = {
-    PI: PI,
-    PIx2: PI * 2,
-    PI_2: PI / 2,
-    PI_180: PI / 180,
-    N180_PI: 180 / PI,
-    Infinity: -999,
+  PI: PI,
+  PIx2: PI * 2,
+  PI_2: PI / 2,
+  PI_180: PI / 180,
+  N180_PI: 180 / PI,
+  Infinity: -999,
 
-    isInfinity: function isInfinity(num) {
-        return num === this.Infinity || num === INFINITY;
-    },
-    randomAToB: function randomAToB(a, b) {
-        var isInt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  isInfinity: function isInfinity(num) {
+    return num === this.Infinity || num === INFINITY;
+  },
+  randomAToB: function randomAToB(a, b) {
+    var isInt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-        if (!isInt) return a + Math.random() * (b - a);else return Math.floor(Math.random() * (b - a)) + a;
-    },
-    randomFloating: function randomFloating(center, f, isInt) {
-        return this.randomAToB(center - f, center + f, isInt);
-    },
-    randomZone: function randomZone(display) {},
-    degreeTransform: function degreeTransform(a) {
-        return a * PI / 180;
-    },
-    toColor16: function toColor16(num) {
-        return "#" + num.toString(16);
-    },
-    randomColor: function randomColor() {
-        return "#" + ("00000" + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
-    }
+    if (!isInt) return a + Math.random() * (b - a);else return Math.floor(Math.random() * (b - a)) + a;
+  },
+  randomFloating: function randomFloating(center, f, isInt) {
+    return this.randomAToB(center - f, center + f, isInt);
+  },
+  randomColor: function randomColor() {
+    return "#" + ("00000" + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
+  },
+  randomZone: function randomZone(display) {},
+  floor: function floor(num) {
+    var k = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4;
+
+    var digits = Math.pow(10, k);
+    return Math.floor(num * digits) / digits;
+  },
+  degreeTransform: function degreeTransform(a) {
+    return a * PI / 180;
+  },
+  toColor16: function toColor16(num) {
+    return "#" + num.toString(16);
+  }
 };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -690,15 +696,15 @@ var Util = {
   }
 };
 
-var IdsMap = {};
+var idsMap = {};
 
 var Puid = {
   _index: 0,
   _cache: {},
 
   id: function id(type) {
-    if (IdsMap[type] === undefined || IdsMap[type] === null) IdsMap[type] = 0;
-    return type + "_" + IdsMap[type]++;
+    if (idsMap[type] === undefined || idsMap[type] === null) idsMap[type] = 0;
+    return type + "_" + idsMap[type]++;
   },
   getId: function getId(target) {
     var uid = this.getIdFromCache(target);
@@ -1183,7 +1189,7 @@ var Proton = function () {
    */
 
 
-  // 1:100
+  // event name
   function Proton(integrationType) {
     classCallCheck(this, Proton);
 
@@ -1191,7 +1197,8 @@ var Proton = function () {
     this.renderers = [];
 
     this.time = 0;
-    this.oldTime = 0;
+    this.now = 0;
+    this.then = 0;
     this.elapsed = 0;
 
     this.stats = new Stats(this);
@@ -1199,21 +1206,27 @@ var Proton = function () {
 
     this.integrationType = Util.initValue(integrationType, Proton.EULER);
     this.integrator = new Integration(this.integrationType);
+
+    this._fps = "auto";
+    this._interval = Proton.DEFAULT_INTERVAL;
   }
 
-  /**
-   * add a type of Renderer
-   *
-   * @method addRenderer
-   * @memberof Proton
-   * @instance
-   *
-   * @param {Renderer} render
-   */
+  // measure 1:100
 
 
   createClass(Proton, [{
     key: "addRenderer",
+
+
+    /**
+     * add a type of Renderer
+     *
+     * @method addRenderer
+     * @memberof Proton
+     * @instance
+     *
+     * @param {Renderer} render
+     */
     value: function addRenderer(render) {
       render.init(this);
       this.renderers.push(render);
@@ -1284,24 +1297,40 @@ var Proton = function () {
   }, {
     key: "update",
     value: function update() {
-      this.dispatchEvent(Proton.PROTON_UPDATE);
+      // 'auto' is the default browser refresh rate, the vast majority is 60fps
+      if (this._fps === "auto") {
+        this.dispatchEvent(Proton.PROTON_UPDATE);
 
-      if (Proton.USE_CLOCK) {
-        if (!this.oldTime) this.oldTime = new Date().getTime();
+        if (Proton.USE_CLOCK) {
+          if (!this.then) this.then = new Date().getTime();
+          this.now = new Date().getTime();
+          this.elapsed = (this.now - this.then) * 0.001;
+          // Fix bugs such as chrome browser switching tabs causing excessive time difference
+          this.amendChangeTabsBug();
 
-        var time = new Date().getTime();
-        this.elapsed = (time - this.oldTime) / 1000;
-        Proton.amendChangeTabsBug && this.amendChangeTabsBug();
+          if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+          this.then = this.now;
+        } else {
+          this.emittersUpdate(Proton.DEFAULT_INTERVAL);
+        }
 
-        this.oldTime = time;
-      } else {
-        this.elapsed = 0.0167;
+        this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
       }
 
-      // emitter update
-      if (this.elapsed > 0) this.emittersUpdate(this.elapsed);
+      // If the fps frame rate is set
+      else {
+          if (!this.then) this.then = new Date().getTime();
+          this.now = new Date().getTime();
+          this.elapsed = (this.now - this.then) * 0.001;
 
-      this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+          if (this.elapsed > this._interval) {
+            this.dispatchEvent(Proton.PROTON_UPDATE);
+            this.emittersUpdate(this._interval);
+            // https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe
+            this.then = this.now - this.elapsed % this._interval * 1000;
+            this.dispatchEvent(Proton.PROTON_UPDATE_AFTER);
+          }
+        }
     }
   }, {
     key: "emittersUpdate",
@@ -1323,8 +1352,9 @@ var Proton = function () {
   }, {
     key: "amendChangeTabsBug",
     value: function amendChangeTabsBug() {
+      if (!Proton.amendChangeTabsBug) return;
       if (this.elapsed > 0.5) {
-        this.oldTime = new Date().getTime();
+        this.then = new Date().getTime();
         this.elapsed = 0;
       }
     }
@@ -1380,7 +1410,7 @@ var Proton = function () {
 
       var destroyOther = function destroyOther() {
         _this.time = 0;
-        _this.oldTime = 0;
+        _this.then = 0;
         _this.pool.destroy();
 
         Util.destroyAll(_this.emitters);
@@ -1392,6 +1422,15 @@ var Proton = function () {
       } else {
         destroyOther();
       }
+    }
+  }, {
+    key: "fps",
+    set: function set$$1(fps) {
+      this._fps = fps;
+      this._interval = fps === "auto" ? Proton.DEFAULT_INTERVAL : MathUtil.floor(1 / fps, 7);
+    },
+    get: function get$$1() {
+      return this._fps;
     }
   }]);
   return Proton;
@@ -1405,10 +1444,11 @@ Proton.PARTICLE_CREATED = "PARTICLE_CREATED";
 Proton.PARTICLE_UPDATE = "PARTICLE_UPDATE";
 Proton.PARTICLE_SLEEP = "PARTICLE_SLEEP";
 Proton.PARTICLE_DEAD = "PARTICLE_DEAD";
-Proton.PROTON_UPDATE = "PROTON_UPDATE";
-Proton.PROTON_UPDATE_AFTER = "PROTON_UPDATE_AFTER";
 Proton.EMITTER_ADDED = "EMITTER_ADDED";
 Proton.EMITTER_REMOVED = "EMITTER_REMOVED";
+Proton.PROTON_UPDATE = "PROTON_UPDATE";
+Proton.PROTON_UPDATE_AFTER = "PROTON_UPDATE_AFTER";
+Proton.DEFAULT_INTERVAL = 0.0167;
 Proton.amendChangeTabsBug = true;
 EventDispatcher.bind(Proton);
 
@@ -3499,6 +3539,132 @@ var Color = function (_Behaviour) {
   return Color;
 }(Behaviour);
 
+var CHANGING = "changing";
+
+var Cyclone = function (_Behaviour) {
+  inherits(Cyclone, _Behaviour);
+
+  /**
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.Cyclone
+   *
+   * @param {Number} angle
+   * @param {Number} force
+   * @param {Number} [life=Infinity] 			this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Cyclone(angle, force, life, easing) {
+    classCallCheck(this, Cyclone);
+
+    var _this = possibleConstructorReturn(this, (Cyclone.__proto__ || Object.getPrototypeOf(Cyclone)).call(this, life, easing));
+
+    _this.setAngleAndForce(angle, force);
+    _this.name = "Cyclone";
+    return _this;
+  }
+
+  createClass(Cyclone, [{
+    key: "setAngleAndForce",
+    value: function setAngleAndForce(angle, force) {
+      this.force = CHANGING;
+      this.angle = MathUtil.PI / 2;
+
+      if (angle === "right") {
+        this.angle = MathUtil.PI / 2;
+      } else if (angle === "left") {
+        this.angle = -MathUtil.PI / 2;
+      } else if (angle === "random") {
+        this.angle = "random";
+      } else if (angle instanceof Span) {
+        this.angle = "span";
+        this.span = angle;
+      } else if (angle) {
+        this.angle = angle;
+      }
+
+      if (String(force).toLowerCase() === "changing" || String(force).toLowerCase() === "chang" || String(force).toLowerCase() === "auto") {
+        this.force = CHANGING;
+      } else if (force) {
+        this.force = force;
+      }
+    }
+
+    /**
+     * Reset this behaviour's parameters
+     *
+     * @method reset
+     * @memberof Proton#Proton.Cyclone
+     * @instance
+     *
+     * @param {Number} angle
+     * @param {Number} force
+     * @param {Number} [life=Infinity] 			this behaviour's life
+     * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+     */
+
+  }, {
+    key: "reset",
+    value: function reset(angle, force, life, easing) {
+      this.angle = MathUtil.PI / 2;
+      this.setAngleAndForce(angle, force);
+      life && get(Cyclone.prototype.__proto__ || Object.getPrototypeOf(Cyclone.prototype), "reset", this).call(this, life, easing);
+    }
+  }, {
+    key: "initialize",
+    value: function initialize(particle) {
+      if (this.angle === "random") {
+        particle.data.cangle = MathUtil.randomAToB(-MathUtil.PI, MathUtil.PI);
+      } else if (this.angle === "span") {
+        particle.data.cangle = this.span.getValue();
+      }
+
+      particle.data.cyclone = new Vector2D(0, 0);
+    }
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton#Proton.Cyclone
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} the integrate time 1/ms
+     * @param {Int} the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.calculate(particle, time, index);
+
+      var length = void 0;
+      var gradient = particle.v.getGradient();
+      if (this.angle === "random" || this.angle === "span") {
+        gradient += particle.data.cangle;
+      } else {
+        gradient += this.angle;
+      }
+
+      if (this.force === CHANGING) {
+        length = particle.v.length() / 100;
+      } else {
+        length = this.force;
+      }
+
+      particle.data.cyclone.x = length * Math.cos(gradient);
+      particle.data.cyclone.y = length * Math.sin(gradient);
+      particle.data.cyclone = this.normalizeForce(particle.data.cyclone);
+      particle.a.add(particle.data.cyclone);
+    }
+  }]);
+  return Cyclone;
+}(Behaviour);
+
 var Repulsion = function (_Attraction) {
 	inherits(Repulsion, _Attraction);
 
@@ -4099,7 +4265,9 @@ var BehaviourEmitter = function (_Emitter) {
           length = rest.length;
 
       for (i = 0; i < length; i++) {
-        this.selfBehaviours.push(rest[i]);
+        var behaviour = rest[i];
+        this.selfBehaviours.push(behaviour);
+        behaviour.initialize(this);
       }
     }
 
@@ -4745,6 +4913,8 @@ var PixelRenderer = function (_BaseRenderer) {
   return PixelRenderer;
 }(BaseRenderer);
 
+var PIXIClass = void 0;
+
 var PixiRenderer = function (_BaseRenderer) {
   inherits(PixiRenderer, _BaseRenderer);
 
@@ -4754,17 +4924,27 @@ var PixiRenderer = function (_BaseRenderer) {
     var _this = possibleConstructorReturn(this, (PixiRenderer.__proto__ || Object.getPrototypeOf(PixiRenderer)).call(this, element));
 
     _this.stroke = stroke;
+    _this.color = false;
     _this.setColor = false;
+    _this.blendMode = null;
     _this.pool.create = function (body, particle) {
       return _this.createBody(body, particle);
     };
-    _this.createFromImage = PIXI.Sprite.from || PIXI.Sprite.fromImage;
+    _this.setPIXI(window.PIXI);
 
     _this.name = "PixiRenderer";
     return _this;
   }
 
   createClass(PixiRenderer, [{
+    key: "setPIXI",
+    value: function setPIXI(PIXI) {
+      try {
+        PIXIClass = PIXI || { Sprite: {} };
+        this.createFromImage = PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
+      } catch (e) {}
+    }
+  }, {
     key: "onProtonUpdate",
     value: function onProtonUpdate() {}
 
@@ -4781,6 +4961,10 @@ var PixiRenderer = function (_BaseRenderer) {
         particle.body = this.pool.get(this.circleConf, particle);
       }
 
+      if (this.blendMode) {
+        particle.body.blendMode = this.blendMode;
+      }
+
       this.element.addChild(particle.body);
     }
 
@@ -4792,7 +4976,10 @@ var PixiRenderer = function (_BaseRenderer) {
     key: "onParticleUpdate",
     value: function onParticleUpdate(particle) {
       this.transform(particle, particle.body);
-      if (this.setColor) particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+
+      if (this.setColor === true || this.color === true) {
+        particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+      }
     }
 
     /**
@@ -4842,7 +5029,7 @@ var PixiRenderer = function (_BaseRenderer) {
   }, {
     key: "createSprite",
     value: function createSprite(body) {
-      var sprite = body.isInner ? this.createFromImage(body.src) : new PIXI.Sprite(body);
+      var sprite = body.isInner ? this.createFromImage(body.src) : new PIXIClass.Sprite(body);
 
       sprite.anchor.x = 0.5;
       sprite.anchor.y = 0.5;
@@ -4852,7 +5039,7 @@ var PixiRenderer = function (_BaseRenderer) {
   }, {
     key: "createCircle",
     value: function createCircle(particle) {
-      var graphics = new PIXI.Graphics();
+      var graphics = new PIXIClass.Graphics();
 
       if (this.stroke) {
         var stroke = this.stroke instanceof String ? this.stroke : 0x000000;
@@ -5671,6 +5858,7 @@ Proton.Scale = Proton.S = Scale;
 Proton.Rotate = Rotate;
 Proton.Color = Color;
 Proton.Repulsion = Repulsion;
+Proton.Cyclone = Cyclone;
 Proton.GravityWell = GravityWell;
 
 Proton.Emitter = Emitter;
