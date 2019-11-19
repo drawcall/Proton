@@ -3,9 +3,11 @@ import Proton from "proton-engine";
 import RAFManager from "raf-manager";
 import Canvas from "./Canvas.jsx";
 
-export default class Mlines extends React.Component {
+export default class Thick extends React.Component {
   constructor(props) {
     super(props);
+    this.hue = 0;
+    this.colorTemplate = `hsla(hue,80%,50%, 0.75)`;
   }
 
   onCanvasInited(canvas, width, height) {
@@ -24,27 +26,32 @@ export default class Mlines extends React.Component {
 
     const emitter = new Proton.Emitter();
     emitter.damping = 0.008;
-    emitter.rate = new Proton.Rate(250);
+    emitter.rate = new Proton.Rate(150);
+
+    // Initialize
     emitter.addInitialize(new Proton.Mass(1));
-    emitter.addInitialize(new Proton.Radius(4));
+    emitter.addInitialize(new Proton.Radius(8));
     emitter.addInitialize(
-      new Proton.Velocity(new Proton.Span(3), new Proton.Span(-45, 45), "polar")
+      new Proton.V(new Proton.Span(0.1, 0.5), new Proton.Span(0, 360), "polar")
+    );
+    emitter.addInitialize(
+      new Proton.Position(
+        new Proton.CircleZone(canvas.width / 2, canvas.height / 2, 100)
+      )
     );
 
+    // Behaviour
     const crossZoneBehaviour = new Proton.CrossZone(
       new Proton.RectZone(0, 0, canvas.width, canvas.height),
       "cross"
     );
-    emitter.addBehaviour(new Proton.Color("random"));
     emitter.addBehaviour(crossZoneBehaviour);
-    emitter.addBehaviour(new Proton.RandomDrift(15, 15, 0.15));
-
     this.repulsion = new Proton.Repulsion(
       {
         x: canvas.width / 2,
         y: canvas.height / 2 - 100
       },
-      15,
+      3,
       300
     );
 
@@ -53,15 +60,14 @@ export default class Mlines extends React.Component {
         x: canvas.width / 2,
         y: canvas.height / 2
       },
-      20,
+      3,
       200
     );
     emitter.addBehaviour(this.attraction, this.repulsion);
+    emitter.addBehaviour(new Proton.Color("random"));
+    emitter.addBehaviour(new Proton.RandomDrift(20, 15, 0.15));
 
-    emitter.p.x = canvas.width / 2;
-    emitter.p.y = canvas.height - 50;
     emitter.emit("once");
-
     this.proton.addEmitter(emitter);
     this.proton.addRenderer(this.createRenderer(canvas));
     this.crossZoneBehaviour = crossZoneBehaviour;
@@ -70,19 +76,32 @@ export default class Mlines extends React.Component {
   createRenderer(canvas) {
     const context = canvas.getContext("2d");
     const renderer = new Proton.CanvasRenderer(canvas);
-    renderer.onProtonUpdate = function() {
+
+    renderer.onProtonUpdate = () => {
+      this.hue += 1;
       context.fillStyle = "rgba(0, 0, 0, 0.02)";
       context.fillRect(0, 0, canvas.width, canvas.height);
     };
 
-    renderer.onParticleUpdate = function(particle) {
+    renderer.onParticleCreated = particle => {
+      particle.data.begin = Proton.MathUtil.randomAToB(1, 120);
+      particle.data.tha = Proton.MathUtil.randomAToB(0, Math.PI * 2);
+    };
+
+    renderer.onParticleUpdate = particle => {
+      const hue = particle.data.begin + this.hue;
+      particle.color = this.colorTemplate.replace("hue", hue % 360);
+
+      const ratio = 3 / 4;
+      const radius =
+        particle.radius * (1 - ratio) * Math.cos((particle.data.tha += 0.01)) +
+        particle.radius * ratio;
+
       context.beginPath();
-      context.strokeStyle = particle.color;
-      context.lineWidth = 1;
-      context.moveTo(particle.old.p.x, particle.old.p.y);
-      context.lineTo(particle.p.x, particle.p.y);
+      context.fillStyle = particle.color;
+      context.arc(particle.p.x, particle.p.y, radius, 0, Math.PI * 2, true);
       context.closePath();
-      context.stroke();
+      context.fill();
     };
 
     return renderer;
@@ -107,7 +126,6 @@ export default class Mlines extends React.Component {
   render() {
     return (
       <Canvas
-        globalCompositeOperation="darken"
         onCanvasInited={this.onCanvasInited.bind(this)}
         onResize={this.onResize.bind(this)}
       />
