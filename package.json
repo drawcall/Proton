@@ -14,6 +14,7 @@
     "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 3001\"",
     "page": "node ./script/makeexamplepage",
     "lint": "eslint ./src --config=eslintrc.json",
+    "travis": "npm run lint",
     "build": "rollup -c --pub"
   },
   "repository": {
