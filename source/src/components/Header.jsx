@@ -48,7 +48,7 @@ export default class Header extends React.Component {
                 <a
                   className="navbar-item"
                   href="https://projects.jpeer.at/proton/"
-                  target="_blank"
+                  target="_blank" rel="noopener noreferrer"
                 >
                   Documentation
                 </a>
@@ -57,7 +57,7 @@ export default class Header extends React.Component {
                   <a
                     className="button is-info is-inverted"
                     href="https://github.com/a-jie/Proton"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                   >
                     <span className="icon">
                       <i className="fa fa-github" />

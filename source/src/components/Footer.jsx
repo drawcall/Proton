@@ -7,18 +7,18 @@ function Footer() {
       <div className="content has-text-centered">
         <p>
           <strong>Proton</strong> by{" "}
-          <a href="https://github.com/a-jie" target="_blank">
+          <a href="https://github.com/a-jie" target="_blank"  rel="noopener noreferrer">
             anonymous namespace
           </a>
           . The source code is licensed{" "}
           <a
             href="http://opensource.org/licenses/mit-license.php"
-            target="_blank"
+            target="_blank"  rel="noopener noreferrer"
           >
             MIT
           </a>
           . The website is made using{" "}
-          <a href="https://bulma.io/" target="_blank">
+          <a href="https://bulma.io/" target="_blank"  rel="noopener noreferrer">
             BULMA
           </a>
           .

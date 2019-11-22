@@ -37,9 +37,9 @@ const getHt = props => {
 };
 
 const getLine = props => {
-  if (props.size == 1 || props.size === undefined) {
+  if (props.size === 1 || props.size === undefined) {
     return <Line />;
-  } else if (props.size == 2) {
+  } else if (props.size === 2) {
     // return <Line width={250} height={1} />
   }
 

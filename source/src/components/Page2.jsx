@@ -8,6 +8,8 @@ import "../css/page2.css";
 
 function Page2() {
   const code = `
+import Proton from 'proton-engine';
+
 const proton = new Proton();
 const emitter = new Proton.Emitter();
 

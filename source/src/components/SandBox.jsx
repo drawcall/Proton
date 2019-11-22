@@ -7,7 +7,7 @@ export default function SandBox() {
       src="https://codesandbox.io/embed/proton-emitter-h2y9z?fontsize=14&hidenavigation=1"
       style={{
         width: "100%",
-        height: 380,
+        height: 400,
         border: 0,
         borderRadius: 4,
         overflow: "hidden"
