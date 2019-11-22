@@ -6,11 +6,11 @@
   <a href='https://www.npmjs.com/package/proton-engine'>
     <img src='https://badge.fury.io/js/proton-engine.svg' alt='npm version' height='18'>
   </a>
-  <a href='https://github.com/a-jie/Proton/issues'>
-    <img src='https://img.shields.io/github/issues/a-jie/Proton.svg' alt='issues open' height='18'>
-  </a>
   <a href='https://travis-ci.com/a-jie/Proton'>
     <img src='https://travis-ci.com/a-jie/Proton.svg?branch=master' alt='travis' height='18'>
+  </a>
+  <a href='https://github.com/a-jie/Proton/issues'>
+    <img src='https://img.shields.io/github/issues/a-jie/Proton.svg' alt='issues open' height='18'>
   </a>
   <a href='#'>
     <img src='https://img.shields.io/npm/l/proton-engine.svg' alt='license:MIT' height='18'>
