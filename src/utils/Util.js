@@ -177,5 +177,19 @@ export default {
     }
 
     arr.length = 0;
+  },
+
+  assign(target, source) {
+    if (typeof Object.assign !== "function") {
+      for (let key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+
+      return target;
+    } else {
+      return Object.assign(target, source);
+    }
   }
 };

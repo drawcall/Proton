@@ -119,7 +119,7 @@ Proton.WebGLRenderer = Proton.WebGlRenderer = WebGLRenderer;
 Proton.CustomRenderer = CustomRenderer;
 
 Proton.Debug = Debug;
-Object.assign(Proton, ease);
+Util.assign(Proton, ease);
 
 // export
 export default Proton;
