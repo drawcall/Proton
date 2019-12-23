@@ -2,6 +2,9 @@ DS_Store
 git/
 node_modules/
 example/
+examples/
+images/
+static/
 .*.swp
 .DS_Store
 .git
