@@ -1,4 +1,4 @@
-<div align=center><img src="https://a-jie.github.io/Proton/images/logo/proton.png"/></div>
+<div align=center><img src="https://drawcall.github.io/Proton/images/logo/proton.png"/></div>
 
 ---
 
@@ -6,11 +6,11 @@
   <a href='https://www.npmjs.com/package/proton-engine'>
     <img src='https://badge.fury.io/js/proton-engine.svg' alt='npm version' height='18'>
   </a>
-  <a href='https://travis-ci.com/a-jie/Proton'>
-    <img src='https://travis-ci.com/a-jie/Proton.svg?branch=master' alt='travis' height='18'>
+  <a href='https://travis-ci.com/drawcall/Proton'>
+    <img src='https://travis-ci.com/drawcall/Proton.svg?branch=master' alt='travis' height='18'>
   </a>
-  <a href='https://github.com/a-jie/Proton/issues'>
-    <img src='https://img.shields.io/github/issues/a-jie/Proton.svg' alt='issues open' height='18'>
+  <a href='https://github.com/drawcall/Proton/issues'>
+    <img src='https://img.shields.io/github/issues/drawcall/Proton.svg' alt='issues open' height='18'>
   </a>
   <a href='#'>
     <img src='https://img.shields.io/npm/l/proton-engine.svg' alt='license:MIT' height='18'>
@@ -110,14 +110,14 @@ proton.addRenderer(renderer);
 
 * Use Euler integration calculation is more accurate (default false) `Proton.USE_CLOCK = false or true;`.
 
-Proton has now been upgraded to the __v4__ version. Performance has been greatly improved and api also has some improvements. For more details, please check [here](https://github.com/a-jie/Proton/releases).
+Proton has now been upgraded to the __v4__ version. Performance has been greatly improved and api also has some improvements. For more details, please check [here](https://github.com/drawcall/Proton/releases).
 
 ## Building
 
 `node` is a dependency, use terminal to install it with:   
 
 ```javascript
-git clone git://github.com/a-jie/Proton.git
+git clone git://github.com/drawcall/Proton.git
 
 ...
 npm install
@@ -132,7 +132,7 @@ npm start
 ```
 
 ## Changelog
-Detailed changes for each release are documented in the [release notes](https://github.com/a-jie/Proton/releases).
+Detailed changes for each release are documented in the [release notes](https://github.com/drawcall/Proton/releases).
 
 
 ## License
