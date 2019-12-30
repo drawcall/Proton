@@ -130,7 +130,7 @@ const GAME_ARR = [
   {
     thumb: "threejs",
     url:
-      "https://a-jie.github.io/three.proton/"
+      "https://drawcall.github.io/three.proton/"
   }
 ];
 

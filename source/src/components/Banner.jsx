@@ -36,7 +36,7 @@ class Banner extends React.Component {
 
   handlerClick(type) {
     if (type === "GITHUB") {
-      ppo.open("https://github.com/a-jie/Proton");
+      ppo.open("https://github.com/drawcall/Proton");
     } else {
       window.location.href = "#examples";
     }

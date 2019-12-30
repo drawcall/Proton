@@ -7,7 +7,7 @@ function Footer() {
       <div className="content has-text-centered">
         <p>
           <strong>Proton</strong> by{" "}
-          <a href="https://github.com/a-jie" target="_blank"  rel="noopener noreferrer">
+          <a href="https://github.com/drawcall" target="_blank"  rel="noopener noreferrer">
             anonymous namespace
           </a>
           . The source code is licensed{" "}

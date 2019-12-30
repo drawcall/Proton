@@ -38,7 +38,7 @@ export default class Header extends React.Component {
               <div className="navbar-end">
                 <a
                   className="navbar-item is-active"
-                  href="https://a-jie.github.io/Proton/"
+                  href="https://drawcall.github.io/Proton/"
                 >
                   Home
                 </a>
@@ -56,7 +56,7 @@ export default class Header extends React.Component {
                 <span className="navbar-item">
                   <a
                     className="button is-info is-inverted"
-                    href="https://github.com/a-jie/Proton"
+                    href="https://github.com/drawcall/Proton"
                     target="_blank" rel="noopener noreferrer"
                   >
                     <span className="icon">
