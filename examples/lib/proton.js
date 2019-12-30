@@ -5832,6 +5832,7 @@ var Debug = {
   }
 };
 
+// namespace
 Proton.Particle = Proton.P = Particle;
 Proton.Pool = Pool;
 
@@ -5895,8 +5896,6 @@ Proton.CustomRenderer = CustomRenderer;
 
 Proton.Debug = Debug;
 Util.assign(Proton, ease);
-
-// export
 
 return Proton;
 
