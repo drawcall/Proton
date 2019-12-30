@@ -6,7 +6,7 @@ import pkjson from "./package.json";
 
 const banner = `/*!
 * Proton v${pkjson.version}
-* https://github.com/a-jie/Proton
+* https://github.com/drawcall/Proton
 *
 * Copyright 2013-${new Date().getFullYear()}, A-JIE
 * Licensed under the MIT license
