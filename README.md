@@ -20,7 +20,7 @@
 
 Proton is a lightweight and powerful Javascript particle animation library. Use it to easily create a variety of cool particle effects.
 
-Check out examples at [http://drawcall.github.io/Proton/](http://drawcall.github.io/Proton/). The **3D version** of the proton engine is here [https://drawcall.github.io/three.proton/](https://drawcall.github.io/three.proton/)
+Check out examples at [http://drawcall.github.io/Proton/](http://drawcall.github.io/Proton/). The **3D version** of the proton engine is here [https://github.com/drawcall/three.proton/](https://github.com/drawcall/three.proton/)
 
 ## Features
 
