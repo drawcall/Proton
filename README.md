@@ -12,6 +12,9 @@
   <a href='https://github.com/drawcall/Proton/issues'>
     <img src='https://img.shields.io/github/issues/drawcall/Proton.svg' alt='issues open' height='18'>
   </a>
+  <a href='https://cdnjs.com/libraries/proton-engine'>
+    <img src='https://img.shields.io/cdnjs/v/proton-engine' alt='issues open' height='18'>
+  </a>
   <a href='#'>
     <img src='https://img.shields.io/npm/l/proton-engine.svg' alt='license:MIT' height='18'>
   </a>
