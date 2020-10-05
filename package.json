@@ -10,6 +10,8 @@
     "webgl"
   ],
   "main": "./build/proton.min.js",
+  "module": "src/index.js",
+  "types": "src/types.d.ts",
   "scripts": {
     "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 3001\"",
     "page": "node ./script/makeexamplepage",
