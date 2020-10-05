@@ -1,3 +1,6 @@
+/** @typedef {import('../behaviour/Behaviour')} Behaviour */
+/** @typedef {import('../math/Vector2D')} Vector2D */
+/** @typedef {import('../utils/Rgb')} Rgb */
 import Rgb from "../utils/Rgb";
 import Puid from "../utils/Puid";
 import Util from "../utils/Util";
@@ -6,6 +9,30 @@ import Vector2D from "../math/Vector2D";
 import MathUtil from "../math/MathUtil";
 
 export default class Particle {
+  /** @type string */
+  id = ''
+
+  /** @type {{p:Vector2D,v:Vector2D,a:Vector2D}} */
+  old = {}
+
+  /** @type {object} */
+  data = {}
+
+  /** @type {Behaviour[]} */
+  behaviours = []
+
+  /** @type {Vector2D} */
+  p = []
+
+  /** @type {Vector2D} */
+  v = []
+
+  /** @type {Vector2D} */
+  a = []
+
+  /** @type {Rgb} */
+  rgb = {}
+
   /**
    * the Particle class
    *
@@ -99,6 +126,9 @@ export default class Particle {
     }
   }
 
+  /**
+   * @param {Behaviour} behaviour
+   */
   addBehaviour(behaviour) {
     this.behaviours.push(behaviour);
 
@@ -106,6 +136,9 @@ export default class Particle {
     behaviour.initialize(this);
   }
 
+  /**
+   * @param {Behaviour[]} behaviours
+   */
   addBehaviours(behaviours) {
     const length = behaviours.length;
     let i;
