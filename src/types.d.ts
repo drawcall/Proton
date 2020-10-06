@@ -245,7 +245,7 @@ declare class Proton extends Ease {
  * see https://www.typescriptlang.org/docs/handbook/declaration-files/deep-dive.html
  */
 declare namespace Proton {
-  const getSpan: (a, b, center) => typeof Span;
+  const getSpan: (a: any, b: any, center: any) => typeof Span;
 
   const createArraySpan: typeof ArraySpan.createArraySpan;
 
@@ -1409,7 +1409,7 @@ declare namespace Proton {
      * @description - Destroyes the given object
      */
     function emptyObject<T extends AnyObj>(input: T, ignore?: string[]): void;
-    function classApply(constructor: Function, args?: any[]);
+    function classApply(constructor: Function, args?: any[]): any;
     function setVectorVal(particle: Particle, conf?: VectorValConf): void;
     function hasProp(target: any, key: string): boolean;
     function setProp<T extends AnyObj, U extends T>(
