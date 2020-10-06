@@ -59,7 +59,7 @@ import ImageZone from "./zone/ImageZone";
 import Debug from "./debug/Debug";
 
 // namespace
-Proton.Particle = Proton.P = Particle;
+Proton.Particle = Particle;
 Proton.Pool = Pool;
 
 Proton.Util = Util;
@@ -91,7 +91,7 @@ Proton.RandomDrift = Proton.RD = RandomDrift;
 Proton.Gravity = Proton.G = Gravity;
 Proton.Collision = Collision;
 Proton.CrossZone = CrossZone;
-Proton.Alpha = Proton.A = Alpha;
+Proton.Alpha = Alpha;
 Proton.Scale = Proton.S = Scale;
 Proton.Rotate = Rotate;
 Proton.Color = Color;
