@@ -1,6 +1,6 @@
 {
   "name": "proton-engine",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Proton is a simple and powerful javascript particle animation engine.",
   "keywords": [
     "particle",
@@ -10,7 +10,6 @@
     "webgl"
   ],
   "main": "./build/proton.min.js",
-  "module": "src/index.js",
   "types": "src/types.d.ts",
   "scripts": {
     "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 3001\"",
