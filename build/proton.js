@@ -1763,7 +1763,11 @@ var Vector2D = function () {
   return Vector2D;
 }();
 
+/** @typedef {import('../behaviour/Behaviour')} Behaviour */
+/** @typedef {import('../math/Vector2D')} Vector2D */
+/** @typedef {import('../utils/Rgb')} Rgb */
 var Particle = function () {
+
   /**
    * the Particle class
    *
@@ -1772,8 +1776,27 @@ var Particle = function () {
    * @param {Object} pObj the parameters object;
    * for example {life:3,dead:false}
    */
+
+
+  /** @type {Vector2D} */
+
+
+  /** @type {Vector2D} */
+
+
+  /** @type {object} */
+
+  /** @type string */
   function Particle(conf) {
     classCallCheck(this, Particle);
+    this.id = '';
+    this.old = {};
+    this.data = {};
+    this.behaviours = [];
+    this.p = [];
+    this.v = [];
+    this.a = [];
+    this.rgb = {};
 
     /**
      * The particle's id;
@@ -1797,6 +1820,18 @@ var Particle = function () {
     this.reset();
     conf && Util.setProp(this, conf);
   }
+
+  /** @type {Rgb} */
+
+
+  /** @type {Vector2D} */
+
+
+  /** @type {Behaviour[]} */
+
+
+  /** @type {{p:Vector2D,v:Vector2D,a:Vector2D}} */
+
 
   createClass(Particle, [{
     key: "getDirection",
@@ -1862,6 +1897,11 @@ var Particle = function () {
         this.behaviours[i] && this.behaviours[i].applyBehaviour(this, time, index);
       }
     }
+
+    /**
+     * @param {Behaviour} behaviour
+     */
+
   }, {
     key: "addBehaviour",
     value: function addBehaviour(behaviour) {
@@ -1870,6 +1910,11 @@ var Particle = function () {
       if (behaviour.hasOwnProperty("parents")) behaviour.parents.push(this);
       behaviour.initialize(this);
     }
+
+    /**
+     * @param {Behaviour[]} behaviours
+     */
+
   }, {
     key: "addBehaviours",
     value: function addBehaviours(behaviours) {
@@ -5833,7 +5878,7 @@ var Debug = {
 };
 
 // namespace
-Proton.Particle = Proton.P = Particle;
+Proton.Particle = Particle;
 Proton.Pool = Pool;
 
 Proton.Util = Util;
@@ -5867,7 +5912,7 @@ Proton.RandomDrift = Proton.RD = RandomDrift;
 Proton.Gravity = Proton.G = Gravity;
 Proton.Collision = Collision;
 Proton.CrossZone = CrossZone;
-Proton.Alpha = Proton.A = Alpha;
+Proton.Alpha = Alpha;
 Proton.Scale = Proton.S = Scale;
 Proton.Rotate = Rotate;
 Proton.Color = Color;
