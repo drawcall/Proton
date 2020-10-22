@@ -127,7 +127,7 @@ npm install
 npm run build
 ``` 
 
-And run example 
+And run example
 
 ```javascript
 npm start
