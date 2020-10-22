@@ -45,7 +45,6 @@ Check out examples at [http://drawcall.github.io/Proton/](http://drawcall.github
 
 See detailed documentation please visit [https://projects.jpeer.at/proton/](https://projects.jpeer.at/proton/).
 Thank you very much [@matsu7089](https://github.com/matsu7089) for writing a [good tutorial](https://qiita.com/matsu7089/items/dcb7d326e4ec1340eba6).
- 
 
 ## Installation
 
