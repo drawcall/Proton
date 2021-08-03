@@ -173,7 +173,7 @@ declare class Proton extends Ease {
 
   oldtime: number;
 
-  constructor(integrationType: PIT_types);
+  constructor(integrationType?: PIT_types);
 
   /**
    * add the Emitter
