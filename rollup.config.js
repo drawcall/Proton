@@ -1,8 +1,9 @@
 // Rollup plugins
-import babel from "rollup-plugin-babel";
-import uglify from "rollup-plugin-uglify";
+import babel from "@rollup/plugin-babel";
+import { terser } from "rollup-plugin-terser";
 import license from "rollup-plugin-license";
 import pkjson from "./package.json";
+import babelrc from "./.babelrc.json";
 
 const banner = `/*!
 * Proton v${pkjson.version}
@@ -14,30 +15,49 @@ const banner = `/*!
 *
 */`;
 
-const isDev = process.argv.splice(2).indexOf("--pub") < 0;
-const plugins = isDev
-  ? [
+const input = "src/index.js";
+const isDev = process.env.NODE_ENV == "dev";
+
+let rconfig;
+if (isDev) {
+  rconfig = {
+    input,
+    output: {
+      file: "build/proton.js",
+      format: "umd",
+      name: "Proton",
+      sourcemap: true
+    },
+    plugins: [
       babel({
+        babelHelpers: "bundled",
+        compact: false,
+        babelrc: false,
+        ...babelrc,
         exclude: "node_modules/**"
       })
     ]
-  : [
+  };
+} else {
+  rconfig = {
+    input,
+    output: {
+      file: "build/proton.min.js",
+      format: "umd",
+      name: "Proton",
+      sourcemap: true
+    },
+    plugins: [
       babel({
-        exclude: "node_modules/**"
+        exclude: "node_modules/**",
+        babelHelpers: "bundled",
+        babelrc: false,
+        ...babelrc
       }),
-      uglify(),
-      license({ banner: banner })
-    ];
+      terser(),
+      license({ banner })
+    ]
+  };
+}
 
-const output = isDev ? { file: "build/proton.js" } : { file: "build/proton.min.js" };
-
-export default {
-  input: "src/index.js",
-  output: {
-    ...output,
-    format: "umd",
-    name: "Proton",
-    sourcemap: true
-  },
-  plugins: plugins
-};
+export default rconfig;
