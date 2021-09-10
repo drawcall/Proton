@@ -66,4 +66,9 @@ export default class EaselRenderer extends BaseRenderer {
     particle.body = shape;
     particle.graphics = graphics;
   }
+
+  destroy() {
+    super.destroy();
+    this.stroke = null;
+  }
 }

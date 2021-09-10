@@ -107,7 +107,6 @@ export default class PixiRenderer extends BaseRenderer {
 
   destroy(particles) {
     super.destroy();
-    this.pool.destroy();
 
     let i = particles.length;
     while (i--) {

@@ -304,4 +304,13 @@ export default class WebGLRenderer extends BaseRenderer {
 
     this.mstack.push(matrix);
   }
+
+  destroy() {
+    super.destroy();
+    this.gl = null;
+    this.mstack = null;
+    this.umat = null;
+    this.smat = null;
+    this.texturebuffers = null;
+  }
 }

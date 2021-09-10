@@ -131,4 +131,11 @@ export default class CanvasRenderer extends BaseRenderer {
       return canvas;
     }
   }
+
+  destroy() {
+    super.destroy();
+    this.stroke = null;
+    this.context = null;
+    this.bufferCache = null;
+  }
 }

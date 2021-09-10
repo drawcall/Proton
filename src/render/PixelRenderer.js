@@ -7,7 +7,6 @@ export default class PixelRenderer extends BaseRenderer {
 
     this.context = this.element.getContext("2d");
     this.imageData = null;
-    this.rectangle = null;
     this.rectangle = rectangle;
     this.createImageData(rectangle);
 
@@ -64,4 +63,12 @@ export default class PixelRenderer extends BaseRenderer {
   }
 
   onParticleDead(particle) {}
+
+  destroy() {
+    super.destroy();
+    this.stroke = null;
+    this.context = null;
+    this.imageData = null;
+    this.rectangle = null;
+  }
 }

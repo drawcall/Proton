@@ -64,6 +64,8 @@ export default class BaseRenderer {
   destroy() {
     this.remove();
     this.pool.destroy();
+    this.pool = null;
+    this.element = null;
     this.element = null;
   }
 

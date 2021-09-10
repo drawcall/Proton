@@ -86,4 +86,9 @@ export default class DomRenderer extends BaseRenderer {
 
     return dom;
   }
+
+  destroy() {
+    super.destroy();
+    this.stroke = null;
+  }
 }
