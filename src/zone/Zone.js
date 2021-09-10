@@ -11,4 +11,8 @@ export default class Zone {
   getPosition() {}
 
   crossing(particle) {}
+
+  destroy() {
+    this.vector = null;
+  }
 }

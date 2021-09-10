@@ -8,7 +8,6 @@ export default class CircleZone extends Zone {
     this.x = x;
     this.y = y;
     this.radius = radius;
-
     this.angle = 0;
     this.center = { x, y };
   }
@@ -16,7 +15,6 @@ export default class CircleZone extends Zone {
   getPosition() {
     this.angle = MathUtil.PIx2 * Math.random();
     this.randomRadius = Math.random() * this.radius;
-
     this.vector.x = this.x + this.randomRadius * Math.cos(this.angle);
     this.vector.y = this.y + this.randomRadius * Math.sin(this.angle);
 
@@ -44,12 +42,12 @@ export default class CircleZone extends Zone {
   }
 
   getSymmetric(particle) {
-    let tha2 = particle.v.getGradient();
-    let tha1 = this.getGradient(particle);
+    const tha2 = particle.v.getGradient();
+    const tha1 = this.getGradient(particle);
 
-    let tha = 2 * (tha1 - tha2);
-    let oldx = particle.v.x;
-    let oldy = particle.v.y;
+    const tha = 2 * (tha1 - tha2);
+    const oldx = particle.v.x;
+    const oldy = particle.v.y;
 
     particle.v.x = oldx * Math.cos(tha) - oldy * Math.sin(tha);
     particle.v.y = oldx * Math.sin(tha) + oldy * Math.cos(tha);

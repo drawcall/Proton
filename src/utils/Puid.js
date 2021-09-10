@@ -15,7 +15,6 @@ const Puid = {
 
     uid = `PUID_${this._index++}`;
     this._cache[uid] = target;
-
     return uid;
   },
 
@@ -33,12 +32,7 @@ const Puid = {
   },
 
   isBody(obj, target) {
-    return (
-      typeof obj === "object" &&
-      typeof target === "object" &&
-      obj.isInner &&
-      target.isInner
-    );
+    return typeof obj === "object" && typeof target === "object" && obj.isInner && target.isInner;
   },
 
   getTarget(uid) {

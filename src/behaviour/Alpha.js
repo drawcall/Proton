@@ -75,9 +75,7 @@ export default class Alpha extends Behaviour {
   applyBehaviour(particle, time, index) {
     this.calculate(particle, time, index);
 
-    particle.alpha =
-      particle.data.alphaB +
-      (particle.data.alphaA - particle.data.alphaB) * this.energy;
+    particle.alpha = particle.data.alphaB + (particle.data.alphaA - particle.data.alphaB) * this.energy;
 
     if (particle.alpha < 0.001) particle.alpha = 0;
   }

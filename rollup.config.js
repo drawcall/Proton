@@ -8,7 +8,7 @@ const banner = `/*!
 * Proton v${pkjson.version}
 * https://github.com/drawcall/Proton
 *
-* Copyright 2013-${new Date().getFullYear()}, A-JIE
+* Copyright 2013-${new Date().getFullYear()}, drawcall
 * Licensed under the MIT license
 * http://www.opensource.org/licenses/mit-license
 *
@@ -29,9 +29,7 @@ const plugins = isDev
       license({ banner: banner })
     ];
 
-const output = isDev
-  ? { file: "build/proton.js" }
-  : { file: "build/proton.min.js" };
+const output = isDev ? { file: "build/proton.js" } : { file: "build/proton.min.js" };
 
 export default {
   input: "src/index.js",

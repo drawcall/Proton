@@ -66,8 +66,7 @@ export default class Proton {
 
   set fps(fps) {
     this._fps = fps;
-    this._interval =
-      fps === "auto" ? Proton.DEFAULT_INTERVAL : MathUtil.floor(1 / fps, 7);
+    this._interval = fps === "auto" ? Proton.DEFAULT_INTERVAL : MathUtil.floor(1 / fps, 7);
   }
 
   get fps() {

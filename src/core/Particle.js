@@ -10,28 +10,28 @@ import MathUtil from "../math/MathUtil";
 
 export default class Particle {
   /** @type string */
-  id = ''
+  id = "";
 
   /** @type {{p:Vector2D,v:Vector2D,a:Vector2D}} */
-  old = {}
+  old = {};
 
   /** @type {object} */
-  data = {}
+  data = {};
 
   /** @type {Behaviour[]} */
-  behaviours = []
+  behaviours = [];
 
   /** @type {Vector2D} */
-  p = []
+  p = [];
 
   /** @type {Vector2D} */
-  v = []
+  v = [];
 
   /** @type {Vector2D} */
-  a = []
+  a = [];
 
   /** @type {Rgb} */
-  rgb = {}
+  rgb = {};
 
   /**
    * the Particle class
@@ -121,8 +121,7 @@ export default class Particle {
     let i;
 
     for (i = 0; i < length; i++) {
-      this.behaviours[i] &&
-        this.behaviours[i].applyBehaviour(this, time, index);
+      this.behaviours[i] && this.behaviours[i].applyBehaviour(this, time, index);
     }
   }
 

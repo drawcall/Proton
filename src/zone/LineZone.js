@@ -36,11 +36,8 @@ export default class LineZone extends Zone {
 
   getPosition() {
     this.random = Math.random();
-
-    this.vector.x =
-      this.x1 + this.random * this.length * Math.cos(this.gradient);
-    this.vector.y =
-      this.y1 + this.random * this.length * Math.sin(this.gradient);
+    this.vector.x = this.x1 + this.random * this.length * Math.cos(this.gradient);
+    this.vector.y = this.y1 + this.random * this.length * Math.sin(this.gradient);
 
     return this.vector;
   }
@@ -100,18 +97,12 @@ export default class LineZone extends Zone {
 
   crossing(particle) {
     if (this.crossType === "dead") {
-      if (
-        this.direction === ">" ||
-        this.direction === "R" ||
-        this.direction === "right" ||
-        this.direction === "down"
-      ) {
+      if (this.direction === ">" || this.direction === "R" || this.direction === "right" || this.direction === "down") {
         if (!this.rangeOut(particle)) return;
         if (this.getDirection(particle.p.x, particle.p.y)) particle.dead = true;
       } else {
         if (!this.rangeOut(particle)) return;
-        if (!this.getDirection(particle.p.x, particle.p.y))
-          particle.dead = true;
+        if (!this.getDirection(particle.p.x, particle.p.y)) particle.dead = true;
       }
     } else if (this.crossType === "bound") {
       if (!this.rangeOut(particle)) return;

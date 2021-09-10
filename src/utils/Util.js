@@ -81,10 +81,7 @@ export default {
     if (!args) {
       return new constructor();
     } else {
-      const FactoryFunc = constructor.bind.apply(
-        constructor,
-        [null].concat(args)
-      );
+      const FactoryFunc = constructor.bind.apply(constructor, [null].concat(args));
       return new FactoryFunc();
     }
   },

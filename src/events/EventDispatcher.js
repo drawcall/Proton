@@ -11,18 +11,10 @@ export default class EventDispatcher {
 
   static bind(target) {
     target.prototype.dispatchEvent = EventDispatcher.prototype.dispatchEvent;
-
-    target.prototype.hasEventListener =
-      EventDispatcher.prototype.hasEventListener;
-
-    target.prototype.addEventListener =
-      EventDispatcher.prototype.addEventListener;
-
-    target.prototype.removeEventListener =
-      EventDispatcher.prototype.removeEventListener;
-
-    target.prototype.removeAllEventListeners =
-      EventDispatcher.prototype.removeAllEventListeners;
+    target.prototype.hasEventListener = EventDispatcher.prototype.hasEventListener;
+    target.prototype.addEventListener = EventDispatcher.prototype.addEventListener;
+    target.prototype.removeEventListener = EventDispatcher.prototype.removeEventListener;
+    target.prototype.removeAllEventListeners = EventDispatcher.prototype.removeAllEventListeners;
   }
 
   addEventListener(type, listener) {

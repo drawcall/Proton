@@ -11,8 +11,7 @@ export default class Rectangle {
   }
 
   contains(x, y) {
-    if (x <= this.right && x >= this.x && y <= this.bottom && y >= this.y)
-      return true;
+    if (x <= this.right && x >= this.x && y <= this.bottom && y >= this.y) return true;
     else return false;
   }
 }

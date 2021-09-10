@@ -23,19 +23,11 @@ export default class Stats {
         break;
 
       case 3:
+        if (emitter) str += "initializes:" + emitter.initializes.length + "<br>";
         if (emitter)
-          str += "initializes:" + emitter.initializes.length + "<br>";
-        if (emitter)
-          str +=
-            '<span style="display:inline-block;">' +
-            this.concatArr(emitter.initializes) +
-            "</span><br>";
+          str += '<span style="display:inline-block;">' + this.concatArr(emitter.initializes) + "</span><br>";
         if (emitter) str += "behaviours:" + emitter.behaviours.length + "<br>";
-        if (emitter)
-          str +=
-            '<span style="display:inline-block;">' +
-            this.concatArr(emitter.behaviours) +
-            "</span><br>";
+        if (emitter) str += '<span style="display:inline-block;">' + this.concatArr(emitter.behaviours) + "</span><br>";
         break;
 
       case 4:

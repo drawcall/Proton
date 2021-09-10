@@ -5,8 +5,7 @@ export default class MStack {
     this.mats = [];
     this.size = 0;
 
-    for (let i = 0; i < 20; i++)
-      this.mats.push(Mat3.create([0, 0, 0, 0, 0, 0, 0, 0, 0]));
+    for (let i = 0; i < 20; i++) this.mats.push(Mat3.create([0, 0, 0, 0, 0, 0, 0, 0, 0]));
   }
 
   set(m, i) {

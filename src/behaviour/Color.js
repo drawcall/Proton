@@ -72,15 +72,9 @@ export default class Color extends Behaviour {
     if (this.b) {
       this.calculate(particle, time, index);
 
-      particle.rgb.r =
-        particle.data.colorB.r +
-        (particle.data.colorA.r - particle.data.colorB.r) * this.energy;
-      particle.rgb.g =
-        particle.data.colorB.g +
-        (particle.data.colorA.g - particle.data.colorB.g) * this.energy;
-      particle.rgb.b =
-        particle.data.colorB.b +
-        (particle.data.colorA.b - particle.data.colorB.b) * this.energy;
+      particle.rgb.r = particle.data.colorB.r + (particle.data.colorA.r - particle.data.colorB.r) * this.energy;
+      particle.rgb.g = particle.data.colorB.g + (particle.data.colorA.g - particle.data.colorB.g) * this.energy;
+      particle.rgb.b = particle.data.colorB.b + (particle.data.colorA.b - particle.data.colorB.b) * this.energy;
 
       particle.rgb.r = Math.floor(particle.rgb.r);
       particle.rgb.g = Math.floor(particle.rgb.g);

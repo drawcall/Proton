@@ -18,12 +18,7 @@ export default {
    */
   getImageData(context, image, rect) {
     context.drawImage(image, rect.x, rect.y);
-    const imagedata = context.getImageData(
-      rect.x,
-      rect.y,
-      rect.width,
-      rect.height
-    );
+    const imagedata = context.getImageData(rect.x, rect.y, rect.width, rect.height);
     context.clearRect(rect.x, rect.y, rect.width, rect.height);
 
     return imagedata;
@@ -64,11 +59,7 @@ export default {
       const width = WebGLUtil.nhpot(img.width);
       const height = WebGLUtil.nhpot(img.height);
 
-      const canvas = DomUtil.createCanvas(
-        `proton_canvas_cache_${++canvasId}`,
-        width,
-        height
-      );
+      const canvas = DomUtil.createCanvas(`proton_canvas_cache_${++canvasId}`, width, height);
       const context = canvas.getContext("2d");
       context.drawImage(img, 0, 0, img.width, img.height);
 

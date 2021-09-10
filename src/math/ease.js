@@ -102,8 +102,7 @@ export default {
 
   easeInOutBack(value) {
     let s = 1.70158;
-    if ((value /= 0.5) < 1)
-      return 0.5 * (value * value * (((s *= 1.525) + 1) * value - s));
+    if ((value /= 0.5) < 1) return 0.5 * (value * value * (((s *= 1.525) + 1) * value - s));
     return 0.5 * ((value -= 2) * value * (((s *= 1.525) + 1) * value + s) + 2);
   },
 

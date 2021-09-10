@@ -725,7 +725,6 @@ var Puid = {
 
     uid = "PUID_" + this._index++;
     this._cache[uid] = target;
-
     return uid;
   },
   getIdFromCache: function getIdFromCache(target) {
@@ -1132,13 +1131,9 @@ var EventDispatcher = function () {
     key: "bind",
     value: function bind(target) {
       target.prototype.dispatchEvent = EventDispatcher.prototype.dispatchEvent;
-
       target.prototype.hasEventListener = EventDispatcher.prototype.hasEventListener;
-
       target.prototype.addEventListener = EventDispatcher.prototype.addEventListener;
-
       target.prototype.removeEventListener = EventDispatcher.prototype.removeEventListener;
-
       target.prototype.removeAllEventListeners = EventDispatcher.prototype.removeAllEventListeners;
     }
   }]);
@@ -1789,7 +1784,7 @@ var Particle = function () {
   /** @type string */
   function Particle(conf) {
     classCallCheck(this, Particle);
-    this.id = '';
+    this.id = "";
     this.old = {};
     this.data = {};
     this.behaviours = [];
@@ -2332,6 +2327,11 @@ var Zone = function () {
   }, {
     key: "crossing",
     value: function crossing(particle) {}
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.vector = null;
+    }
   }]);
   return Zone;
 }();
@@ -2538,225 +2538,224 @@ var Body = function (_Initialize) {
 
 var Behaviour = function () {
 
-    /**
-     * The Behaviour class is the base for the other Behaviour
-     *
-     * @memberof! -
-     * @interface
-     * @alias Proton.Behaviour
-     *
-     * @param {Number} life 	the behaviours life
-     * @param {String} easing 	The behaviour's decaying trend, for example ease.easeOutQuart
-     *
-     * @property {String}  id 		The behaviours id
-     * @param {Number} [life=Infinity] 				this behaviour's life
-     * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-     * @property {Number}  age=0 	How long the particle should be 'alife'
-     * @property {Number}  energy=1
-     * @property {Boolean} dead=false The particle is dead at first
-     * @property {Array}   parents 	The behaviour's parents array
-     * @property {String}  name 	The behaviour name
-     */
-    function Behaviour(life, easing) {
-        classCallCheck(this, Behaviour);
+  /**
+   * The Behaviour class is the base for the other Behaviour
+   *
+   * @memberof! -
+   * @interface
+   * @alias Proton.Behaviour
+   *
+   * @param {Number} life 	the behaviours life
+   * @param {String} easing 	The behaviour's decaying trend, for example ease.easeOutQuart
+   *
+   * @property {String}  id 		The behaviours id
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   * @property {Number}  age=0 	How long the particle should be 'alife'
+   * @property {Number}  energy=1
+   * @property {Boolean} dead=false The particle is dead at first
+   * @property {Array}   parents 	The behaviour's parents array
+   * @property {String}  name 	The behaviour name
+   */
+  function Behaviour(life, easing) {
+    classCallCheck(this, Behaviour);
+
+    this.life = Util.initValue(life, Infinity);
+    this.easing = ease.getEasing(easing);
+
+    this.age = 0;
+    this.energy = 1;
+    this.dead = false;
+    this.parents = [];
+
+    this.id = "Behaviour_" + Behaviour.id++;
+    this.name = "Behaviour";
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
+   * @memberof Proton.Behaviour
+   * @instance
+   *
+   * @param {Number} [life=Infinity] 		this behaviour's life
+   * @param {String} [easing=easeLinear] 	this behaviour's easing
+   */
 
 
-        this.life = Util.initValue(life, Infinity);
-        this.easing = ease.getEasing(easing);
-
-        this.age = 0;
-        this.energy = 1;
-        this.dead = false;
-        this.parents = [];
-
-        this.id = 'Behaviour_' + Behaviour.id++;
-        this.name = 'Behaviour';
+  createClass(Behaviour, [{
+    key: "reset",
+    value: function reset(life, easing) {
+      this.life = Util.initValue(life, Infinity);
+      this.easing = ease.getEasing(easing);
     }
 
     /**
-     * Reset this behaviour's parameters
+     * Normalize a force by 1:100;
      *
-     * @method reset
+     * @method normalizeForce
      * @memberof Proton.Behaviour
      * @instance
      *
-     * @param {Number} [life=Infinity] 		this behaviour's life
-     * @param {String} [easing=easeLinear] 	this behaviour's easing
+     * @param {Proton.Vector2D} force
      */
 
+  }, {
+    key: "normalizeForce",
+    value: function normalizeForce(force) {
+      return force.multiplyScalar(Proton.MEASURE);
+    }
 
-    createClass(Behaviour, [{
-        key: 'reset',
-        value: function reset(life, easing) {
-            this.life = Util.initValue(life, Infinity);
-            this.easing = ease.getEasing(easing);
-        }
+    /**
+     * Normalize a value by 1:100;
+     *
+     * @method normalizeValue
+     * @memberof Proton.Behaviour
+     * @instance
+     *
+     * @param {Number} value
+     */
 
-        /**
-         * Normalize a force by 1:100;
-         *
-         * @method normalizeForce
-         * @memberof Proton.Behaviour
-         * @instance
-         *
-         * @param {Proton.Vector2D} force
-         */
+  }, {
+    key: "normalizeValue",
+    value: function normalizeValue(value) {
+      return value * Proton.MEASURE;
+    }
 
-    }, {
-        key: 'normalizeForce',
-        value: function normalizeForce(force) {
-            return force.multiplyScalar(Proton.MEASURE);
-        }
+    /**
+     * Initialize the behaviour's parameters for all particles
+     *
+     * @method initialize
+     * @memberof Proton.Behaviour
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     */
 
-        /**
-         * Normalize a value by 1:100;
-         *
-         * @method normalizeValue
-         * @memberof Proton.Behaviour
-         * @instance
-         *
-         * @param {Number} value
-         */
+  }, {
+    key: "initialize",
+    value: function initialize(particle) {}
 
-    }, {
-        key: 'normalizeValue',
-        value: function normalizeValue(value) {
-            return value * Proton.MEASURE;
-        }
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton.Behaviour
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} 			time the integrate time 1/ms
+     * @param {Int} 			index the particle index
+     */
 
-        /**
-         * Initialize the behaviour's parameters for all particles
-         *
-         * @method initialize
-         * @memberof Proton.Behaviour
-         * @instance
-         *
-         * @param {Proton.Particle} particle
-         */
+  }, {
+    key: "calculate",
+    value: function calculate(particle, time, index) {
+      this.age += time;
 
-    }, {
-        key: 'initialize',
-        value: function initialize(particle) {}
+      if (this.age >= this.life || this.dead) {
+        this.energy = 0;
+        this.dead = true;
+        this.destroy();
+      } else {
+        var scale = this.easing(particle.age / particle.life);
+        this.energy = Math.max(1 - scale, 0);
+      }
+    }
 
-        /**
-         * Apply this behaviour for all particles every time
-         *
-         * @method applyBehaviour
-         * @memberof Proton.Behaviour
-         * @instance
-         *
-         * @param {Proton.Particle} particle
-         * @param {Number} 			time the integrate time 1/ms
-         * @param {Int} 			index the particle index
-         */
+    /**
+     * Destory this behaviour
+     *
+     * @method destroy
+     * @memberof Proton.Behaviour
+     * @instance
+     */
 
-    }, {
-        key: 'calculate',
-        value: function calculate(particle, time, index) {
-            this.age += time;
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      var i = this.parents.length;
+      while (i--) {
+        this.parents[i].removeBehaviour(this);
+      }
 
-            if (this.age >= this.life || this.dead) {
-                this.energy = 0;
-                this.dead = true;
-                this.destroy();
-            } else {
-                var scale = this.easing(particle.age / particle.life);
-                this.energy = Math.max(1 - scale, 0);
-            }
-        }
-
-        /**
-         * Destory this behaviour
-         *
-         * @method destroy
-         * @memberof Proton.Behaviour
-         * @instance
-         */
-
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            var i = this.parents.length;
-            while (i--) {
-                this.parents[i].removeBehaviour(this);
-            }
-
-            this.parents.length = 0;
-        }
-    }]);
-    return Behaviour;
+      this.parents.length = 0;
+    }
+  }]);
+  return Behaviour;
 }();
 
 Behaviour.id = 0;
 
 var Force = function (_Behaviour) {
-	inherits(Force, _Behaviour);
+  inherits(Force, _Behaviour);
 
-	/**
-  * @memberof! Proton#
-  * @augments Proton.Behaviour
-  * @constructor
-  * @alias Proton.Force
-  *
-  * @param {Number} fx
-  * @param {Number} fy
-  * @param {Number} [life=Infinity] 			this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  *
-  * @property {String} name The Behaviour name
-  */
-	function Force(fx, fy, life, easing) {
-		classCallCheck(this, Force);
-
-		var _this = possibleConstructorReturn(this, (Force.__proto__ || Object.getPrototypeOf(Force)).call(this, life, easing));
-
-		_this.force = _this.normalizeForce(new Vector2D(fx, fy));
-		_this.name = 'Force';
-		return _this;
-	}
-
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @method reset
-  * @memberof Proton#Proton.Force
-  * @instance
-  *
-  * @param {Number} fx
-  * @param {Number} fy
-  * @param {Number} [life=Infinity] 			this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  */
-
-
-	createClass(Force, [{
-		key: 'reset',
-		value: function reset(fx, fy, life, easing) {
-			this.force = this.normalizeForce(new Vector2D(fx, fy));
-
-			life && get(Force.prototype.__proto__ || Object.getPrototypeOf(Force.prototype), 'reset', this).call(this, life, easing);
-		}
-
-		/**
-   * Apply this behaviour for all particles every time
+  /**
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.Force
    *
-   * @method applyBehaviour
+   * @param {Number} fx
+   * @param {Number} fy
+   * @param {Number} [life=Infinity] 			this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Force(fx, fy, life, easing) {
+    classCallCheck(this, Force);
+
+    var _this = possibleConstructorReturn(this, (Force.__proto__ || Object.getPrototypeOf(Force)).call(this, life, easing));
+
+    _this.force = _this.normalizeForce(new Vector2D(fx, fy));
+    _this.name = "Force";
+    return _this;
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
    * @memberof Proton#Proton.Force
    * @instance
    *
-   * @param {Proton.Particle} particle
-   * @param {Number} the integrate time 1/ms
-   * @param {Int} the particle index
+   * @param {Number} fx
+   * @param {Number} fy
+   * @param {Number} [life=Infinity] 			this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
    */
 
-	}, {
-		key: 'applyBehaviour',
-		value: function applyBehaviour(particle, time, index) {
-			this.calculate(particle, time, index);
-			particle.a.add(this.force);
-		}
-	}]);
-	return Force;
+
+  createClass(Force, [{
+    key: "reset",
+    value: function reset(fx, fy, life, easing) {
+      this.force = this.normalizeForce(new Vector2D(fx, fy));
+
+      life && get(Force.prototype.__proto__ || Object.getPrototypeOf(Force.prototype), "reset", this).call(this, life, easing);
+    }
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton#Proton.Force
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} the integrate time 1/ms
+     * @param {Int} the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.calculate(particle, time, index);
+      particle.a.add(this.force);
+    }
+  }]);
+  return Force;
 }(Behaviour);
 
 var Attraction = function (_Behaviour) {
@@ -2955,245 +2954,245 @@ var RandomDrift = function (_Behaviour) {
 }(Behaviour);
 
 var Gravity = function (_Force) {
-	inherits(Gravity, _Force);
+  inherits(Gravity, _Force);
 
-	/**
-  * @memberof! Proton#
-  * @augments Proton#Proton.Force
-  * @constructor
-  * @alias Proton.Gravity
-  *
-  * @param {Number} g 							Gravity
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  *
-  * @property {String} name The Behaviour name
-  */
-	function Gravity(g, life, easing) {
-		classCallCheck(this, Gravity);
+  /**
+   * @memberof! Proton#
+   * @augments Proton#Proton.Force
+   * @constructor
+   * @alias Proton.Gravity
+   *
+   * @param {Number} g 							Gravity
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Gravity(g, life, easing) {
+    classCallCheck(this, Gravity);
 
-		var _this = possibleConstructorReturn(this, (Gravity.__proto__ || Object.getPrototypeOf(Gravity)).call(this, 0, g, life, easing));
+    var _this = possibleConstructorReturn(this, (Gravity.__proto__ || Object.getPrototypeOf(Gravity)).call(this, 0, g, life, easing));
 
-		_this.name = 'Gravity';
-		return _this;
-	}
+    _this.name = "Gravity";
+    return _this;
+  }
 
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @method reset
-  * @memberof Proton#Proton.Gravity
-  * @instance
-  *
-  * @param {Number} g 							Gravity
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  */
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
+   * @memberof Proton#Proton.Gravity
+   * @instance
+   *
+   * @param {Number} g 							Gravity
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   */
 
 
-	createClass(Gravity, [{
-		key: 'reset',
-		value: function reset(g, life, easing) {
-			get(Gravity.prototype.__proto__ || Object.getPrototypeOf(Gravity.prototype), 'reset', this).call(this, 0, g, life, easing);
-		}
-	}]);
-	return Gravity;
+  createClass(Gravity, [{
+    key: "reset",
+    value: function reset(g, life, easing) {
+      get(Gravity.prototype.__proto__ || Object.getPrototypeOf(Gravity.prototype), "reset", this).call(this, 0, g, life, easing);
+    }
+  }]);
+  return Gravity;
 }(Force);
 
 var Collision = function (_Behaviour) {
-	inherits(Collision, _Behaviour);
+  inherits(Collision, _Behaviour);
 
-	/**
-  * The callback after collision
-  *
-  * @callback Callback
-  *
-  * @param {Proton.Particle} particle
-  * @param {Proton.Paritcle} otherParticle
-  */
-	/**
-  * @memberof! Proton#
-  * @augments Proton.Behaviour
-  * @constructor
-  * @alias Proton.Collision
-  *
-  * @todo add description to mass
-  *
-  * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
-  * @param {Boolean} 		[mass=true]
-  * @param {Callback}	 	[callback=null]		the callback after the collision
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  *
-  * @property {String} name The Behaviour name
-  */
-	function Collision(emitter, mass, callback, life, easing) {
-		classCallCheck(this, Collision);
-
-		var _this = possibleConstructorReturn(this, (Collision.__proto__ || Object.getPrototypeOf(Collision)).call(this, life, easing));
-
-		_this.reset(emitter, mass, callback);
-		_this.name = 'Collision';
-		return _this;
-	}
-
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @memberof Proton#Proton.Collision
-  * @method reset
-  * @instance
-  *
-  * @todo add description to mass
-  *
-  * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
-  * @param {Boolean} 		[mass=true]
-  * @param {Callback}	 	[callback=null]		the callback after the collision
-  * @param {Number} 			[life=Infinity] 	this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  */
-
-
-	createClass(Collision, [{
-		key: 'reset',
-		value: function reset(emitter, mass, callback, life, easing) {
-			this.emitter = Util.initValue(emitter, null);
-			this.mass = Util.initValue(mass, true);
-			this.callback = Util.initValue(callback, null);
-
-			this.collisionPool = [];
-			this.delta = new Vector2D();
-
-			life && get(Collision.prototype.__proto__ || Object.getPrototypeOf(Collision.prototype), 'reset', this).call(this, life, easing);
-		}
-
-		/**
-   * Apply this behaviour for all particles every time
+  /**
+   * The callback after collision
    *
-   * @memberof Proton#Proton.Collision
-   * @method applyBehaviour
-   * @instance
+   * @callback Callback
    *
    * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
+   * @param {Proton.Paritcle} otherParticle
+   */
+  /**
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.Collision
+   *
+   * @todo add description to mass
+   *
+   * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
+   * @param {Boolean} 		[mass=true]
+   * @param {Callback}	 	[callback=null]		the callback after the collision
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Collision(emitter, mass, callback, life, easing) {
+    classCallCheck(this, Collision);
+
+    var _this = possibleConstructorReturn(this, (Collision.__proto__ || Object.getPrototypeOf(Collision)).call(this, life, easing));
+
+    _this.reset(emitter, mass, callback);
+    _this.name = "Collision";
+    return _this;
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @memberof Proton#Proton.Collision
+   * @method reset
+   * @instance
+   *
+   * @todo add description to mass
+   *
+   * @param {Proton.Emitter} 	[emitter=null] 		the attraction point coordinates
+   * @param {Boolean} 		[mass=true]
+   * @param {Callback}	 	[callback=null]		the callback after the collision
+   * @param {Number} 			[life=Infinity] 	this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
    */
 
-	}, {
-		key: 'applyBehaviour',
-		value: function applyBehaviour(particle, time, index) {
-			var newPool = this.emitter ? this.emitter.particles.slice(index) : this.pool.slice(index);
-			var length = newPool.length;
 
-			var otherParticle = void 0;
-			var lengthSq = void 0;
-			var overlap = void 0;
-			var totalMass = void 0;
-			var averageMass1 = void 0,
-			    averageMass2 = void 0;
-			var i = void 0;
+  createClass(Collision, [{
+    key: "reset",
+    value: function reset(emitter, mass, callback, life, easing) {
+      this.emitter = Util.initValue(emitter, null);
+      this.mass = Util.initValue(mass, true);
+      this.callback = Util.initValue(callback, null);
 
-			for (i = 0; i < length; i++) {
-				otherParticle = newPool[i];
+      this.collisionPool = [];
+      this.delta = new Vector2D();
 
-				if (otherParticle !== particle) {
-					this.delta.copy(otherParticle.p);
-					this.delta.sub(particle.p);
-
-					lengthSq = this.delta.lengthSq();
-					var distance = particle.radius + otherParticle.radius;
-
-					if (lengthSq <= distance * distance) {
-						overlap = distance - Math.sqrt(lengthSq);
-						overlap += 0.5;
-
-						totalMass = particle.mass + otherParticle.mass;
-						averageMass1 = this.mass ? otherParticle.mass / totalMass : 0.5;
-						averageMass2 = this.mass ? particle.mass / totalMass : 0.5;
-
-						particle.p.add(this.delta.clone().normalize().multiplyScalar(overlap * -averageMass1));
-						otherParticle.p.add(this.delta.normalize().multiplyScalar(overlap * averageMass2));
-
-						this.callback && this.callback(particle, otherParticle);
-					}
-				}
-			}
-		}
-	}]);
-	return Collision;
-}(Behaviour);
-
-var CrossZone = function (_Behaviour) {
-    inherits(CrossZone, _Behaviour);
-
-    /**
-     * Defines what happens if the particles come to the end of the specified zone
-     *
-     * @memberof! Proton#
-     * @augments Proton.Behaviour
-     * @constructor
-     * @alias Proton.CrossZone
-     *
-     * @param {Proton.Zone} zone 						can be any Proton.Zone - e.g. Proton.RectZone()
-     * @param {String} 		[crossType=dead] 			what happens if the particles pass the zone - allowed strings: dead | bound | cross
-     * @param {Number} 		[life=Infinity] 			this behaviour's life
-     * @param {String} 		[easing=ease.easeLinear] 	this behaviour's easing
-     *
-     * @property {String} name The Behaviour name
-     */
-    function CrossZone(zone, crossType, life, easing) {
-        classCallCheck(this, CrossZone);
-
-        var _this = possibleConstructorReturn(this, (CrossZone.__proto__ || Object.getPrototypeOf(CrossZone)).call(this, life, easing));
-
-        _this.reset(zone, crossType);
-        _this.name = 'CrossZone';
-        return _this;
+      life && get(Collision.prototype.__proto__ || Object.getPrototypeOf(Collision.prototype), "reset", this).call(this, life, easing);
     }
 
     /**
-     * Reset this behaviour's parameters
+     * Apply this behaviour for all particles every time
      *
-     * @method reset
+     * @memberof Proton#Proton.Collision
+     * @method applyBehaviour
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} 			time the integrate time 1/ms
+     * @param {Int} 			index the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      var newPool = this.emitter ? this.emitter.particles.slice(index) : this.pool.slice(index);
+      var length = newPool.length;
+
+      var otherParticle = void 0;
+      var lengthSq = void 0;
+      var overlap = void 0;
+      var totalMass = void 0;
+      var averageMass1 = void 0,
+          averageMass2 = void 0;
+      var i = void 0;
+
+      for (i = 0; i < length; i++) {
+        otherParticle = newPool[i];
+
+        if (otherParticle !== particle) {
+          this.delta.copy(otherParticle.p);
+          this.delta.sub(particle.p);
+
+          lengthSq = this.delta.lengthSq();
+          var distance = particle.radius + otherParticle.radius;
+
+          if (lengthSq <= distance * distance) {
+            overlap = distance - Math.sqrt(lengthSq);
+            overlap += 0.5;
+
+            totalMass = particle.mass + otherParticle.mass;
+            averageMass1 = this.mass ? otherParticle.mass / totalMass : 0.5;
+            averageMass2 = this.mass ? particle.mass / totalMass : 0.5;
+
+            particle.p.add(this.delta.clone().normalize().multiplyScalar(overlap * -averageMass1));
+            otherParticle.p.add(this.delta.normalize().multiplyScalar(overlap * averageMass2));
+
+            this.callback && this.callback(particle, otherParticle);
+          }
+        }
+      }
+    }
+  }]);
+  return Collision;
+}(Behaviour);
+
+var CrossZone = function (_Behaviour) {
+  inherits(CrossZone, _Behaviour);
+
+  /**
+   * Defines what happens if the particles come to the end of the specified zone
+   *
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.CrossZone
+   *
+   * @param {Proton.Zone} zone 						can be any Proton.Zone - e.g. Proton.RectZone()
+   * @param {String} 		[crossType=dead] 			what happens if the particles pass the zone - allowed strings: dead | bound | cross
+   * @param {Number} 		[life=Infinity] 			this behaviour's life
+   * @param {String} 		[easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function CrossZone(zone, crossType, life, easing) {
+    classCallCheck(this, CrossZone);
+
+    var _this = possibleConstructorReturn(this, (CrossZone.__proto__ || Object.getPrototypeOf(CrossZone)).call(this, life, easing));
+
+    _this.reset(zone, crossType);
+    _this.name = "CrossZone";
+    return _this;
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
+   * @memberof Proton#Proton.CrossZone
+   * @instance
+   *
+   * @param {Proton.Zone} zone 				can be any Proton.Zone - e.g. Proton.RectZone()
+   * @param {String} 		[crossType=dead] 	what happens if the particles pass the zone - allowed strings: dead | bound | cross
+   * @param {Number} 		[life=Infinity] 	this behaviour's life
+   * @param {String} 		[easing=easeLinear]	this behaviour's easing
+   */
+
+
+  createClass(CrossZone, [{
+    key: "reset",
+    value: function reset(zone, crossType, life, easing) {
+      this.zone = zone;
+      this.zone.crossType = Util.initValue(crossType, "dead");
+
+      life && get(CrossZone.prototype.__proto__ || Object.getPrototypeOf(CrossZone.prototype), "reset", this).call(this, life, easing);
+    }
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
      * @memberof Proton#Proton.CrossZone
      * @instance
      *
-     * @param {Proton.Zone} zone 				can be any Proton.Zone - e.g. Proton.RectZone()
-     * @param {String} 		[crossType=dead] 	what happens if the particles pass the zone - allowed strings: dead | bound | cross
-     * @param {Number} 		[life=Infinity] 	this behaviour's life
-     * @param {String} 		[easing=easeLinear]	this behaviour's easing
+     * @param {Proton.Particle} particle
+     * @param {Number} the integrate time 1/ms
+     * @param {Int} the particle index
      */
 
-
-    createClass(CrossZone, [{
-        key: 'reset',
-        value: function reset(zone, crossType, life, easing) {
-            this.zone = zone;
-            this.zone.crossType = Util.initValue(crossType, 'dead');
-
-            life && get(CrossZone.prototype.__proto__ || Object.getPrototypeOf(CrossZone.prototype), 'reset', this).call(this, life, easing);
-        }
-
-        /**
-         * Apply this behaviour for all particles every time
-         *
-         * @method applyBehaviour
-         * @memberof Proton#Proton.CrossZone
-         * @instance
-         *
-         * @param {Proton.Particle} particle
-         * @param {Number} the integrate time 1/ms
-         * @param {Int} the particle index
-         */
-
-    }, {
-        key: 'applyBehaviour',
-        value: function applyBehaviour(particle, time, index) {
-            this.calculate(particle, time, index);
-            this.zone.crossing(particle);
-        }
-    }]);
-    return CrossZone;
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.calculate(particle, time, index);
+      this.zone.crossing(particle);
+    }
+  }]);
+  return CrossZone;
 }(Behaviour);
 
 var Alpha = function (_Behaviour) {
@@ -3292,207 +3291,207 @@ var Alpha = function (_Behaviour) {
 }(Behaviour);
 
 var Scale = function (_Behaviour) {
-	inherits(Scale, _Behaviour);
+  inherits(Scale, _Behaviour);
 
-	/**
-  * @memberof! Proton#
-  * @augments Proton.Behaviour
-  * @constructor
-  * @alias Proton.Scale
-  *
-  * @todo add description for 'a' and 'b'
-  *
-  * @param {Number} a
-  * @param {String} b
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  *
-  * @property {String} name The Behaviour name
-  */
-	function Scale(a, b, life, easing) {
-		classCallCheck(this, Scale);
-
-		var _this = possibleConstructorReturn(this, (Scale.__proto__ || Object.getPrototypeOf(Scale)).call(this, life, easing));
-
-		_this.reset(a, b);
-		_this.name = 'Scale';
-		return _this;
-	}
-
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @method reset
-  * @memberof Proton#Proton.Scale
-  * @instance
-  *
-  * @param {Number} a
-  * @param {String} b
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  */
-
-
-	createClass(Scale, [{
-		key: 'reset',
-		value: function reset(a, b, life, easing) {
-			this.same = b === null || b === undefined ? true : false;
-			this.a = Span.setSpanValue(Util.initValue(a, 1));
-			this.b = Span.setSpanValue(b);
-
-			life && get(Scale.prototype.__proto__ || Object.getPrototypeOf(Scale.prototype), 'reset', this).call(this, life, easing);
-		}
-
-		/**
-   * Initialize the behaviour's parameters for all particles
+  /**
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.Scale
    *
-   * @method initialize
+   * @todo add description for 'a' and 'b'
+   *
+   * @param {Number} a
+   * @param {String} b
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Scale(a, b, life, easing) {
+    classCallCheck(this, Scale);
+
+    var _this = possibleConstructorReturn(this, (Scale.__proto__ || Object.getPrototypeOf(Scale)).call(this, life, easing));
+
+    _this.reset(a, b);
+    _this.name = "Scale";
+    return _this;
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
    * @memberof Proton#Proton.Scale
    * @instance
    *
-   * @param {Proton.Particle} particle
+   * @param {Number} a
+   * @param {String} b
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
    */
 
-	}, {
-		key: 'initialize',
-		value: function initialize(particle) {
-			particle.data.scaleA = this.a.getValue();
-			particle.data.oldRadius = particle.radius;
-			particle.data.scaleB = this.same ? particle.data.scaleA : this.b.getValue();
-		}
-	}, {
-		key: 'applyBehaviour',
 
+  createClass(Scale, [{
+    key: "reset",
+    value: function reset(a, b, life, easing) {
+      this.same = b === null || b === undefined ? true : false;
+      this.a = Span.setSpanValue(Util.initValue(a, 1));
+      this.b = Span.setSpanValue(b);
 
-		/**
-   * Apply this behaviour for all particles every time
-   *
-   * @method applyBehaviour
-   * @memberof Proton#Proton.Scale
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
-   */
-		value: function applyBehaviour(particle, time, index) {
-			this.calculate(particle, time, index);
-			particle.scale = particle.data.scaleB + (particle.data.scaleA - particle.data.scaleB) * this.energy;
+      life && get(Scale.prototype.__proto__ || Object.getPrototypeOf(Scale.prototype), "reset", this).call(this, life, easing);
+    }
 
-			if (particle.scale < 0.0001) particle.scale = 0;
-			particle.radius = particle.data.oldRadius * particle.scale;
-		}
-	}]);
-	return Scale;
+    /**
+     * Initialize the behaviour's parameters for all particles
+     *
+     * @method initialize
+     * @memberof Proton#Proton.Scale
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     */
+
+  }, {
+    key: "initialize",
+    value: function initialize(particle) {
+      particle.data.scaleA = this.a.getValue();
+      particle.data.oldRadius = particle.radius;
+      particle.data.scaleB = this.same ? particle.data.scaleA : this.b.getValue();
+    }
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton#Proton.Scale
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} 			time the integrate time 1/ms
+     * @param {Int} 			index the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.calculate(particle, time, index);
+      particle.scale = particle.data.scaleB + (particle.data.scaleA - particle.data.scaleB) * this.energy;
+
+      if (particle.scale < 0.0001) particle.scale = 0;
+      particle.radius = particle.data.oldRadius * particle.scale;
+    }
+  }]);
+  return Scale;
 }(Behaviour);
 
 var Rotate = function (_Behaviour) {
-	inherits(Rotate, _Behaviour);
+  inherits(Rotate, _Behaviour);
 
-	/**
-  * @memberof! Proton#
-  * @augments Proton.Behaviour
-  * @constructor
-  * @alias Proton.Rotate
-  *
-  * @todo add description for 'a', 'b' and 'style'
-  *
-  * @param {String} [influence=Velocity] The rotation's influence
-  * @param {String} b
-  * @param {String} [style=to]
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  *
-  * @property {String} name The Behaviour name
-  */
-	function Rotate(influence, b, style, life, easing) {
-		classCallCheck(this, Rotate);
-
-		var _this = possibleConstructorReturn(this, (Rotate.__proto__ || Object.getPrototypeOf(Rotate)).call(this, life, easing));
-
-		_this.reset(influence, b, style);
-		_this.name = 'Rotate';
-		return _this;
-	}
-
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @method reset
-  * @memberof Proton#Proton.Rotate
-  * @instance
-  *
-  * @todo add description for 'a', 'b' and 'style'
-  *
-  * @param {String} a
-  * @param {String} b
-  * @param {String} [style=to]
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  */
-
-
-	createClass(Rotate, [{
-		key: 'reset',
-		value: function reset(a, b, style, life, easing) {
-			this.same = b === null || b === undefined ? true : false;
-
-			this.a = Span.setSpanValue(Util.initValue(a, 'Velocity'));
-			this.b = Span.setSpanValue(Util.initValue(b, 0));
-			this.style = Util.initValue(style, 'to');
-
-			life && get(Rotate.prototype.__proto__ || Object.getPrototypeOf(Rotate.prototype), 'reset', this).call(this, life, easing);
-		}
-
-		/**
-   * Initialize the behaviour's parameters for all particles
+  /**
+   * @memberof! Proton#
+   * @augments Proton.Behaviour
+   * @constructor
+   * @alias Proton.Rotate
    *
-   * @method initialize
+   * @todo add description for 'a', 'b' and 'style'
+   *
+   * @param {String} [influence=Velocity] The rotation's influence
+   * @param {String} b
+   * @param {String} [style=to]
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function Rotate(influence, b, style, life, easing) {
+    classCallCheck(this, Rotate);
+
+    var _this = possibleConstructorReturn(this, (Rotate.__proto__ || Object.getPrototypeOf(Rotate)).call(this, life, easing));
+
+    _this.reset(influence, b, style);
+    _this.name = "Rotate";
+    return _this;
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
    * @memberof Proton#Proton.Rotate
    * @instance
    *
-   * @param {Proton.Particle} particle
+   * @todo add description for 'a', 'b' and 'style'
+   *
+   * @param {String} a
+   * @param {String} b
+   * @param {String} [style=to]
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
    */
 
-	}, {
-		key: 'initialize',
-		value: function initialize(particle) {
-			particle.rotation = this.a.getValue();
-			particle.data.rotationA = this.a.getValue();
 
-			if (!this.same) particle.data.rotationB = this.b.getValue();
-		}
-	}, {
-		key: 'applyBehaviour',
+  createClass(Rotate, [{
+    key: "reset",
+    value: function reset(a, b, style, life, easing) {
+      this.same = b === null || b === undefined ? true : false;
 
+      this.a = Span.setSpanValue(Util.initValue(a, "Velocity"));
+      this.b = Span.setSpanValue(Util.initValue(b, 0));
+      this.style = Util.initValue(style, "to");
 
-		/**
-   * Apply this behaviour for all particles every time
-   *
-   * @method applyBehaviour
-   * @memberof Proton#Proton.Rotate
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
-   */
-		value: function applyBehaviour(particle, time, index) {
-			this.calculate(particle, time, index);
+      life && get(Rotate.prototype.__proto__ || Object.getPrototypeOf(Rotate.prototype), "reset", this).call(this, life, easing);
+    }
 
-			if (!this.same) {
-				if (this.style === 'to' || this.style === 'TO' || this.style === '_') {
-					particle.rotation += particle.data.rotationB + (particle.data.rotationA - particle.data.rotationB) * this.energy;
-				} else {
-					particle.rotation += particle.data.rotationB;
-				}
-			} else if (this.a.a === 'V' || this.a.a === 'Velocity' || this.a.a === 'v') {
-				// beta...
-				particle.rotation = particle.getDirection();
-			}
-		}
-	}]);
-	return Rotate;
+    /**
+     * Initialize the behaviour's parameters for all particles
+     *
+     * @method initialize
+     * @memberof Proton#Proton.Rotate
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     */
+
+  }, {
+    key: "initialize",
+    value: function initialize(particle) {
+      particle.rotation = this.a.getValue();
+      particle.data.rotationA = this.a.getValue();
+
+      if (!this.same) particle.data.rotationB = this.b.getValue();
+    }
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton#Proton.Rotate
+     * @instance
+     *
+     * @param {Proton.Particle} particle
+     * @param {Number} 			time the integrate time 1/ms
+     * @param {Int} 			index the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.calculate(particle, time, index);
+
+      if (!this.same) {
+        if (this.style === "to" || this.style === "TO" || this.style === "_") {
+          particle.rotation += particle.data.rotationB + (particle.data.rotationA - particle.data.rotationB) * this.energy;
+        } else {
+          particle.rotation += particle.data.rotationB;
+        }
+      } else if (this.a.a === "V" || this.a.a === "Velocity" || this.a.a === "v") {
+        // beta...
+        particle.rotation = particle.getDirection();
+      }
+    }
+  }]);
+  return Rotate;
 }(Behaviour);
 
 var Color = function (_Behaviour) {
@@ -3724,153 +3723,153 @@ var Cyclone = function (_Behaviour) {
 }(Behaviour);
 
 var Repulsion = function (_Attraction) {
-	inherits(Repulsion, _Attraction);
+  inherits(Repulsion, _Attraction);
 
-	/**
-  * The oppisite of Proton.Attraction - turns the force
-  *
-  * @memberof! Proton#
-  * @augments Proton#Proton.Attraction
-  * @constructor
-  * @alias Proton.Repulsion
-  *
-  * @todo add description for 'force' and 'radius'
-  *
-  * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-  * @param {Number} [force=100]
-  * @param {Number} [radius=1000]
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  *
-  * @property {Number} force
-  * @property {String} name The Behaviour name
-  */
-	function Repulsion(targetPosition, force, radius, life, easing) {
-		classCallCheck(this, Repulsion);
+  /**
+   * The oppisite of Proton.Attraction - turns the force
+   *
+   * @memberof! Proton#
+   * @augments Proton#Proton.Attraction
+   * @constructor
+   * @alias Proton.Repulsion
+   *
+   * @todo add description for 'force' and 'radius'
+   *
+   * @param {Proton.Vector2D} targetPosition the attraction point coordinates
+   * @param {Number} [force=100]
+   * @param {Number} [radius=1000]
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   *
+   * @property {Number} force
+   * @property {String} name The Behaviour name
+   */
+  function Repulsion(targetPosition, force, radius, life, easing) {
+    classCallCheck(this, Repulsion);
 
-		var _this = possibleConstructorReturn(this, (Repulsion.__proto__ || Object.getPrototypeOf(Repulsion)).call(this, targetPosition, force, radius, life, easing));
+    var _this = possibleConstructorReturn(this, (Repulsion.__proto__ || Object.getPrototypeOf(Repulsion)).call(this, targetPosition, force, radius, life, easing));
 
-		_this.force *= -1;
-		_this.name = 'Repulsion';
-		return _this;
-	}
+    _this.force *= -1;
+    _this.name = "Repulsion";
+    return _this;
+  }
 
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @method reset
-  * @memberof Proton#Proton.Repulsion
-  * @instance
-  *
-  * @todo add description for 'force' and 'radius'
-  *
-  * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-  * @param {Number} [force=100]
-  * @param {Number} [radius=1000]
-  * @param {Number} [life=Infinity] 				this behaviour's life
-  * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-  */
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
+   * @memberof Proton#Proton.Repulsion
+   * @instance
+   *
+   * @todo add description for 'force' and 'radius'
+   *
+   * @param {Proton.Vector2D} targetPosition the attraction point coordinates
+   * @param {Number} [force=100]
+   * @param {Number} [radius=1000]
+   * @param {Number} [life=Infinity] 				this behaviour's life
+   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   */
 
 
-	createClass(Repulsion, [{
-		key: 'reset',
-		value: function reset(targetPosition, force, radius, life, easing) {
-			get(Repulsion.prototype.__proto__ || Object.getPrototypeOf(Repulsion.prototype), 'reset', this).call(this, targetPosition, force, radius, life, easing);
-			this.force *= -1;
-		}
-	}]);
-	return Repulsion;
+  createClass(Repulsion, [{
+    key: "reset",
+    value: function reset(targetPosition, force, radius, life, easing) {
+      get(Repulsion.prototype.__proto__ || Object.getPrototypeOf(Repulsion.prototype), "reset", this).call(this, targetPosition, force, radius, life, easing);
+      this.force *= -1;
+    }
+  }]);
+  return Repulsion;
 }(Attraction);
 
 var GravityWell = function (_Behaviour) {
-	inherits(GravityWell, _Behaviour);
+  inherits(GravityWell, _Behaviour);
 
-	/**
-  * @memberof! Proton#
-  * @augments Behaviour
-  * @constructor
-  * @alias GravityWell
-  *
-  * @param {Vector2D} [centerPoint=new Vector2D] The point in the center
-  * @param {Number} [force=100]					The force
-  * @param {Number} [life=Infinity]				this behaviour's life
-  * @param {String} [easing=easeLinear]	this behaviour's easing
-  *
-  * @property {String} name The Behaviour name
-  */
-	function GravityWell(centerPoint, force, life, easing) {
-		classCallCheck(this, GravityWell);
-
-		var _this = possibleConstructorReturn(this, (GravityWell.__proto__ || Object.getPrototypeOf(GravityWell)).call(this, life, easing));
-
-		_this.distanceVec = new Vector2D();
-		_this.centerPoint = Util.initValue(centerPoint, new Vector2D());
-		_this.force = Util.initValue(_this.normalizeValue(force), 100);
-
-		_this.name = 'GravityWell';
-		return _this;
-	}
-
-	/**
-  * Reset this behaviour's parameters
-  *
-  * @method reset
-  * @memberof Proton#GravityWell
-  * @instance
-  *
-  * @param {Vector2D} [centerPoint=new Vector2D] The point in the center
-  * @param {Number} [force=100]					The force
-  * @param {Number} [life=Infinity]				this behaviour's life
-  * @param {String} [easing=easeLinear]	this behaviour's easing
-  */
-
-
-	createClass(GravityWell, [{
-		key: 'reset',
-		value: function reset(centerPoint, force, life, easing) {
-			this.distanceVec = new Vector2D();
-			this.centerPoint = Util.initValue(centerPoint, new Vector2D());
-			this.force = Util.initValue(this.normalizeValue(force), 100);
-
-			life && get(GravityWell.prototype.__proto__ || Object.getPrototypeOf(GravityWell.prototype), 'reset', this).call(this, life, easing);
-		}
-	}, {
-		key: 'initialize',
-
-
-		/**
-   * @inheritdoc
-   */
-		value: function initialize(particle) {}
-	}, {
-		key: 'applyBehaviour',
-
-
-		/**
-   * Apply this behaviour for all particles every time
+  /**
+   * @memberof! Proton#
+   * @augments Behaviour
+   * @constructor
+   * @alias GravityWell
    *
-   * @method applyBehaviour
+   * @param {Vector2D} [centerPoint=new Vector2D] The point in the center
+   * @param {Number} [force=100]					The force
+   * @param {Number} [life=Infinity]				this behaviour's life
+   * @param {String} [easing=easeLinear]	this behaviour's easing
+   *
+   * @property {String} name The Behaviour name
+   */
+  function GravityWell(centerPoint, force, life, easing) {
+    classCallCheck(this, GravityWell);
+
+    var _this = possibleConstructorReturn(this, (GravityWell.__proto__ || Object.getPrototypeOf(GravityWell)).call(this, life, easing));
+
+    _this.distanceVec = new Vector2D();
+    _this.centerPoint = Util.initValue(centerPoint, new Vector2D());
+    _this.force = Util.initValue(_this.normalizeValue(force), 100);
+
+    _this.name = "GravityWell";
+    return _this;
+  }
+
+  /**
+   * Reset this behaviour's parameters
+   *
+   * @method reset
    * @memberof Proton#GravityWell
    * @instance
    *
-   * @param {Particle} particle
-   * @param {Number} the integrate time 1/ms
-   * @param {Int} the particle index
+   * @param {Vector2D} [centerPoint=new Vector2D] The point in the center
+   * @param {Number} [force=100]					The force
+   * @param {Number} [life=Infinity]				this behaviour's life
+   * @param {String} [easing=easeLinear]	this behaviour's easing
    */
-		value: function applyBehaviour(particle, time, index) {
-			this.distanceVec.set(this.centerPoint.x - particle.p.x, this.centerPoint.y - particle.p.y);
-			var distanceSq = this.distanceVec.lengthSq();
 
-			if (distanceSq !== 0) {
-				var distance = this.distanceVec.length();
-				var factor = this.force * time / (distanceSq * distance);
 
-				particle.v.x += factor * this.distanceVec.x;
-				particle.v.y += factor * this.distanceVec.y;
-			}
-		}
-	}]);
-	return GravityWell;
+  createClass(GravityWell, [{
+    key: "reset",
+    value: function reset(centerPoint, force, life, easing) {
+      this.distanceVec = new Vector2D();
+      this.centerPoint = Util.initValue(centerPoint, new Vector2D());
+      this.force = Util.initValue(this.normalizeValue(force), 100);
+
+      life && get(GravityWell.prototype.__proto__ || Object.getPrototypeOf(GravityWell.prototype), "reset", this).call(this, life, easing);
+    }
+
+    /**
+     * @inheritdoc
+     */
+
+  }, {
+    key: "initialize",
+    value: function initialize(particle) {}
+
+    /**
+     * Apply this behaviour for all particles every time
+     *
+     * @method applyBehaviour
+     * @memberof Proton#GravityWell
+     * @instance
+     *
+     * @param {Particle} particle
+     * @param {Number} the integrate time 1/ms
+     * @param {Int} the particle index
+     */
+
+  }, {
+    key: "applyBehaviour",
+    value: function applyBehaviour(particle, time, index) {
+      this.distanceVec.set(this.centerPoint.x - particle.p.x, this.centerPoint.y - particle.p.y);
+      var distanceSq = this.distanceVec.lengthSq();
+
+      if (distanceSq !== 0) {
+        var distance = this.distanceVec.length();
+        var factor = this.force * time / (distanceSq * distance);
+
+        particle.v.x += factor * this.distanceVec.x;
+        particle.v.y += factor * this.distanceVec.y;
+      }
+    }
+  }]);
+  return GravityWell;
 }(Behaviour);
 
 var InitializeUtil = {
@@ -4401,7 +4400,6 @@ var FollowEmitter = function (_Emitter) {
       this.mouseupHandler = function (e) {
         return _this2.mouseup.call(_this2, e);
       };
-
       this.mouseTarget.addEventListener("mousemove", this.mousemoveHandler, false);
     }
 
@@ -4456,265 +4454,267 @@ var FollowEmitter = function (_Emitter) {
 }(Emitter);
 
 var BaseRenderer = function () {
-    function BaseRenderer(element, stroke) {
-        classCallCheck(this, BaseRenderer);
+  function BaseRenderer(element, stroke) {
+    classCallCheck(this, BaseRenderer);
 
-        this.pool = new Pool();
-        this.element = element;
-        this.stroke = stroke;
-        this.circleConf = { isCircle: true };
+    this.pool = new Pool();
+    this.element = element;
+    this.stroke = stroke;
+    this.circleConf = { isCircle: true };
 
-        this.initHandler();
-        this.name = "BaseRenderer";
+    this.initHandler();
+    this.name = "BaseRenderer";
+  }
+
+  createClass(BaseRenderer, [{
+    key: "setStroke",
+    value: function setStroke() {
+      var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#000000";
+      var thinkness = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+      this.stroke = { color: color, thinkness: thinkness };
     }
+  }, {
+    key: "initHandler",
+    value: function initHandler() {
+      var _this = this;
 
-    createClass(BaseRenderer, [{
-        key: "setStroke",
-        value: function setStroke() {
-            var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#000000";
-            var thinkness = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      this._protonUpdateHandler = function () {
+        _this.onProtonUpdate.call(_this);
+      };
 
-            this.stroke = { color: color, thinkness: thinkness };
-        }
-    }, {
-        key: "initHandler",
-        value: function initHandler() {
-            var _this = this;
+      this._protonUpdateAfterHandler = function () {
+        _this.onProtonUpdateAfter.call(_this);
+      };
 
-            this._protonUpdateHandler = function () {
-                _this.onProtonUpdate.call(_this);
-            };
+      this._emitterAddedHandler = function (emitter) {
+        _this.onEmitterAdded.call(_this, emitter);
+      };
 
-            this._protonUpdateAfterHandler = function () {
-                _this.onProtonUpdateAfter.call(_this);
-            };
+      this._emitterRemovedHandler = function (emitter) {
+        _this.onEmitterRemoved.call(_this, emitter);
+      };
 
-            this._emitterAddedHandler = function (emitter) {
-                _this.onEmitterAdded.call(_this, emitter);
-            };
+      this._particleCreatedHandler = function (particle) {
+        _this.onParticleCreated.call(_this, particle);
+      };
 
-            this._emitterRemovedHandler = function (emitter) {
-                _this.onEmitterRemoved.call(_this, emitter);
-            };
+      this._particleUpdateHandler = function (particle) {
+        _this.onParticleUpdate.call(_this, particle);
+      };
 
-            this._particleCreatedHandler = function (particle) {
-                _this.onParticleCreated.call(_this, particle);
-            };
+      this._particleDeadHandler = function (particle) {
+        _this.onParticleDead.call(_this, particle);
+      };
+    }
+  }, {
+    key: "init",
+    value: function init(proton) {
+      this.parent = proton;
 
-            this._particleUpdateHandler = function (particle) {
-                _this.onParticleUpdate.call(_this, particle);
-            };
+      proton.addEventListener("PROTON_UPDATE", this._protonUpdateHandler);
+      proton.addEventListener("PROTON_UPDATE_AFTER", this._protonUpdateAfterHandler);
 
-            this._particleDeadHandler = function (particle) {
-                _this.onParticleDead.call(_this, particle);
-            };
-        }
-    }, {
-        key: "init",
-        value: function init(proton) {
-            this.parent = proton;
+      proton.addEventListener("EMITTER_ADDED", this._emitterAddedHandler);
+      proton.addEventListener("EMITTER_REMOVED", this._emitterRemovedHandler);
 
-            proton.addEventListener("PROTON_UPDATE", this._protonUpdateHandler);
-            proton.addEventListener("PROTON_UPDATE_AFTER", this._protonUpdateAfterHandler);
+      proton.addEventListener("PARTICLE_CREATED", this._particleCreatedHandler);
+      proton.addEventListener("PARTICLE_UPDATE", this._particleUpdateHandler);
+      proton.addEventListener("PARTICLE_DEAD", this._particleDeadHandler);
+    }
+  }, {
+    key: "resize",
+    value: function resize(width, height) {}
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.remove();
+      this.pool.destroy();
+      this.element = null;
+    }
+  }, {
+    key: "remove",
+    value: function remove(proton) {
+      this.parent.removeEventListener("PROTON_UPDATE", this._protonUpdateHandler);
+      this.parent.removeEventListener("PROTON_UPDATE_AFTER", this._protonUpdateAfterHandler);
 
-            proton.addEventListener("EMITTER_ADDED", this._emitterAddedHandler);
-            proton.addEventListener("EMITTER_REMOVED", this._emitterRemovedHandler);
+      this.parent.removeEventListener("EMITTER_ADDED", this._emitterAddedHandler);
+      this.parent.removeEventListener("EMITTER_REMOVED", this._emitterRemovedHandler);
 
-            proton.addEventListener("PARTICLE_CREATED", this._particleCreatedHandler);
-            proton.addEventListener("PARTICLE_UPDATE", this._particleUpdateHandler);
-            proton.addEventListener("PARTICLE_DEAD", this._particleDeadHandler);
-        }
-    }, {
-        key: "resize",
-        value: function resize(width, height) {}
-    }, {
-        key: "destroy",
-        value: function destroy() {
-            this.remove();
-        }
-    }, {
-        key: "remove",
-        value: function remove(proton) {
-            this.parent.removeEventListener("PROTON_UPDATE", this._protonUpdateHandler);
-            this.parent.removeEventListener("PROTON_UPDATE_AFTER", this._protonUpdateAfterHandler);
+      this.parent.removeEventListener("PARTICLE_CREATED", this._particleCreatedHandler);
+      this.parent.removeEventListener("PARTICLE_UPDATE", this._particleUpdateHandler);
+      this.parent.removeEventListener("PARTICLE_DEAD", this._particleDeadHandler);
 
-            this.parent.removeEventListener("EMITTER_ADDED", this._emitterAddedHandler);
-            this.parent.removeEventListener("EMITTER_REMOVED", this._emitterRemovedHandler);
-
-            this.parent.removeEventListener("PARTICLE_CREATED", this._particleCreatedHandler);
-            this.parent.removeEventListener("PARTICLE_UPDATE", this._particleUpdateHandler);
-            this.parent.removeEventListener("PARTICLE_DEAD", this._particleDeadHandler);
-
-            this.parent = null;
-        }
-    }, {
-        key: "onProtonUpdate",
-        value: function onProtonUpdate() {}
-    }, {
-        key: "onProtonUpdateAfter",
-        value: function onProtonUpdateAfter() {}
-    }, {
-        key: "onEmitterAdded",
-        value: function onEmitterAdded(emitter) {}
-    }, {
-        key: "onEmitterRemoved",
-        value: function onEmitterRemoved(emitter) {}
-    }, {
-        key: "onParticleCreated",
-        value: function onParticleCreated(particle) {}
-    }, {
-        key: "onParticleUpdate",
-        value: function onParticleUpdate(particle) {}
-    }, {
-        key: "onParticleDead",
-        value: function onParticleDead(particle) {}
-    }]);
-    return BaseRenderer;
+      this.parent = null;
+    }
+  }, {
+    key: "onProtonUpdate",
+    value: function onProtonUpdate() {}
+  }, {
+    key: "onProtonUpdateAfter",
+    value: function onProtonUpdateAfter() {}
+  }, {
+    key: "onEmitterAdded",
+    value: function onEmitterAdded(emitter) {}
+  }, {
+    key: "onEmitterRemoved",
+    value: function onEmitterRemoved(emitter) {}
+  }, {
+    key: "onParticleCreated",
+    value: function onParticleCreated(particle) {}
+  }, {
+    key: "onParticleUpdate",
+    value: function onParticleUpdate(particle) {}
+  }, {
+    key: "onParticleDead",
+    value: function onParticleDead(particle) {}
+  }]);
+  return BaseRenderer;
 }();
 
 var CanvasRenderer = function (_BaseRenderer) {
-    inherits(CanvasRenderer, _BaseRenderer);
+  inherits(CanvasRenderer, _BaseRenderer);
 
-    function CanvasRenderer(element) {
-        classCallCheck(this, CanvasRenderer);
+  function CanvasRenderer(element) {
+    classCallCheck(this, CanvasRenderer);
 
-        var _this = possibleConstructorReturn(this, (CanvasRenderer.__proto__ || Object.getPrototypeOf(CanvasRenderer)).call(this, element));
+    var _this = possibleConstructorReturn(this, (CanvasRenderer.__proto__ || Object.getPrototypeOf(CanvasRenderer)).call(this, element));
 
-        _this.stroke = null;
-        _this.context = _this.element.getContext("2d");
-        _this.bufferCache = {};
-        _this.name = "CanvasRenderer";
-        return _this;
+    _this.stroke = null;
+    _this.context = _this.element.getContext("2d");
+    _this.bufferCache = {};
+    _this.name = "CanvasRenderer";
+    return _this;
+  }
+
+  createClass(CanvasRenderer, [{
+    key: "resize",
+    value: function resize(width, height) {
+      this.element.width = width;
+      this.element.height = height;
+    }
+  }, {
+    key: "onProtonUpdate",
+    value: function onProtonUpdate() {
+      this.context.clearRect(0, 0, this.element.width, this.element.height);
+    }
+  }, {
+    key: "onParticleCreated",
+    value: function onParticleCreated(particle) {
+      if (particle.body) {
+        ImgUtil.getImgFromCache(particle.body, this.addImg2Body, particle);
+      } else {
+        particle.color = particle.color || "#ff0000";
+      }
+    }
+  }, {
+    key: "onParticleUpdate",
+    value: function onParticleUpdate(particle) {
+      if (particle.body) {
+        if (particle.body instanceof Image) this.drawImage(particle);
+      } else {
+        this.drawCircle(particle);
+      }
+    }
+  }, {
+    key: "onParticleDead",
+    value: function onParticleDead(particle) {
+      particle.body = null;
     }
 
-    createClass(CanvasRenderer, [{
-        key: "resize",
-        value: function resize(width, height) {
-            this.element.width = width;
-            this.element.height = height;
-        }
-    }, {
-        key: "onProtonUpdate",
-        value: function onProtonUpdate() {
-            this.context.clearRect(0, 0, this.element.width, this.element.height);
-        }
-    }, {
-        key: "onParticleCreated",
-        value: function onParticleCreated(particle) {
-            if (particle.body) {
-                ImgUtil.getImgFromCache(particle.body, this.addImg2Body, particle);
-            } else {
-                particle.color = particle.color || "#ff0000";
-            }
-        }
-    }, {
-        key: "onParticleUpdate",
-        value: function onParticleUpdate(particle) {
-            if (particle.body) {
-                if (particle.body instanceof Image) this.drawImage(particle);
-            } else {
-                this.drawCircle(particle);
-            }
-        }
-    }, {
-        key: "onParticleDead",
-        value: function onParticleDead(particle) {
-            particle.body = null;
-        }
+    // private method
 
-        // private
+  }, {
+    key: "addImg2Body",
+    value: function addImg2Body(img, particle) {
+      particle.body = img;
+    }
 
-    }, {
-        key: "addImg2Body",
-        value: function addImg2Body(img, particle) {
-            particle.body = img;
-        }
+    // private drawCircle
 
-        // private drawCircle
+  }, {
+    key: "drawImage",
+    value: function drawImage(particle) {
+      var w = particle.body.width * particle.scale | 0;
+      var h = particle.body.height * particle.scale | 0;
+      var x = particle.p.x - w / 2;
+      var y = particle.p.y - h / 2;
 
-    }, {
-        key: "drawImage",
-        value: function drawImage(particle) {
-            var w = particle.body.width * particle.scale | 0;
-            var h = particle.body.height * particle.scale | 0;
-            var x = particle.p.x - w / 2;
-            var y = particle.p.y - h / 2;
+      if (!!particle.color) {
+        if (!particle.data["buffer"]) particle.data.buffer = this.createBuffer(particle.body);
 
-            if (!!particle.color) {
-                if (!particle.data["buffer"]) particle.data.buffer = this.createBuffer(particle.body);
+        var bufContext = particle.data.buffer.getContext("2d");
+        bufContext.clearRect(0, 0, particle.data.buffer.width, particle.data.buffer.height);
+        bufContext.globalAlpha = particle.alpha;
+        bufContext.drawImage(particle.body, 0, 0);
 
-                var bufContext = particle.data.buffer.getContext("2d");
-                bufContext.clearRect(0, 0, particle.data.buffer.width, particle.data.buffer.height);
-                bufContext.globalAlpha = particle.alpha;
-                bufContext.drawImage(particle.body, 0, 0);
+        bufContext.globalCompositeOperation = "source-atop";
+        bufContext.fillStyle = ColorUtil.rgbToHex(particle.rgb);
+        bufContext.fillRect(0, 0, particle.data.buffer.width, particle.data.buffer.height);
+        bufContext.globalCompositeOperation = "source-over";
+        bufContext.globalAlpha = 1;
 
-                bufContext.globalCompositeOperation = "source-atop";
-                bufContext.fillStyle = ColorUtil.rgbToHex(particle.rgb);
-                bufContext.fillRect(0, 0, particle.data.buffer.width, particle.data.buffer.height);
-                bufContext.globalCompositeOperation = "source-over";
-                bufContext.globalAlpha = 1;
+        this.context.drawImage(particle.data.buffer, 0, 0, particle.data.buffer.width, particle.data.buffer.height, x, y, w, h);
+      } else {
+        this.context.save();
 
-                this.context.drawImage(particle.data.buffer, 0, 0, particle.data.buffer.width, particle.data.buffer.height, x, y, w, h);
-            } else {
-                this.context.save();
+        this.context.globalAlpha = particle.alpha;
+        this.context.translate(particle.p.x, particle.p.y);
+        this.context.rotate(MathUtil.degreeTransform(particle.rotation));
+        this.context.translate(-particle.p.x, -particle.p.y);
+        this.context.drawImage(particle.body, 0, 0, particle.body.width, particle.body.height, x, y, w, h);
 
-                this.context.globalAlpha = particle.alpha;
-                this.context.translate(particle.p.x, particle.p.y);
-                this.context.rotate(MathUtil.degreeTransform(particle.rotation));
-                this.context.translate(-particle.p.x, -particle.p.y);
-                this.context.drawImage(particle.body, 0, 0, particle.body.width, particle.body.height, x, y, w, h);
+        this.context.globalAlpha = 1;
+        this.context.restore();
+      }
+    }
 
-                this.context.globalAlpha = 1;
-                this.context.restore();
-            }
-        }
+    // private drawCircle --
 
-        // private drawCircle --
+  }, {
+    key: "drawCircle",
+    value: function drawCircle(particle) {
+      if (particle.rgb) {
+        this.context.fillStyle = "rgba(" + particle.rgb.r + "," + particle.rgb.g + "," + particle.rgb.b + "," + particle.alpha + ")";
+      } else {
+        this.context.fillStyle = particle.color;
+      }
 
-    }, {
-        key: "drawCircle",
-        value: function drawCircle(particle) {
-            if (particle.rgb) {
-                this.context.fillStyle = "rgba(" + particle.rgb.r + "," + particle.rgb.g + "," + particle.rgb.b + "," + particle.alpha + ")";
-            } else {
-                this.context.fillStyle = particle.color;
-            }
+      // draw circle
+      this.context.beginPath();
+      this.context.arc(particle.p.x, particle.p.y, particle.radius, 0, Math.PI * 2, true);
 
-            // draw circle
-            this.context.beginPath();
-            this.context.arc(particle.p.x, particle.p.y, particle.radius, 0, Math.PI * 2, true);
+      if (this.stroke) {
+        this.context.strokeStyle = this.stroke.color;
+        this.context.lineWidth = this.stroke.thinkness;
+        this.context.stroke();
+      }
 
-            if (this.stroke) {
-                this.context.strokeStyle = this.stroke.color;
-                this.context.lineWidth = this.stroke.thinkness;
-                this.context.stroke();
-            }
+      this.context.closePath();
+      this.context.fill();
+    }
 
-            this.context.closePath();
-            this.context.fill();
+    // private createBuffer
+
+  }, {
+    key: "createBuffer",
+    value: function createBuffer(image) {
+      if (image instanceof Image) {
+        var size = image.width + "_" + image.height;
+        var canvas = this.bufferCache[size];
+
+        if (!canvas) {
+          canvas = document.createElement("canvas");
+          canvas.width = image.width;
+          canvas.height = image.height;
+          this.bufferCache[size] = canvas;
         }
 
-        // private createBuffer
-
-    }, {
-        key: "createBuffer",
-        value: function createBuffer(image) {
-            if (image instanceof Image) {
-                var size = image.width + "_" + image.height;
-                var canvas = this.bufferCache[size];
-
-                if (!canvas) {
-                    canvas = document.createElement("canvas");
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    this.bufferCache[size] = canvas;
-                }
-
-                return canvas;
-            }
-        }
-    }]);
-    return CanvasRenderer;
+        return canvas;
+      }
+    }
+  }]);
+  return CanvasRenderer;
 }(BaseRenderer);
 
 var DomRenderer = function (_BaseRenderer) {
@@ -4726,12 +4726,12 @@ var DomRenderer = function (_BaseRenderer) {
     var _this = possibleConstructorReturn(this, (DomRenderer.__proto__ || Object.getPrototypeOf(DomRenderer)).call(this, element));
 
     _this.stroke = null;
+    _this.transform3d = false;
     _this.pool.create = function (body, particle) {
       return _this.createBody(body, particle);
     };
     _this.addImg2Body = _this.addImg2Body.bind(_this);
 
-    _this.transform3d = false;
     _this.name = "DomRenderer";
     return _this;
   }
@@ -4750,9 +4750,14 @@ var DomRenderer = function (_BaseRenderer) {
     key: "onParticleUpdate",
     value: function onParticleUpdate(particle) {
       if (this.bodyReady(particle)) {
-        if (this.transform3d) DomUtil.transform3d(particle.body, particle.p.x, particle.p.y, particle.scale, particle.rotation);else DomUtil.transform(particle.body, particle.p.x, particle.p.y, particle.scale, particle.rotation);
+        if (this.transform3d) {
+          DomUtil.transform3d(particle.body, particle.p.x, particle.p.y, particle.scale, particle.rotation);
+        } else {
+          DomUtil.transform(particle.body, particle.p.x, particle.p.y, particle.scale, particle.rotation);
+        }
 
         particle.body.style.opacity = particle.alpha;
+
         if (particle.body.isCircle) {
           particle.body.style.backgroundColor = particle.color || "#ff0000";
         }
@@ -4773,7 +4778,7 @@ var DomRenderer = function (_BaseRenderer) {
       return _typeof(particle.body) === "object" && particle.body && !particle.body.isInner;
     }
 
-    // private
+    // private method
 
   }, {
     key: "addImg2Body",
@@ -4787,10 +4792,11 @@ var DomRenderer = function (_BaseRenderer) {
   }, {
     key: "createBody",
     value: function createBody(body, particle) {
-      if (body.isCircle) return this.createCircle(particle);else return this.createSprite(body, particle);
+      if (body.isCircle) return this.createCircle(particle);
+      return this.createSprite(body, particle);
     }
 
-    // private --
+    // private methods
 
   }, {
     key: "createCircle",
@@ -4886,10 +4892,13 @@ var EaselRenderer = function (_BaseRenderer) {
       var graphics = this.pool.get(createjs.Graphics);
 
       if (this.stroke) {
-        if (this.stroke instanceof String) graphics.beginStroke(this.stroke);else graphics.beginStroke("#000000");
+        if (this.stroke instanceof String) {
+          graphics.beginStroke(this.stroke);
+        } else {
+          graphics.beginStroke("#000000");
+        }
       }
       graphics.beginFill(particle.color || "#ff0000").drawCircle(0, 0, particle.radius);
-
       var shape = this.pool.get(createjs.Shape, [graphics]);
 
       particle.body = shape;
@@ -4948,7 +4957,7 @@ var PixelRenderer = function (_BaseRenderer) {
     key: "onParticleUpdate",
     value: function onParticleUpdate(particle) {
       if (this.imageData) {
-        this.setPixel(this.imageData, Math.floor(particle.p.x - this.rectangle.x), Math.floor(particle.p.y - this.rectangle.y), particle);
+        this.setPixel(this.imageData, particle.p.x - this.rectangle.x >> 0, particle.p.y - this.rectangle.y >> 0, particle);
       }
     }
   }, {
@@ -4958,7 +4967,6 @@ var PixelRenderer = function (_BaseRenderer) {
       if (x < 0 || x > this.element.width || y < 0 || y > this.elementwidth) return;
 
       var i = ((y >> 0) * imagedata.width + (x >> 0)) * 4;
-
       imagedata.data[i] = rgb.r;
       imagedata.data[i + 1] = rgb.g;
       imagedata.data[i + 2] = rgb.b;
@@ -5052,20 +5060,6 @@ var PixiRenderer = function (_BaseRenderer) {
       particle.body = null;
     }
   }, {
-    key: "destroy",
-    value: function destroy(particles) {
-      get(PixiRenderer.prototype.__proto__ || Object.getPrototypeOf(PixiRenderer.prototype), "destroy", this).call(this);
-      this.pool.destroy();
-
-      var i = particles.length;
-      while (i--) {
-        var particle = particles[i];
-        if (particle.body) {
-          this.element.removeChild(particle.body);
-        }
-      }
-    }
-  }, {
     key: "transform",
     value: function transform(particle, target) {
       target.x = particle.p.x;
@@ -5109,6 +5103,20 @@ var PixiRenderer = function (_BaseRenderer) {
       graphics.endFill();
 
       return graphics;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy(particles) {
+      get(PixiRenderer.prototype.__proto__ || Object.getPrototypeOf(PixiRenderer.prototype), "destroy", this).call(this);
+      this.pool.destroy();
+
+      var i = particles.length;
+      while (i--) {
+        var particle = particles[i];
+        if (particle.body) {
+          this.element.removeChild(particle.body);
+        }
+      }
     }
   }]);
   return PixiRenderer;
@@ -5155,292 +5163,290 @@ var MStack = function () {
 }();
 
 var WebGLRenderer = function (_BaseRenderer) {
-    inherits(WebGLRenderer, _BaseRenderer);
+  inherits(WebGLRenderer, _BaseRenderer);
 
-    function WebGLRenderer(element) {
-        classCallCheck(this, WebGLRenderer);
+  function WebGLRenderer(element) {
+    classCallCheck(this, WebGLRenderer);
 
-        var _this = possibleConstructorReturn(this, (WebGLRenderer.__proto__ || Object.getPrototypeOf(WebGLRenderer)).call(this, element));
+    var _this = possibleConstructorReturn(this, (WebGLRenderer.__proto__ || Object.getPrototypeOf(WebGLRenderer)).call(this, element));
 
-        _this.gl = _this.element.getContext('experimental-webgl', { antialias: true, stencil: false, depth: false });
-        if (!_this.gl) alert('Sorry your browser do not suppest WebGL!');
+    _this.gl = _this.element.getContext("experimental-webgl", { antialias: true, stencil: false, depth: false });
+    if (!_this.gl) alert("Sorry your browser do not suppest WebGL!");
 
-        _this.initVar();
-        _this.setMaxRadius();
-        _this.initShaders();
-        _this.initBuffers();
+    _this.initVar();
+    _this.setMaxRadius();
+    _this.initShaders();
+    _this.initBuffers();
 
-        _this.gl.blendEquation(_this.gl.FUNC_ADD);
-        _this.gl.blendFunc(_this.gl.SRC_ALPHA, _this.gl.ONE_MINUS_SRC_ALPHA);
-        _this.gl.enable(_this.gl.BLEND);
+    _this.gl.blendEquation(_this.gl.FUNC_ADD);
+    _this.gl.blendFunc(_this.gl.SRC_ALPHA, _this.gl.ONE_MINUS_SRC_ALPHA);
+    _this.gl.enable(_this.gl.BLEND);
+    _this.addImg2Body = _this.addImg2Body.bind(_this);
 
-        _this.addImg2Body = _this.addImg2Body.bind(_this);
+    _this.name = "WebGLRenderer";
+    return _this;
+  }
 
-        _this.name = 'WebGLRenderer';
-        return _this;
+  createClass(WebGLRenderer, [{
+    key: "init",
+    value: function init(proton) {
+      get(WebGLRenderer.prototype.__proto__ || Object.getPrototypeOf(WebGLRenderer.prototype), "init", this).call(this, proton);
+      this.resize(this.element.width, this.element.height);
+    }
+  }, {
+    key: "resize",
+    value: function resize(width, height) {
+      this.umat[4] = -2;
+      this.umat[7] = 1;
+
+      this.smat[0] = 1 / width;
+      this.smat[4] = 1 / height;
+
+      this.mstack.set(this.umat, 0);
+      this.mstack.set(this.smat, 1);
+
+      this.gl.viewport(0, 0, width, height);
+      this.element.width = width;
+      this.element.height = height;
+    }
+  }, {
+    key: "setMaxRadius",
+    value: function setMaxRadius(radius) {
+      this.circleCanvasURL = this.createCircle(radius);
+    }
+  }, {
+    key: "getVertexShader",
+    value: function getVertexShader() {
+      var vsSource = ["uniform vec2 viewport;", "attribute vec2 aVertexPosition;", "attribute vec2 aTextureCoord;", "uniform mat3 tMat;", "varying vec2 vTextureCoord;", "varying float alpha;", "void main() {", "vec3 v = tMat * vec3(aVertexPosition, 1.0);", "gl_Position = vec4(v.x, v.y, 0, 1);", "vTextureCoord = aTextureCoord;", "alpha = tMat[0][2];", "}"].join("\n");
+      return vsSource;
+    }
+  }, {
+    key: "getFragmentShader",
+    value: function getFragmentShader() {
+      var fsSource = ["precision mediump float;", "varying vec2 vTextureCoord;", "varying float alpha;", "uniform sampler2D uSampler;", "uniform vec4 color;", "uniform bool useTexture;", "uniform vec3 uColor;", "void main() {", "vec4 textureColor = texture2D(uSampler, vTextureCoord);", "gl_FragColor = textureColor * vec4(uColor, 1.0);", "gl_FragColor.w *= alpha;", "}"].join("\n");
+      return fsSource;
+    }
+  }, {
+    key: "initVar",
+    value: function initVar() {
+      this.mstack = new MStack();
+      this.umat = Mat3.create([2, 0, 1, 0, -2, 0, -1, 1, 1]);
+      this.smat = Mat3.create([1 / 100, 0, 1, 0, 1 / 100, 0, 0, 0, 1]);
+      this.texturebuffers = {};
+    }
+  }, {
+    key: "blendEquation",
+    value: function blendEquation(A) {
+      this.gl.blendEquation(this.gl[A]);
+    }
+  }, {
+    key: "blendFunc",
+    value: function blendFunc(A, B) {
+      this.gl.blendFunc(this.gl[A], this.gl[B]);
+    }
+  }, {
+    key: "getShader",
+    value: function getShader(gl, str, fs) {
+      var shader = fs ? gl.createShader(gl.FRAGMENT_SHADER) : gl.createShader(gl.VERTEX_SHADER);
+
+      gl.shaderSource(shader, str);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+        return null;
+      }
+
+      return shader;
+    }
+  }, {
+    key: "initShaders",
+    value: function initShaders() {
+      var fragmentShader = this.getShader(this.gl, this.getFragmentShader(), true);
+      var vertexShader = this.getShader(this.gl, this.getVertexShader(), false);
+
+      this.sprogram = this.gl.createProgram();
+      this.gl.attachShader(this.sprogram, vertexShader);
+      this.gl.attachShader(this.sprogram, fragmentShader);
+      this.gl.linkProgram(this.sprogram);
+
+      if (!this.gl.getProgramParameter(this.sprogram, this.gl.LINK_STATUS)) alert("Could not initialise shaders");
+
+      this.gl.useProgram(this.sprogram);
+      this.sprogram.vpa = this.gl.getAttribLocation(this.sprogram, "aVertexPosition");
+      this.sprogram.tca = this.gl.getAttribLocation(this.sprogram, "aTextureCoord");
+      this.gl.enableVertexAttribArray(this.sprogram.tca);
+      this.gl.enableVertexAttribArray(this.sprogram.vpa);
+
+      this.sprogram.tMatUniform = this.gl.getUniformLocation(this.sprogram, "tMat");
+      this.sprogram.samplerUniform = this.gl.getUniformLocation(this.sprogram, "uSampler");
+      this.sprogram.useTex = this.gl.getUniformLocation(this.sprogram, "useTexture");
+      this.sprogram.color = this.gl.getUniformLocation(this.sprogram, "uColor");
+      this.gl.uniform1i(this.sprogram.useTex, 1);
+    }
+  }, {
+    key: "initBuffers",
+    value: function initBuffers() {
+      var vs = [0, 3, 1, 0, 2, 3];
+      var idx = void 0;
+
+      this.unitIBuffer = this.gl.createBuffer();
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitIBuffer);
+      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vs), this.gl.STATIC_DRAW);
+
+      var i = void 0;
+      var ids = [];
+      for (i = 0; i < 100; i++) {
+        ids.push(i);
+      }idx = new Uint16Array(ids);
+
+      this.unitI33 = this.gl.createBuffer();
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitI33);
+      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, idx, this.gl.STATIC_DRAW);
+
+      ids = [];
+      for (i = 0; i < 100; i++) {
+        ids.push(i, i + 1, i + 2);
+      }idx = new Uint16Array(ids);
+
+      this.stripBuffer = this.gl.createBuffer();
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.stripBuffer);
+      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, idx, this.gl.STATIC_DRAW);
+    }
+  }, {
+    key: "createCircle",
+    value: function createCircle(raidus) {
+      this.circleCanvasRadius = WebGLUtil.nhpot(Util.initValue(raidus, 32));
+      var canvas = DomUtil.createCanvas("circle_canvas", this.circleCanvasRadius * 2, this.circleCanvasRadius * 2);
+      var context = canvas.getContext("2d");
+
+      context.beginPath();
+      context.arc(this.circleCanvasRadius, this.circleCanvasRadius, this.circleCanvasRadius, 0, Math.PI * 2, true);
+      context.closePath();
+      context.fillStyle = "#FFF";
+      context.fill();
+
+      return canvas.toDataURL();
+    }
+  }, {
+    key: "drawImg2Canvas",
+    value: function drawImg2Canvas(particle) {
+      var _w = particle.body.width;
+      var _h = particle.body.height;
+
+      var _width = WebGLUtil.nhpot(particle.body.width);
+      var _height = WebGLUtil.nhpot(particle.body.height);
+
+      var _scaleX = particle.body.width / _width;
+      var _scaleY = particle.body.height / _height;
+
+      if (!this.texturebuffers[particle.data.src]) this.texturebuffers[particle.data.src] = [this.gl.createTexture(), this.gl.createBuffer(), this.gl.createBuffer()];
+
+      particle.data.texture = this.texturebuffers[particle.data.src][0];
+      particle.data.vcBuffer = this.texturebuffers[particle.data.src][1];
+      particle.data.tcBuffer = this.texturebuffers[particle.data.src][2];
+
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.tcBuffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, _scaleX, 0.0, 0.0, _scaleY, _scaleY, _scaleY]), this.gl.STATIC_DRAW);
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.vcBuffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, _w, 0.0, 0.0, _h, _w, _h]), this.gl.STATIC_DRAW);
+
+      var context = particle.data.canvas.getContext("2d");
+      var data = context.getImageData(0, 0, _width, _height);
+
+      this.gl.bindTexture(this.gl.TEXTURE_2D, particle.data.texture);
+      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, data);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
+      this.gl.generateMipmap(this.gl.TEXTURE_2D);
+
+      particle.data.textureLoaded = true;
+      particle.data.textureWidth = _w;
+      particle.data.textureHeight = _h;
+    }
+  }, {
+    key: "onProtonUpdate",
+    value: function onProtonUpdate() {
+      // this.gl.clearColor(0, 0, 0, 1);
+      // this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    }
+  }, {
+    key: "onParticleCreated",
+    value: function onParticleCreated(particle) {
+      particle.data.textureLoaded = false;
+      particle.data.tmat = Mat3.create();
+      particle.data.tmat[8] = 1;
+      particle.data.imat = Mat3.create();
+      particle.data.imat[8] = 1;
+
+      if (particle.body) {
+        ImgUtil.getImgFromCache(particle.body, this.addImg2Body, particle);
+      } else {
+        ImgUtil.getImgFromCache(this.circleCanvasURL, this.addImg2Body, particle);
+        particle.data.oldScale = particle.radius / this.circleCanvasRadius;
+      }
     }
 
-    createClass(WebGLRenderer, [{
-        key: 'init',
-        value: function init(proton) {
-            get(WebGLRenderer.prototype.__proto__ || Object.getPrototypeOf(WebGLRenderer.prototype), 'init', this).call(this, proton);
-            this.resize(this.element.width, this.element.height);
-        }
-    }, {
-        key: 'resize',
-        value: function resize(width, height) {
-            this.umat[4] = -2;
-            this.umat[7] = 1;
+    // private
 
-            this.smat[0] = 1 / width;
-            this.smat[4] = 1 / height;
+  }, {
+    key: "addImg2Body",
+    value: function addImg2Body(img, particle) {
+      if (particle.dead) return;
+      particle.body = img;
+      particle.data.src = img.src;
+      particle.data.canvas = ImgUtil.getCanvasFromCache(img);
+      particle.data.oldScale = 1;
 
-            this.mstack.set(this.umat, 0);
-            this.mstack.set(this.smat, 1);
+      this.drawImg2Canvas(particle);
+    }
+  }, {
+    key: "onParticleUpdate",
+    value: function onParticleUpdate(particle) {
+      if (particle.data.textureLoaded) {
+        this.updateMatrix(particle);
 
-            this.gl.viewport(0, 0, width, height);
-            this.element.width = width;
-            this.element.height = height;
-        }
-    }, {
-        key: 'setMaxRadius',
-        value: function setMaxRadius(radius) {
-            this.circleCanvasURL = this.createCircle(radius);
-        }
-    }, {
-        key: 'getVertexShader',
-        value: function getVertexShader() {
-            var vsSource = ['uniform vec2 viewport;', 'attribute vec2 aVertexPosition;', 'attribute vec2 aTextureCoord;', 'uniform mat3 tMat;', 'varying vec2 vTextureCoord;', 'varying float alpha;', 'void main() {', 'vec3 v = tMat * vec3(aVertexPosition, 1.0);', 'gl_Position = vec4(v.x, v.y, 0, 1);', 'vTextureCoord = aTextureCoord;', 'alpha = tMat[0][2];', '}'].join('\n');
-            return vsSource;
-        }
-    }, {
-        key: 'getFragmentShader',
-        value: function getFragmentShader() {
-            var fsSource = ['precision mediump float;', 'varying vec2 vTextureCoord;', 'varying float alpha;', 'uniform sampler2D uSampler;', 'uniform vec4 color;', 'uniform bool useTexture;', 'uniform vec3 uColor;', 'void main() {', 'vec4 textureColor = texture2D(uSampler, vTextureCoord);', 'gl_FragColor = textureColor * vec4(uColor, 1.0);', 'gl_FragColor.w *= alpha;', '}'].join('\n');
-            return fsSource;
-        }
-    }, {
-        key: 'initVar',
-        value: function initVar() {
-            this.mstack = new MStack();
-            this.umat = Mat3.create([2, 0, 1, 0, -2, 0, -1, 1, 1]);
-            this.smat = Mat3.create([1 / 100, 0, 1, 0, 1 / 100, 0, 0, 0, 1]);
-            this.texturebuffers = {};
-        }
-    }, {
-        key: 'blendEquation',
-        value: function blendEquation(A) {
-            this.gl.blendEquation(this.gl[A]);
-        }
-    }, {
-        key: 'blendFunc',
-        value: function blendFunc(A, B) {
-            this.gl.blendFunc(this.gl[A], this.gl[B]);
-        }
-    }, {
-        key: 'getShader',
-        value: function getShader(gl, str, fs) {
-            var shader = fs ? gl.createShader(gl.FRAGMENT_SHADER) : gl.createShader(gl.VERTEX_SHADER);
+        this.gl.uniform3f(this.sprogram.color, particle.rgb.r / 255, particle.rgb.g / 255, particle.rgb.b / 255);
+        this.gl.uniformMatrix3fv(this.sprogram.tMatUniform, false, this.mstack.top());
 
-            gl.shaderSource(shader, str);
-            gl.compileShader(shader);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.vcBuffer);
+        this.gl.vertexAttribPointer(this.sprogram.vpa, 2, this.gl.FLOAT, false, 0, 0);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.tcBuffer);
+        this.gl.vertexAttribPointer(this.sprogram.tca, 2, this.gl.FLOAT, false, 0, 0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, particle.data.texture);
+        this.gl.uniform1i(this.sprogram.samplerUniform, 0);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitIBuffer);
 
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                alert(gl.getShaderInfoLog(shader));
-                return null;
-            }
+        this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+        this.mstack.pop();
+      }
+    }
+  }, {
+    key: "onParticleDead",
+    value: function onParticleDead(particle) {}
+  }, {
+    key: "updateMatrix",
+    value: function updateMatrix(particle) {
+      var moveOriginMatrix = WebGLUtil.makeTranslation(-particle.data.textureWidth / 2, -particle.data.textureHeight / 2);
+      var translationMatrix = WebGLUtil.makeTranslation(particle.p.x, particle.p.y);
 
-            return shader;
-        }
-    }, {
-        key: 'initShaders',
-        value: function initShaders() {
-            var fragmentShader = this.getShader(this.gl, this.getFragmentShader(), true);
-            var vertexShader = this.getShader(this.gl, this.getVertexShader(), false);
+      var angel = particle.rotation * MathUtil.PI_180;
+      var rotationMatrix = WebGLUtil.makeRotation(angel);
 
-            this.sprogram = this.gl.createProgram();
-            this.gl.attachShader(this.sprogram, vertexShader);
-            this.gl.attachShader(this.sprogram, fragmentShader);
-            this.gl.linkProgram(this.sprogram);
+      var scale = particle.scale * particle.data.oldScale;
+      var scaleMatrix = WebGLUtil.makeScale(scale, scale);
+      var matrix = WebGLUtil.matrixMultiply(moveOriginMatrix, scaleMatrix);
 
-            if (!this.gl.getProgramParameter(this.sprogram, this.gl.LINK_STATUS)) alert('Could not initialise shaders');
+      matrix = WebGLUtil.matrixMultiply(matrix, rotationMatrix);
+      matrix = WebGLUtil.matrixMultiply(matrix, translationMatrix);
 
-            this.gl.useProgram(this.sprogram);
-            this.sprogram.vpa = this.gl.getAttribLocation(this.sprogram, 'aVertexPosition');
-            this.sprogram.tca = this.gl.getAttribLocation(this.sprogram, 'aTextureCoord');
-            this.gl.enableVertexAttribArray(this.sprogram.tca);
-            this.gl.enableVertexAttribArray(this.sprogram.vpa);
+      Mat3.inverse(matrix, particle.data.imat);
+      matrix[2] = particle.alpha;
 
-            this.sprogram.tMatUniform = this.gl.getUniformLocation(this.sprogram, 'tMat');
-            this.sprogram.samplerUniform = this.gl.getUniformLocation(this.sprogram, 'uSampler');
-            this.sprogram.useTex = this.gl.getUniformLocation(this.sprogram, 'useTexture');
-            this.sprogram.color = this.gl.getUniformLocation(this.sprogram, 'uColor');
-            this.gl.uniform1i(this.sprogram.useTex, 1);
-        }
-    }, {
-        key: 'initBuffers',
-        value: function initBuffers() {
-            var vs = [0, 3, 1, 0, 2, 3];
-            var idx = void 0;
-
-            this.unitIBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitIBuffer);
-            this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vs), this.gl.STATIC_DRAW);
-
-            var i = void 0;
-            var ids = [];
-            for (i = 0; i < 100; i++) {
-                ids.push(i);
-            }idx = new Uint16Array(ids);
-
-            this.unitI33 = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitI33);
-            this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, idx, this.gl.STATIC_DRAW);
-
-            ids = [];
-            for (i = 0; i < 100; i++) {
-                ids.push(i, i + 1, i + 2);
-            }idx = new Uint16Array(ids);
-
-            this.stripBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.stripBuffer);
-            this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, idx, this.gl.STATIC_DRAW);
-        }
-    }, {
-        key: 'createCircle',
-        value: function createCircle(raidus) {
-            this.circleCanvasRadius = WebGLUtil.nhpot(Util.initValue(raidus, 32));
-            var canvas = DomUtil.createCanvas('circle_canvas', this.circleCanvasRadius * 2, this.circleCanvasRadius * 2);
-            var context = canvas.getContext('2d');
-
-            context.beginPath();
-            context.arc(this.circleCanvasRadius, this.circleCanvasRadius, this.circleCanvasRadius, 0, Math.PI * 2, true);
-            context.closePath();
-            context.fillStyle = '#FFF';
-            context.fill();
-
-            return canvas.toDataURL();
-        }
-    }, {
-        key: 'drawImg2Canvas',
-        value: function drawImg2Canvas(particle) {
-            var _w = particle.body.width;
-            var _h = particle.body.height;
-
-            var _width = WebGLUtil.nhpot(particle.body.width);
-            var _height = WebGLUtil.nhpot(particle.body.height);
-
-            var _scaleX = particle.body.width / _width;
-            var _scaleY = particle.body.height / _height;
-
-            if (!this.texturebuffers[particle.data.src]) this.texturebuffers[particle.data.src] = [this.gl.createTexture(), this.gl.createBuffer(), this.gl.createBuffer()];
-
-            particle.data.texture = this.texturebuffers[particle.data.src][0];
-            particle.data.vcBuffer = this.texturebuffers[particle.data.src][1];
-            particle.data.tcBuffer = this.texturebuffers[particle.data.src][2];
-
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.tcBuffer);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, _scaleX, 0.0, 0.0, _scaleY, _scaleY, _scaleY]), this.gl.STATIC_DRAW);
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.vcBuffer);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, _w, 0.0, 0.0, _h, _w, _h]), this.gl.STATIC_DRAW);
-
-            var context = particle.data.canvas.getContext('2d');
-            var data = context.getImageData(0, 0, _width, _height);
-
-            this.gl.bindTexture(this.gl.TEXTURE_2D, particle.data.texture);
-            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, data);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
-            this.gl.generateMipmap(this.gl.TEXTURE_2D);
-
-            particle.data.textureLoaded = true;
-            particle.data.textureWidth = _w;
-            particle.data.textureHeight = _h;
-        }
-    }, {
-        key: 'onProtonUpdate',
-        value: function onProtonUpdate() {
-            // this.gl.clearColor(0, 0, 0, 1);
-            // this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        }
-    }, {
-        key: 'onParticleCreated',
-        value: function onParticleCreated(particle) {
-            particle.data.textureLoaded = false;
-            particle.data.tmat = Mat3.create();
-            particle.data.tmat[8] = 1;
-            particle.data.imat = Mat3.create();
-            particle.data.imat[8] = 1;
-
-            if (particle.body) {
-                ImgUtil.getImgFromCache(particle.body, this.addImg2Body, particle);
-            } else {
-                ImgUtil.getImgFromCache(this.circleCanvasURL, this.addImg2Body, particle);
-                particle.data.oldScale = particle.radius / this.circleCanvasRadius;
-            }
-        }
-
-        // private
-
-    }, {
-        key: 'addImg2Body',
-        value: function addImg2Body(img, particle) {
-            if (particle.dead) return;
-            particle.body = img;
-            particle.data.src = img.src;
-            particle.data.canvas = ImgUtil.getCanvasFromCache(img);
-            particle.data.oldScale = 1;
-
-            this.drawImg2Canvas(particle);
-        }
-    }, {
-        key: 'onParticleUpdate',
-        value: function onParticleUpdate(particle) {
-            if (particle.data.textureLoaded) {
-                this.updateMatrix(particle);
-
-                this.gl.uniform3f(this.sprogram.color, particle.rgb.r / 255, particle.rgb.g / 255, particle.rgb.b / 255);
-                this.gl.uniformMatrix3fv(this.sprogram.tMatUniform, false, this.mstack.top());
-
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.vcBuffer);
-                this.gl.vertexAttribPointer(this.sprogram.vpa, 2, this.gl.FLOAT, false, 0, 0);
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, particle.data.tcBuffer);
-                this.gl.vertexAttribPointer(this.sprogram.tca, 2, this.gl.FLOAT, false, 0, 0);
-                this.gl.bindTexture(this.gl.TEXTURE_2D, particle.data.texture);
-                this.gl.uniform1i(this.sprogram.samplerUniform, 0);
-                this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.unitIBuffer);
-
-                this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
-
-                this.mstack.pop();
-            }
-        }
-    }, {
-        key: 'onParticleDead',
-        value: function onParticleDead(particle) {}
-    }, {
-        key: 'updateMatrix',
-        value: function updateMatrix(particle) {
-            var moveOriginMatrix = WebGLUtil.makeTranslation(-particle.data.textureWidth / 2, -particle.data.textureHeight / 2);
-            var translationMatrix = WebGLUtil.makeTranslation(particle.p.x, particle.p.y);
-
-            var angel = particle.rotation * MathUtil.PI_180;
-            var rotationMatrix = WebGLUtil.makeRotation(angel);
-
-            var scale = particle.scale * particle.data.oldScale;
-            var scaleMatrix = WebGLUtil.makeScale(scale, scale);
-            var matrix = WebGLUtil.matrixMultiply(moveOriginMatrix, scaleMatrix);
-
-            matrix = WebGLUtil.matrixMultiply(matrix, rotationMatrix);
-            matrix = WebGLUtil.matrixMultiply(matrix, translationMatrix);
-
-            Mat3.inverse(matrix, particle.data.imat);
-            matrix[2] = particle.alpha;
-
-            this.mstack.push(matrix);
-        }
-    }]);
-    return WebGLRenderer;
+      this.mstack.push(matrix);
+    }
+  }]);
+  return WebGLRenderer;
 }(BaseRenderer);
 
 var CustomRenderer = function (_BaseRenderer) {
@@ -5499,7 +5505,6 @@ var LineZone = function (_Zone) {
     key: "getPosition",
     value: function getPosition() {
       this.random = Math.random();
-
       this.vector.x = this.x1 + this.random * this.length * Math.cos(this.gradient);
       this.vector.y = this.y1 + this.random * this.length * Math.sin(this.gradient);
 
@@ -5608,7 +5613,6 @@ var CircleZone = function (_Zone) {
     _this.x = x;
     _this.y = y;
     _this.radius = radius;
-
     _this.angle = 0;
     _this.center = { x: x, y: y };
     return _this;
@@ -5619,7 +5623,6 @@ var CircleZone = function (_Zone) {
     value: function getPosition() {
       this.angle = MathUtil.PIx2 * Math.random();
       this.randomRadius = Math.random() * this.radius;
-
       this.vector.x = this.x + this.randomRadius * Math.cos(this.angle);
       this.vector.y = this.y + this.randomRadius * Math.sin(this.angle);
 
@@ -5723,9 +5726,17 @@ var RectZone = function (_Zone) {
 
         // particle cross zone
         else if (this.crossType === "cross") {
-            if (particle.p.x + particle.radius < this.x && particle.v.x <= 0) particle.p.x = this.x + this.width + particle.radius;else if (particle.p.x - particle.radius > this.x + this.width && particle.v.x >= 0) particle.p.x = this.x - particle.radius;
+            if (particle.p.x + particle.radius < this.x && particle.v.x <= 0) {
+              particle.p.x = this.x + this.width + particle.radius;
+            } else if (particle.p.x - particle.radius > this.x + this.width && particle.v.x >= 0) {
+              particle.p.x = this.x - particle.radius;
+            }
 
-            if (particle.p.y + particle.radius < this.y && particle.v.y <= 0) particle.p.y = this.y + this.height + particle.radius;else if (particle.p.y - particle.radius > this.y + this.height && particle.v.y >= 0) particle.p.y = this.y - particle.radius;
+            if (particle.p.y + particle.radius < this.y && particle.v.y <= 0) {
+              particle.p.y = this.y + this.height + particle.radius;
+            } else if (particle.p.y - particle.radius > this.y + this.height && particle.v.y >= 0) {
+              particle.p.y = this.y - particle.radius;
+            }
           }
     }
   }]);
@@ -5809,6 +5820,12 @@ var ImageZone = function (_Zone) {
       } else if (this.crossType === "bound") {
         if (!this.getBound(particle.p.x - this.x, particle.p.y - this.y)) particle.v.negate();
       }
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      get(ImageZone.prototype.__proto__ || Object.getPrototypeOf(ImageZone.prototype), "destroy", this).call(this);
+      this.imageData = null;
     }
   }]);
   return ImageZone;

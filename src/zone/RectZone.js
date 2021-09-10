@@ -21,12 +21,10 @@ export default class RectZone extends Zone {
     // particle dead zone
     if (this.crossType === "dead") {
       if (particle.p.x + particle.radius < this.x) particle.dead = true;
-      else if (particle.p.x - particle.radius > this.x + this.width)
-        particle.dead = true;
+      else if (particle.p.x - particle.radius > this.x + this.width) particle.dead = true;
 
       if (particle.p.y + particle.radius < this.y) particle.dead = true;
-      else if (particle.p.y - particle.radius > this.y + this.height)
-        particle.dead = true;
+      else if (particle.p.y - particle.radius > this.y + this.height) particle.dead = true;
     }
 
     // particle bound zone
@@ -50,21 +48,17 @@ export default class RectZone extends Zone {
 
     // particle cross zone
     else if (this.crossType === "cross") {
-      if (particle.p.x + particle.radius < this.x && particle.v.x <= 0)
+      if (particle.p.x + particle.radius < this.x && particle.v.x <= 0) {
         particle.p.x = this.x + this.width + particle.radius;
-      else if (
-        particle.p.x - particle.radius > this.x + this.width &&
-        particle.v.x >= 0
-      )
+      } else if (particle.p.x - particle.radius > this.x + this.width && particle.v.x >= 0) {
         particle.p.x = this.x - particle.radius;
+      }
 
-      if (particle.p.y + particle.radius < this.y && particle.v.y <= 0)
+      if (particle.p.y + particle.radius < this.y && particle.v.y <= 0) {
         particle.p.y = this.y + this.height + particle.radius;
-      else if (
-        particle.p.y - particle.radius > this.y + this.height &&
-        particle.v.y >= 0
-      )
+      } else if (particle.p.y - particle.radius > this.y + this.height && particle.v.y >= 0) {
         particle.p.y = this.y - particle.radius;
+      }
     }
   }
 }

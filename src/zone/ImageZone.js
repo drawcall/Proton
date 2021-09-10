@@ -4,7 +4,6 @@ import Util from "../utils/Util";
 export default class ImageZone extends Zone {
   constructor(imageData, x, y, d) {
     super();
-
     this.reset(imageData, x, y, d);
   }
 
@@ -37,7 +36,7 @@ export default class ImageZone extends Zone {
   }
 
   getBound(x, y) {
-    var index = ((y >> 0) * this.imageData.width + (x >> 0)) * 4;
+    const index = ((y >> 0) * this.imageData.width + (x >> 0)) * 4;
     if (this.imageData.data[index + 3] > 0) return true;
     else return false;
   }
@@ -50,7 +49,7 @@ export default class ImageZone extends Zone {
   getColor(x, y) {
     x -= this.x;
     y -= this.y;
-    var i = ((y >> 0) * this.imageData.width + (x >> 0)) * 4;
+    const i = ((y >> 0) * this.imageData.width + (x >> 0)) * 4;
 
     return {
       r: this.imageData.data[i],
@@ -62,12 +61,15 @@ export default class ImageZone extends Zone {
 
   crossing(particle) {
     if (this.crossType === "dead") {
-      if (this.getBound(particle.p.x - this.x, particle.p.y - this.y))
-        particle.dead = true;
+      if (this.getBound(particle.p.x - this.x, particle.p.y - this.y)) particle.dead = true;
       else particle.dead = false;
     } else if (this.crossType === "bound") {
-      if (!this.getBound(particle.p.x - this.x, particle.p.y - this.y))
-        particle.v.negate();
+      if (!this.getBound(particle.p.x - this.x, particle.p.y - this.y)) particle.v.negate();
     }
+  }
+
+  destroy() {
+    super.destroy();
+    this.imageData = null;
   }
 }

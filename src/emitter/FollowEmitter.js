@@ -28,12 +28,7 @@ export default class FollowEmitter extends Emitter {
     this.mousemoveHandler = e => this.mousemove.call(this, e);
     this.mousedownHandler = e => this.mousedown.call(this, e);
     this.mouseupHandler = e => this.mouseup.call(this, e);
-
-    this.mouseTarget.addEventListener(
-      "mousemove",
-      this.mousemoveHandler,
-      false
-    );
+    this.mouseTarget.addEventListener("mousemove", this.mousemoveHandler, false);
   }
 
   /**
@@ -70,10 +65,6 @@ export default class FollowEmitter extends Emitter {
    */
   destroy() {
     super.destroy();
-    this.mouseTarget.removeEventListener(
-      "mousemove",
-      this.mousemoveHandler,
-      false
-    );
+    this.mouseTarget.removeEventListener("mousemove", this.mousemoveHandler, false);
   }
 }
