@@ -3,8 +3,10 @@ git/
 node_modules/
 example/
 examples/
+.github/
 images/
 static/
+.babelrc.json
 .*.swp
 .DS_Store
 .git
@@ -13,8 +15,12 @@ static/
 .lock-wscript
 .svn
 .wafpickle-*
+.travis.yml
+.eslintignore
+.editorconfig
 config.gypi
 CVS
 npm-debug.log
+bower.json
 source/
 source/build/

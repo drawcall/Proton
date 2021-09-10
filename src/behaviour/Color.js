@@ -76,9 +76,9 @@ export default class Color extends Behaviour {
       particle.rgb.g = particle.data.colorB.g + (particle.data.colorA.g - particle.data.colorB.g) * this.energy;
       particle.rgb.b = particle.data.colorB.b + (particle.data.colorA.b - particle.data.colorB.b) * this.energy;
 
-      particle.rgb.r = Math.floor(particle.rgb.r);
-      particle.rgb.g = Math.floor(particle.rgb.g);
-      particle.rgb.b = Math.floor(particle.rgb.b);
+      particle.rgb.r = particle.rgb.r << 0;
+      particle.rgb.g = particle.rgb.g << 0;
+      particle.rgb.b = particle.rgb.b << 0;
     } else {
       particle.rgb.r = particle.data.colorA.r;
       particle.rgb.g = particle.data.colorA.g;

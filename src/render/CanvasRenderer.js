@@ -50,7 +50,7 @@ export default class CanvasRenderer extends BaseRenderer {
     particle.body = img;
   }
 
-  // private drawCircle
+  // private drawImage method
   drawImage(particle) {
     const w = (particle.body.width * particle.scale) | 0;
     const h = (particle.body.height * particle.scale) | 0;
