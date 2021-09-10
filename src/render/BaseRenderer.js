@@ -63,6 +63,8 @@ export default class BaseRenderer {
 
   destroy() {
     this.remove();
+    this.pool.destroy();
+    this.element = null;
   }
 
   remove(proton) {

@@ -20,8 +20,7 @@ export default class PixiRenderer extends BaseRenderer {
   setPIXI(PIXI) {
     try {
       PIXIClass = PIXI || { Sprite: {} };
-      this.createFromImage =
-        PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
+      this.createFromImage = PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
     } catch (e) {}
   }
 
@@ -64,19 +63,6 @@ export default class PixiRenderer extends BaseRenderer {
     particle.body = null;
   }
 
-  destroy(particles) {
-    super.destroy();
-    this.pool.destroy();
-
-    let i = particles.length;
-    while (i--) {
-      let particle = particles[i];
-      if (particle.body) {
-        this.element.removeChild(particle.body);
-      }
-    }
-  }
-
   transform(particle, target) {
     target.x = particle.p.x;
     target.y = particle.p.y;
@@ -96,9 +82,7 @@ export default class PixiRenderer extends BaseRenderer {
   }
 
   createSprite(body) {
-    const sprite = body.isInner
-      ? this.createFromImage(body.src)
-      : new PIXIClass.Sprite(body);
+    const sprite = body.isInner ? this.createFromImage(body.src) : new PIXIClass.Sprite(body);
 
     sprite.anchor.x = 0.5;
     sprite.anchor.y = 0.5;
@@ -119,5 +103,18 @@ export default class PixiRenderer extends BaseRenderer {
     graphics.endFill();
 
     return graphics;
+  }
+
+  destroy(particles) {
+    super.destroy();
+    this.pool.destroy();
+
+    let i = particles.length;
+    while (i--) {
+      let particle = particles[i];
+      if (particle.body) {
+        this.element.removeChild(particle.body);
+      }
+    }
   }
 }

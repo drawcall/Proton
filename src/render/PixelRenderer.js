@@ -20,27 +20,13 @@ export default class PixelRenderer extends BaseRenderer {
   }
 
   createImageData(rectangle) {
-    this.rectangle = rectangle
-      ? rectangle
-      : new Rectangle(0, 0, this.element.width, this.element.height);
-    this.imageData = this.context.createImageData(
-      this.rectangle.width,
-      this.rectangle.height
-    );
-    this.context.putImageData(
-      this.imageData,
-      this.rectangle.x,
-      this.rectangle.y
-    );
+    this.rectangle = rectangle ? rectangle : new Rectangle(0, 0, this.element.width, this.element.height);
+    this.imageData = this.context.createImageData(this.rectangle.width, this.rectangle.height);
+    this.context.putImageData(this.imageData, this.rectangle.x, this.rectangle.y);
   }
 
   onProtonUpdate() {
-    this.context.clearRect(
-      this.rectangle.x,
-      this.rectangle.y,
-      this.rectangle.width,
-      this.rectangle.height
-    );
+    this.context.clearRect(this.rectangle.x, this.rectangle.y, this.rectangle.width, this.rectangle.height);
     this.imageData = this.context.getImageData(
       this.rectangle.x,
       this.rectangle.y,
@@ -50,11 +36,7 @@ export default class PixelRenderer extends BaseRenderer {
   }
 
   onProtonUpdateAfter() {
-    this.context.putImageData(
-      this.imageData,
-      this.rectangle.x,
-      this.rectangle.y
-    );
+    this.context.putImageData(this.imageData, this.rectangle.x, this.rectangle.y);
   }
 
   onParticleCreated(particle) {}
@@ -63,8 +45,8 @@ export default class PixelRenderer extends BaseRenderer {
     if (this.imageData) {
       this.setPixel(
         this.imageData,
-        Math.floor(particle.p.x - this.rectangle.x),
-        Math.floor(particle.p.y - this.rectangle.y),
+        (particle.p.x - this.rectangle.x) >> 0,
+        (particle.p.y - this.rectangle.y) >> 0,
         particle
       );
     }
@@ -72,11 +54,9 @@ export default class PixelRenderer extends BaseRenderer {
 
   setPixel(imagedata, x, y, particle) {
     const rgb = particle.rgb;
-    if (x < 0 || x > this.element.width || y < 0 || y > this.elementwidth)
-      return;
+    if (x < 0 || x > this.element.width || y < 0 || y > this.elementwidth) return;
 
     const i = ((y >> 0) * imagedata.width + (x >> 0)) * 4;
-
     imagedata.data[i] = rgb.r;
     imagedata.data[i + 1] = rgb.g;
     imagedata.data[i + 2] = rgb.b;

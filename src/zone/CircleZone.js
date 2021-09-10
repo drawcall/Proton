@@ -56,9 +56,6 @@ export default class CircleZone extends Zone {
   }
 
   getGradient(particle) {
-    return (
-      -MathUtil.PI_2 +
-      Math.atan2(particle.p.y - this.center.y, particle.p.x - this.center.x)
-    );
+    return -MathUtil.PI_2 + Math.atan2(particle.p.y - this.center.y, particle.p.x - this.center.x);
   }
 }
