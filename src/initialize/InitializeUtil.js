@@ -1,4 +1,4 @@
-import Util from "../utils/Util";
+import PropUtil from "../utils/PropUtil";
 import Initialize from "./Initialize";
 import MathUtil from "../math/MathUtil";
 
@@ -20,8 +20,8 @@ export default {
 
   // init
   init(emitter, particle, initialize) {
-    Util.setProp(particle, initialize);
-    Util.setVectorVal(particle, initialize);
+    PropUtil.setProp(particle, initialize);
+    PropUtil.setVectorVal(particle, initialize);
   },
 
   bindEmitter(emitter, particle) {

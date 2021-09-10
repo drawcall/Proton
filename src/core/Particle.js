@@ -4,6 +4,7 @@
 import Rgb from "../utils/Rgb";
 import Puid from "../utils/Puid";
 import Util from "../utils/Util";
+import PropUtil from "../utils/PropUtil";
 import ease from "../math/ease";
 import Vector2D from "../math/Vector2D";
 import MathUtil from "../math/MathUtil";
@@ -62,7 +63,7 @@ export default class Particle {
 
     this.rgb = new Rgb();
     this.reset();
-    conf && Util.setProp(this, conf);
+    conf && PropUtil.setProp(this, conf);
   }
 
   getDirection() {
