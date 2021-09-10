@@ -7,10 +7,10 @@ export default class DomRenderer extends BaseRenderer {
     super(element);
 
     this.stroke = null;
+    this.transform3d = false;
     this.pool.create = (body, particle) => this.createBody(body, particle);
     this.addImg2Body = this.addImg2Body.bind(this);
 
-    this.transform3d = false;
     this.name = "DomRenderer";
   }
 
@@ -25,24 +25,14 @@ export default class DomRenderer extends BaseRenderer {
 
   onParticleUpdate(particle) {
     if (this.bodyReady(particle)) {
-      if (this.transform3d)
-        DomUtil.transform3d(
-          particle.body,
-          particle.p.x,
-          particle.p.y,
-          particle.scale,
-          particle.rotation
-        );
-      else
-        DomUtil.transform(
-          particle.body,
-          particle.p.x,
-          particle.p.y,
-          particle.scale,
-          particle.rotation
-        );
+      if (this.transform3d) {
+        DomUtil.transform3d(particle.body, particle.p.x, particle.p.y, particle.scale, particle.rotation);
+      } else {
+        DomUtil.transform(particle.body, particle.p.x, particle.p.y, particle.scale, particle.rotation);
+      }
 
       particle.body.style.opacity = particle.alpha;
+
       if (particle.body.isCircle) {
         particle.body.style.backgroundColor = particle.color || "#ff0000";
       }
@@ -58,14 +48,10 @@ export default class DomRenderer extends BaseRenderer {
   }
 
   bodyReady(particle) {
-    return (
-      typeof particle.body === "object" &&
-      particle.body &&
-      !particle.body.isInner
-    );
+    return typeof particle.body === "object" && particle.body && !particle.body.isInner;
   }
 
-  // private
+  // private method
   addImg2Body(img, particle) {
     if (particle.dead) return;
     particle.body = this.pool.get(img, particle);
@@ -76,16 +62,12 @@ export default class DomRenderer extends BaseRenderer {
 
   createBody(body, particle) {
     if (body.isCircle) return this.createCircle(particle);
-    else return this.createSprite(body, particle);
+    return this.createSprite(body, particle);
   }
 
-  // private --
+  // private methods
   createCircle(particle) {
-    const dom = DomUtil.createDiv(
-      `${particle.id}_dom`,
-      2 * particle.radius,
-      2 * particle.radius
-    );
+    const dom = DomUtil.createDiv(`${particle.id}_dom`, 2 * particle.radius, 2 * particle.radius);
     dom.style.borderRadius = `${particle.radius}px`;
 
     if (this.stroke) {
@@ -99,11 +81,7 @@ export default class DomRenderer extends BaseRenderer {
 
   createSprite(body, particle) {
     const url = typeof body === "string" ? body : body.src;
-    const dom = DomUtil.createDiv(
-      `${particle.id}_dom`,
-      body.width,
-      body.height
-    );
+    const dom = DomUtil.createDiv(`${particle.id}_dom`, body.width, body.height);
     dom.style.backgroundImage = `url(${url})`;
 
     return dom;

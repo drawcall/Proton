@@ -54,13 +54,13 @@ export default class EaselRenderer extends BaseRenderer {
     const graphics = this.pool.get(createjs.Graphics);
 
     if (this.stroke) {
-      if (this.stroke instanceof String) graphics.beginStroke(this.stroke);
-      else graphics.beginStroke("#000000");
+      if (this.stroke instanceof String) {
+        graphics.beginStroke(this.stroke);
+      } else {
+        graphics.beginStroke("#000000");
+      }
     }
-    graphics
-      .beginFill(particle.color || "#ff0000")
-      .drawCircle(0, 0, particle.radius);
-
+    graphics.beginFill(particle.color || "#ff0000").drawCircle(0, 0, particle.radius);
     const shape = this.pool.get(createjs.Shape, [graphics]);
 
     particle.body = shape;
