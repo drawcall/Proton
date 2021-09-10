@@ -37,7 +37,6 @@ node_modules
 # documentation
 build/docs/
 
-package-lock.json
 .DS_Store
 source/build/
 static/
