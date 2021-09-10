@@ -52,9 +52,7 @@ Thank you very much [@matsu7089](https://github.com/matsu7089) for writing a [go
 
 #### Install using npm
 
-[![anix](https://nodei.co/npm/proton-engine.png)](https://npmjs.org/package/proton-engine)
-
-##### Note: NPM package-name has been changed from `proton-js` to `proton-engine`
+> Note: NPM package-name has been changed from `proton-js` to `proton-engine`
 
 ```shell
 npm install proton-engine --save
