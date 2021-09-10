@@ -1,3 +1,4 @@
+import Types from "../utils/Types";
 import ColorUtil from "../utils/ColorUtil";
 import MathUtil from "../math/MathUtil";
 import BaseRenderer from "./BaseRenderer";
@@ -94,7 +95,7 @@ export default class PixiRenderer extends BaseRenderer {
     const graphics = new PIXIClass.Graphics();
 
     if (this.stroke) {
-      const stroke = this.stroke instanceof String ? this.stroke : 0x000000;
+      const stroke = Types.isString(this.stroke) ? this.stroke : 0x000000;
       graphics.beginStroke(stroke);
     }
 

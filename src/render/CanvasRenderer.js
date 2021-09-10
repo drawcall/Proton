@@ -1,3 +1,4 @@
+import Types from "../utils/Types";
 import ImgUtil from "../utils/ImgUtil";
 import ColorUtil from "../utils/ColorUtil";
 import MathUtil from "../math/MathUtil";
@@ -32,7 +33,9 @@ export default class CanvasRenderer extends BaseRenderer {
 
   onParticleUpdate(particle) {
     if (particle.body) {
-      if (particle.body instanceof Image) this.drawImage(particle);
+      if (Types.isImage(particle.body)) {
+        this.drawImage(particle);
+      }
     } else {
       this.drawCircle(particle);
     }
@@ -117,7 +120,7 @@ export default class CanvasRenderer extends BaseRenderer {
 
   // private createBuffer
   createBuffer(image) {
-    if (image instanceof Image) {
+    if (Types.isImage(image)) {
       const size = image.width + "_" + image.height;
       let canvas = this.bufferCache[size];
 

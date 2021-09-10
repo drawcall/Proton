@@ -1,3 +1,4 @@
+import Types from "../utils/Types";
 import BaseRenderer from "./BaseRenderer";
 
 export default class EaselRenderer extends BaseRenderer {
@@ -54,7 +55,7 @@ export default class EaselRenderer extends BaseRenderer {
     const graphics = this.pool.get(createjs.Graphics);
 
     if (this.stroke) {
-      if (this.stroke instanceof String) {
+      if (Types.isString(this.stroke)) {
         graphics.beginStroke(this.stroke);
       } else {
         graphics.beginStroke("#000000");

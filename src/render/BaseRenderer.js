@@ -7,7 +7,7 @@ export default class BaseRenderer {
     this.stroke = stroke;
     this.circleConf = { isCircle: true };
 
-    this.initHandler();
+    this.initEventHandler();
     this.name = "BaseRenderer";
   }
 
@@ -15,7 +15,7 @@ export default class BaseRenderer {
     this.stroke = { color, thinkness };
   }
 
-  initHandler() {
+  initEventHandler() {
     this._protonUpdateHandler = () => {
       this.onProtonUpdate.call(this);
     };
@@ -66,7 +66,7 @@ export default class BaseRenderer {
     this.pool.destroy();
     this.pool = null;
     this.element = null;
-    this.element = null;
+    this.stroke = null;
   }
 
   remove(proton) {
