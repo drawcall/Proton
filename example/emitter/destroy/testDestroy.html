@@ -40,32 +40,55 @@
       <canvas id="testCanvas"></canvas>
     </div>
     <script src="../../lib/requestAnimationFrame.min.js"></script>
-    <script src="../../lib/stats.min.js"></script>
+    <script src="../../lib/jquery-1.9.1.min.js"></script>
     <script src="//localhost:3001/build/proton.js"></script>
     <script>
       var proton;
       var renderer;
-      var stats;
 
-      Main();
+      main();
 
-      function Main() {
+      function main() {
         canvas = document.getElementById("testCanvas");
         canvas.width = 1003;
         canvas.height = 610;
-        addStats();
 
         createProton();
         tick();
+        addBtn();
       }
 
-      function addStats() {
-        stats = new Stats();
-        stats.setMode(2);
-        stats.domElement.style.position = "absolute";
-        stats.domElement.style.left = "0px";
-        stats.domElement.style.top = "0px";
-        document.getElementById("container").appendChild(stats.domElement);
+      function addBtn() {
+        var btn = $("<div>Click Reset</div>").css({
+          width: "100px",
+          height: "30px",
+          top: "10px",
+          right: "10px",
+          color: "#fff",
+          background: "#004cf8",
+          padding: "5px",
+          cursor: "pointer",
+          position: "absolute"
+        });
+
+        var inited = true;
+        btn.on("click", function() {
+          if (inited) {
+            inited = false;
+            destroy();
+          } else {
+            inited = true;
+            createProton();
+          }
+        });
+
+        $("body").append(btn);
+      }
+
+      function destroy() {
+        if (!proton) return;
+        proton.destroy(true);
+        proton = null;
       }
 
       function createProton() {
@@ -79,7 +102,7 @@
 
       function createImageEmitter() {
         var emitter = new Proton.Emitter();
-        emitter.rate = new Proton.Rate(new Proton.Span(72, 77), new Proton.Span(0.2, 0.5));
+        emitter.rate = new Proton.Rate(new Proton.Span(10, 20), new Proton.Span(0.3, 0.5));
         emitter.addInitialize(new Proton.Mass(1));
         emitter.addInitialize(new Proton.Life(1, 5));
         emitter.addInitialize(new Proton.Body(["image/fox.png", "image/safari.png", "image/chrome.png"], 100, 100));
@@ -96,11 +119,12 @@
         emitter.p.y = 610 / 2;
         emitter.emit();
         proton.addEmitter(emitter);
+        return emitter;
       }
 
       function createColorEmitter() {
         var emitter = new Proton.Emitter();
-        emitter.rate = new Proton.Rate(new Proton.Span(16, 19), new Proton.Span(0.1, 0.2));
+        emitter.rate = new Proton.Rate(new Proton.Span(10, 15), new Proton.Span(0.1, 0.2));
 
         emitter.addInitialize(new Proton.Mass(1));
         emitter.addInitialize(new Proton.Radius(1, 20));
@@ -116,14 +140,12 @@
         emitter.p.y = 610 / 2;
         emitter.emit();
         proton.addEmitter(emitter);
+        return emitter;
       }
 
       function tick() {
         requestAnimationFrame(tick);
-
-        stats.begin();
-        proton.update();
-        stats.end();
+        proton && proton.update();
       }
     </script>
   </body>

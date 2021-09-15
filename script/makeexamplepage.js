@@ -4,31 +4,25 @@ const path = require("path");
 const src = "./example";
 const filesArr = [];
 
-writePage();
-
 // write content to html
 function writePage() {
   readFiles(src);
 
   const page = src + "/index.html";
-  fs.readFile(page, "utf-8", (err, data) => {
+  const content = getContent(filesArr);
+  const data = template.replace("<% code %>", content);
+
+  fs.writeFile(page, data, err => {
     if (err) throw err;
-
-    const content = getContent(data, filesArr);
-    data = data.replace("<% code %>", content);
-
-    fs.writeFile(page, data, err => {
-      if (err) throw err;
-      console.log("It's saved!");
-    });
+    console.log("It's saved!");
   });
 }
 
-function getContent(data, filesArr) {
+function getContent(filesArr) {
   let content = ``;
   filesArr.forEach(val => {
     content += `<div>
-                <a class="link" href="${val.path.replace("example/", "")}"><b></b>${val.parent} / ${val.filename}</a>
+                <a class="link" href="${val.path}"><b></b>${val.parent} / ${val.filename}</a>
             </div>
             `;
   });
@@ -57,3 +51,25 @@ function readFiles(src, parent) {
     }
   });
 }
+
+const template = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>proton.js / examples</title>
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta charset="utf-8" />
+    <style type="text/css">
+    body{background-color:#fafafa;margin:0;color:#555;font-family:"inconsolata";font-size:15px;line-height:18px}h1{margin-top:30px;margin-bottom:40px;margin-left:20px;font-size:25px;font-weight:normal}h2{font-size:20px;font-weight:normal}a{color:#2194ce;text-decoration:none}.container{margin:20px;margin-bottom:40px}.container>div{margin-bottom:3px}.link{color:#2194ce;text-decoration:none;cursor:pointer;display:block}.link:hover{text-decoration:underline}
+    </style>
+  </head>
+  <body>
+    <h1>Proton / example</h1>
+    <div class="container">
+      <% code %>
+    </div>
+  </body>
+</html>
+`;
+
+writePage();

@@ -15,7 +15,7 @@ const MathUtil = {
 
   randomAToB(a, b, isInt = false) {
     if (!isInt) return a + Math.random() * (b - a);
-    else return Math.floor(Math.random() * (b - a)) + a;
+    else return ((Math.random() * (b - a)) >> 0) + a;
   },
 
   randomFloating(center, f, isInt) {
