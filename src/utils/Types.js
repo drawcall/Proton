@@ -6,10 +6,15 @@ export default {
    */
   isImage(obj) {
     if (!obj) return false;
+    if (obj.__isImage) return true;
 
     const tagName = `${obj.tagName}`.toUpperCase();
     const nodeName = `${obj.nodeName}`.toUpperCase();
-    if (nodeName === "IMG" || tagName === "IMG") return true;
+    if (nodeName === "IMG" || tagName === "IMG") {
+      obj.__isImage = true;
+      return true;
+    }
+
     return false;
   },
 
