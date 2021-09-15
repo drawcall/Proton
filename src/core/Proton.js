@@ -235,9 +235,16 @@ export default class Proton {
       this.time = 0;
       this.then = 0;
       this.pool.destroy();
+      this.stats.destroy();
 
       Util.destroyAll(this.emitters);
       Util.destroyAll(this.renderers, this.getAllParticles());
+
+      this.integrator = null;
+      this.renderers = null;
+      this.emitters = null;
+      this.stats = null;
+      this.pool = null;
     };
 
     if (remove) {

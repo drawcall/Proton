@@ -117,4 +117,14 @@ export default class Stats {
   getEmitterPos(e) {
     return Math.round(e.p.x) + "," + Math.round(e.p.y);
   }
+
+  destroy() {
+    if (this.container && this.container.parentNode) {
+      const body = this.body || document.body;
+      body.removeChild(this.container);
+    }
+
+    this.proton = null;
+    this.container = null;
+  }
 }

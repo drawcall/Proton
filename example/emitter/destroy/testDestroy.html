@@ -18,7 +18,7 @@
       #container {
         width: 1003px;
         height: 610px;
-        margin-top: 50px;
+        margin-top: 100px;
         margin-left: -501px;
         left: 50%;
         position: absolute;
@@ -43,7 +43,7 @@
     <script src="../../lib/jquery-1.9.1.min.js"></script>
     <script src="//localhost:3001/build/proton.js"></script>
     <script>
-      var proton;
+      var proton, emitter1, emitter2;
       var renderer;
 
       main();
@@ -59,42 +59,67 @@
       }
 
       function addBtn() {
-        var btn = $("<div>Click Reset</div>").css({
-          width: "100px",
+        var baseCss = {
+          width: "150px",
           height: "30px",
-          top: "10px",
-          right: "10px",
           color: "#fff",
           background: "#004cf8",
           padding: "5px",
+          textAlign: "center",
+          lineHeight: "30px",
+          borderRadius: "8px",
           cursor: "pointer",
           position: "absolute"
+        };
+
+        var btn1 = $("<div>Destroy Proton</div>").css({
+          top: "10px",
+          right: "10px",
+          ...baseCss
         });
 
-        var inited = true;
-        btn.on("click", function() {
-          if (inited) {
-            inited = false;
+        var btn2 = $("<div>Destroy Emitter</div>").css({
+          top: "10px",
+          right: "200px",
+          ...baseCss
+        });
+
+        var inited1 = true;
+        btn1.on("click", function() {
+          if (inited1) {
             destroy();
           } else {
-            inited = true;
             createProton();
           }
+          inited1 = !inited1;
         });
 
-        $("body").append(btn);
+        var inited2 = true;
+        btn2.on("click", function() {
+          if (inited2) {
+            emitter1.stop();
+          } else {
+            emitter1.emit();
+          }
+          inited2 = !inited2;
+        });
+
+        $("body").append(btn1);
+        $("body").append(btn2);
       }
 
       function destroy() {
         if (!proton) return;
         proton.destroy(true);
+        console.log(proton);
+        console.log(renderer);
         proton = null;
       }
 
       function createProton() {
         proton = new Proton();
-        createImageEmitter();
-        createColorEmitter();
+        emitter1 = createImageEmitter();
+        emitter2 = createColorEmitter();
 
         renderer = new Proton.CanvasRenderer(canvas);
         proton.addRenderer(renderer);
@@ -145,7 +170,10 @@
 
       function tick() {
         requestAnimationFrame(tick);
-        proton && proton.update();
+        if (proton) {
+          proton.update();
+          proton.stats.update(1);
+        }
       }
     </script>
   </body>
