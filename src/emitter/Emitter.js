@@ -308,6 +308,13 @@ export default class Emitter extends Particle {
     this.removeAllInitializers();
     this.removeAllBehaviours();
     this.parent && this.parent.removeEmitter(this);
+
+    this.rate = null;
+    this.old = null;
+    this.rgb = null;
+    this.v = null;
+    this.a = null;
+    this.p = null;
   }
 }
 
