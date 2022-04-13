@@ -42,7 +42,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
     "rollup": "^2.56.3",
-    "rollup-plugin-license": "^2.6.1",
+    "rollup-plugin-license": "^2.7.0",
     "rollup-plugin-terser": "^7.0.2",
     "serve": "^12.0.1"
   }
