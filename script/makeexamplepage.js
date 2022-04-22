@@ -12,7 +12,7 @@ function writePage() {
   const content = getContent(filesArr);
   const data = template.replace("<% code %>", content);
 
-  fs.writeFile(page, data, err => {
+  fs.writeFile(page, data, (err) => {
     if (err) throw err;
     console.log("It's saved!");
   });
@@ -20,7 +20,7 @@ function writePage() {
 
 function getContent(filesArr) {
   let content = ``;
-  filesArr.forEach(val => {
+  filesArr.forEach((val) => {
     content += `<div>
                 <a class="link" href="${val.path}"><b></b>${val.parent} / ${val.filename}</a>
             </div>
@@ -34,7 +34,7 @@ function getContent(filesArr) {
 function readFiles(src, parent) {
   const files = fs.readdirSync(src);
 
-  files.forEach(function(filename) {
+  files.forEach(function (filename) {
     const filepath = path.join(src, filename);
     const stats = fs.statSync(filepath);
 
@@ -42,8 +42,8 @@ function readFiles(src, parent) {
       if (/\.html$/.test(filename) && parent) {
         filesArr.push({
           filename: filename,
-          path: filepath,
-          parent: parent
+          path: filepath.replace(/^example/gi, "."),
+          parent: parent,
         });
       }
     } else if (stats.isDirectory()) {

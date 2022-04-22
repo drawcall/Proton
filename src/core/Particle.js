@@ -23,13 +23,13 @@ export default class Particle {
   behaviours = [];
 
   /** @type {Vector2D} */
-  p = [];
+  p = null;
 
   /** @type {Vector2D} */
-  v = [];
+  v = null;
 
   /** @type {Vector2D} */
-  a = [];
+  a = null;
 
   /** @type {Rgb} */
   rgb = {};
