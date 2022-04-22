@@ -14,13 +14,13 @@ export default class Particle {
   id = "";
 
   /** @type {{p:Vector2D,v:Vector2D,a:Vector2D}} */
-  old = {};
+  old = null;
 
   /** @type {object} */
-  data = {};
+  data = null;
 
   /** @type {Behaviour[]} */
-  behaviours = [];
+  behaviours = null;
 
   /** @type {Vector2D} */
   p = null;
@@ -32,7 +32,7 @@ export default class Particle {
   a = null;
 
   /** @type {Rgb} */
-  rgb = {};
+  rgb = null;
 
   /**
    * the Particle class
