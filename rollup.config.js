@@ -26,7 +26,7 @@ if (isDev) {
       file: "build/proton.js",
       format: "umd",
       name: "Proton",
-      sourcemap: true
+      sourcemap: true,
     },
     plugins: [
       babel({
@@ -34,9 +34,9 @@ if (isDev) {
         compact: false,
         babelrc: false,
         ...babelrc,
-        exclude: "node_modules/**"
-      })
-    ]
+        exclude: "node_modules/**",
+      }),
+    ],
   };
 } else {
   rconfig = {
@@ -45,18 +45,18 @@ if (isDev) {
       file: "build/proton.min.js",
       format: "umd",
       name: "Proton",
-      sourcemap: true
+      sourcemap: true,
     },
     plugins: [
       babel({
         exclude: "node_modules/**",
         babelHelpers: "bundled",
         babelrc: false,
-        ...babelrc
+        ...babelrc,
       }),
       terser(),
-      license({ banner })
-    ]
+      license({ banner }),
+    ],
   };
 }
 
