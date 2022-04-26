@@ -10,4 +10,6 @@ export default class Rgb {
     this.g = 255;
     this.b = 255;
   }
+
+  destroy() {}
 }

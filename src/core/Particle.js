@@ -1,6 +1,7 @@
 /** @typedef {import('../behaviour/Behaviour')} Behaviour */
 /** @typedef {import('../math/Vector2D')} Vector2D */
 /** @typedef {import('../utils/Rgb')} Rgb */
+import PBody from "./PBody";
 import Rgb from "../utils/Rgb";
 import Puid from "../utils/Puid";
 import Util from "../utils/Util";
@@ -9,11 +10,11 @@ import ease from "../math/ease";
 import Vector2D from "../math/Vector2D";
 import MathUtil from "../math/MathUtil";
 
-export default class Particle {
+export default class Particle extends PBody {
   /** @type string */
   id = "";
 
-  /** @type {{p:Vector2D,v:Vector2D,a:Vector2D}} */
+  /** @type {PBody} */
   old = null;
 
   /** @type {object} */
@@ -21,15 +22,6 @@ export default class Particle {
 
   /** @type {Behaviour[]} */
   behaviours = null;
-
-  /** @type {Vector2D} */
-  p = null;
-
-  /** @type {Vector2D} */
-  v = null;
-
-  /** @type {Vector2D} */
-  a = null;
 
   /** @type {Rgb} */
   rgb = null;
@@ -50,18 +42,11 @@ export default class Particle {
      */
     this.name = "Particle";
     this.id = Puid.id(this.name);
-    this.old = {};
+    this.old = new PBody();
     this.data = {};
     this.behaviours = [];
+    this.rgb = new RGB();
 
-    this.p = new Vector2D();
-    this.v = new Vector2D();
-    this.a = new Vector2D();
-    this.old.p = new Vector2D();
-    this.old.v = new Vector2D();
-    this.old.a = new Vector2D();
-
-    this.rgb = new Rgb();
     this.reset();
     conf && PropUtil.setProp(this, conf);
   }
@@ -73,7 +58,6 @@ export default class Particle {
   reset() {
     this.life = Infinity;
     this.age = 0;
-
     this.dead = false;
     this.sleep = false;
     this.body = null;
@@ -88,15 +72,10 @@ export default class Particle {
     this.rotation = 0;
     this.color = null;
 
-    this.p.set(0, 0);
-    this.v.set(0, 0);
-    this.a.set(0, 0);
-    this.old.p.set(0, 0);
-    this.old.v.set(0, 0);
-    this.old.a.set(0, 0);
-    this.easing = ease.easeLinear;
-
+    super.reset();
+    this.old.reset();
     this.rgb.reset();
+    this.easing = ease.easeLinear;
     Util.emptyObject(this.data);
     this.removeAllBehaviours();
 
@@ -166,9 +145,15 @@ export default class Particle {
    * @method destroy
    */
   destroy() {
+    super.destroy();
+    this.old.destroy();
     this.removeAllBehaviours();
+
     this.energy = 0;
     this.dead = true;
     this.parent = null;
+    this.old = null;
+    this.body = null;
+    this.sprite = null;
   }
 }
