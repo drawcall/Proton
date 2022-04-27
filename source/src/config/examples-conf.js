@@ -206,6 +206,10 @@ const EMITTER_ARR = [
   {
     thumb: "bg-particle",
     local: "./examples/initialize/position/bg-particle.html"
+  },
+  {
+    thumb: "matrix",
+    url: "https://codesandbox.io/s/the-matrix-h0fwwm?file=/src/components/Particles.jsx"
   }
 ];
 
