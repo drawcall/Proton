@@ -45,6 +45,13 @@ export default {
     return this.isArray(arr) ? arr : [arr];
   },
 
+  sliceArray(arr1, index, arr2) {
+    this.emptyArray(arr2);
+    for (let i = index; i < arr1.length; i++) {
+      arr2.push(arr1[i]);
+    }
+  },
+
   getRandFromArray(arr) {
     if (!arr) return null;
     return arr[Math.floor(arr.length * Math.random())];

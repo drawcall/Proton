@@ -29,8 +29,9 @@ export default class Collision extends Behaviour {
    */
   constructor(emitter, mass, callback, life, easing) {
     super(life, easing);
-
     this.reset(emitter, mass, callback);
+    this.newPool = [];
+    this.pool = [];
     this.name = "Collision";
   }
 
@@ -72,9 +73,13 @@ export default class Collision extends Behaviour {
    * @param {Int} 			index the particle index
    */
   applyBehaviour(particle, time, index) {
-    const newPool = this.emitter ? this.emitter.particles.slice(index) : this.pool.slice(index);
-    const length = newPool.length;
+    if (this.emitter) {
+      Util.sliceArray(this.emitter.particles, index, this.newPool);
+    } else {
+      Util.sliceArray(this.pool, index, this.newPool);
+    }
 
+    const length = this.newPool.length;
     let otherParticle;
     let lengthSq;
     let overlap;
@@ -83,7 +88,7 @@ export default class Collision extends Behaviour {
     let i;
 
     for (i = 0; i < length; i++) {
-      otherParticle = newPool[i];
+      otherParticle = this.newPool[i];
 
       if (otherParticle !== particle) {
         this.delta.copy(otherParticle.p);
