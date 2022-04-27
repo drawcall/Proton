@@ -90,9 +90,9 @@ export default class Behaviour {
   initialize(particle) {}
 
   /**
-   * Apply this behaviour for all particles every time
+   * computing life cycle
    *
-   * @method applyBehaviour
+   * @method calculate
    * @memberof Proton.Behaviour
    * @instance
    *
@@ -111,6 +111,21 @@ export default class Behaviour {
       const scale = this.easing(particle.age / particle.life);
       this.energy = Math.max(1 - scale, 0);
     }
+  }
+
+  /**
+   * Apply this behaviour for all particles every time
+   *
+   * @method applyBehaviour
+   * @memberof Proton#Proton.Color
+   * @instance
+   *
+   * @param {Proton.Particle} particle
+   * @param {Number} the integrate time 1/ms
+   * @param {Int} the particle index
+   */
+  applyBehaviour(particle, time, index) {
+    this.calculate(particle, time, index);
   }
 
   /**

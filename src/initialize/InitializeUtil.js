@@ -29,7 +29,6 @@ export default {
       particle.p.add(emitter.p);
       particle.v.add(emitter.v);
       particle.a.add(emitter.a);
-
       particle.v.rotate(MathUtil.degreeTransform(emitter.rotation));
     }
   }

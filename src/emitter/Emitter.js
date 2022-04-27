@@ -127,7 +127,7 @@ export default class Emitter extends Particle {
     if (initialize["init"]) {
       initialize.init(this);
     } else {
-      this.initAll();
+      // this.initAll();
     }
   }
 
