@@ -53,7 +53,7 @@ export default class PixelRenderer extends BaseRenderer {
 
   setPixel(imagedata, x, y, particle) {
     const rgb = particle.rgb;
-    if (x < 0 || x > this.element.width || y < 0 || y > this.elementwidth) return;
+    if (x < 0 || x > this.element.width || y < 0 || y > this.element.height) return;
 
     const i = ((y >> 0) * imagedata.width + (x >> 0)) * 4;
     imagedata.data[i] = rgb.r;

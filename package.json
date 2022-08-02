@@ -1,6 +1,6 @@
 {
   "name": "proton-engine",
-  "version": "5.4.3",
+  "version": "5.4.5",
   "description": "Proton is a simple and powerful javascript particle animation engine.",
   "keywords": [
     "particle",
@@ -42,7 +42,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
     "rollup": "^2.56.3",
-    "rollup-plugin-license": "^2.7.0",
+    "rollup-plugin-license": "^2.8.1",
     "rollup-plugin-terser": "^7.0.2",
     "serve": "^12.0.1"
   }
