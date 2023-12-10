@@ -1,6 +1,6 @@
 {
   "name": "proton-engine",
-  "version": "5.4.5",
+  "version": "6.0.1",
   "description": "Proton is a simple and powerful javascript particle animation engine.",
   "keywords": [
     "particle",
@@ -23,7 +23,7 @@
     "url": "https://github.com/drawcall/Proton.git"
   },
   "authors": [
-    "anonymous namespace <colorbuffer@gmail.com>"
+    "drawcall <colorbuffer@gmail.com>"
   ],
   "license": "MIT",
   "bugs": {

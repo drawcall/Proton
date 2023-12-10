@@ -52,7 +52,7 @@ export default class EaselRenderer extends BaseRenderer {
   }
 
   createCircle(particle) {
-    const graphics = this.pool.get(createjs.Graphics);
+    const graphics = this.pool.get(window.createjs.Graphics);
 
     if (this.stroke) {
       if (Types.isString(this.stroke)) {
@@ -62,7 +62,7 @@ export default class EaselRenderer extends BaseRenderer {
       }
     }
     graphics.beginFill(particle.color || "#ff0000").drawCircle(0, 0, particle.radius);
-    const shape = this.pool.get(createjs.Shape, [graphics]);
+    const shape = this.pool.get(window.createjs.Shape, [graphics]);
 
     particle.body = shape;
     particle.graphics = graphics;

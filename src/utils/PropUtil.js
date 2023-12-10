@@ -1,3 +1,5 @@
+import Span from "../math/Span";
+
 export default {
   hasProp(target, key) {
     if (!target) return false;

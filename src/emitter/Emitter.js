@@ -75,7 +75,6 @@ export default class Emitter extends Particle {
     } else if (!isNaN(life)) {
       this.life = life;
     }
-
     this.rate.init();
   }
 
@@ -244,7 +243,11 @@ export default class Emitter extends Particle {
   }
 
   emitting(time) {
-    if (this.totalTime === "once") {
+    if (this.stoped) return;
+
+    if (this.totalTime === "none") {
+      this.emitTime += time;
+    } else if (this.totalTime === "once") {
       let i;
       const length = this.rate.getValue(99999);
 
