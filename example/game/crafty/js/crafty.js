@@ -4303,7 +4303,7 @@ Crafty.storage = (function () {
     * Is `Object.defineProperty` supported?
     */
     support.defineProperty = (function () {
-        if (!'defineProperty' in Object) return false;
+        if (!('defineProperty' in Object)) return false;
         try { Object.defineProperty({}, 'x', {}); }
         catch (e) { return false };
         return true;
