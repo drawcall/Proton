@@ -40,3 +40,4 @@ build/docs/
 .DS_Store
 source/build/
 static/
+yarn.lock

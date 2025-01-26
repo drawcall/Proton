@@ -65,7 +65,7 @@ import Proton from "proton-engine";
 #### OR include in html
 
 ```html
-<script type="text/javascript" src="js/proton.min.js"></script>
+<script type="text/javascript" src="js/proton.web.min.js"></script>
 ```
 
 ## Usage
@@ -73,20 +73,32 @@ import Proton from "proton-engine";
 Proton is very simple to use, a dozen lines of code can create a particle animation.
 
 ```javascript
+import Proton, {
+  Emitter,
+  Rate,
+  Span,
+  Radius,
+  Life,
+  Velocity,
+  Color,
+  Alpha,
+  CanvasRenderer,
+} from "proton-engine";
+
 const proton = new Proton();
-const emitter = new Proton.Emitter();
+const emitter = new Emitter();
 
 //set Rate
-emitter.rate = new Proton.Rate(Proton.getSpan(10, 20), 0.1);
+emitter.rate = new Rate(new Span(10, 20), 0.1);
 
 //add Initialize
-emitter.addInitialize(new Proton.Radius(1, 12));
-emitter.addInitialize(new Proton.Life(2, 4));
-emitter.addInitialize(new Proton.Velocity(3, Proton.getSpan(0, 360), "polar"));
+emitter.addInitialize(new Radius(1, 12));
+emitter.addInitialize(new Life(2, 4));
+emitter.addInitialize(new Velocity(3, new Span(0, 360), "polar"));
 
 //add Behaviour
-emitter.addBehaviour(new Proton.Color("ff0000", "random"));
-emitter.addBehaviour(new Proton.Alpha(1, 0));
+emitter.addBehaviour(new Color("ff0000", "random"));
+emitter.addBehaviour(new Alpha(1, 0));
 
 //set emitter position
 emitter.p.x = canvas.width / 2;
@@ -97,7 +109,7 @@ emitter.emit(5);
 proton.addEmitter(emitter);
 
 // add canvas renderer
-const renderer = new Proton.CanvasRenderer(canvas);
+const renderer = new CanvasRenderer(canvas);
 proton.addRenderer(renderer);
 ```
 

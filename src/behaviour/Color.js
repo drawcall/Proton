@@ -9,8 +9,8 @@ export default class Color extends Behaviour {
    * @constructor
    * @alias Proton.Color
    *
-   * @param {Proton.ArraySpan | String} a the string should be a hex e.g. #000000 for black
-   * @param {Proton.ArraySpan | String} b the string should be a hex e.g. #000000 for black
+   * @param {Proton.ArraySpan | String} [a] the string should be a hex e.g. #000000 for black
+   * @param {Proton.ArraySpan | String} [b] the string should be a hex e.g. #000000 for black
    * @param {Number} [life=Infinity] 	this behaviour's life
    * @param {String} [easing=easeLinear] 	this behaviour's easing
    *

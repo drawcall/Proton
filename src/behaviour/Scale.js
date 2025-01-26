@@ -2,21 +2,28 @@ import Span from "../math/Span";
 import Util from "../utils/Util";
 import Behaviour from "./Behaviour";
 
+/**
+ * Scale behaviour for controlling particle size over time.
+ * @extends Behaviour
+ */
 export default class Scale extends Behaviour {
   /**
-   * @memberof! Proton#
-   * @augments Proton.Behaviour
-   * @constructor
-   * @alias Proton.Scale
-   *
-   * @todo add description for 'a' and 'b'
-   *
-   * @param {Number} a
-   * @param {String} b
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-   *
-   * @property {String} name The Behaviour name
+   * @type {boolean}
+   * @private
+   */
+  same;
+
+  /**
+   * @type {string}
+   */
+  name;
+
+  /**
+   * Creates a new Scale instance.
+   * @param {number|Span} [a=1] - The initial scale value or range.
+   * @param {number|Span} [b] - The final scale value or range. If not provided, it will be the same as 'a'.
+   * @param {number} [life=Infinity] - This behaviour's life.
+   * @param {string} [easing='easeLinear'] - This behaviour's easing function.
    */
   constructor(a, b, life, easing) {
     super(life, easing);
@@ -26,19 +33,14 @@ export default class Scale extends Behaviour {
   }
 
   /**
-   * Reset this behaviour's parameters
-   *
-   * @method reset
-   * @memberof Proton#Proton.Scale
-   * @instance
-   *
-   * @param {Number} a
-   * @param {String} b
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   * Resets this behaviour's parameters.
+   * @param {number|Span} a - The initial scale value or range.
+   * @param {number|Span} [b] - The final scale value or range. If not provided, it will be the same as 'a'.
+   * @param {number} [life] - This behaviour's life.
+   * @param {string} [easing] - This behaviour's easing function.
    */
   reset(a, b, life, easing) {
-    this.same = b === null || b === undefined ? true : false;
+    this.same = b === null || b === undefined;
     this.a = Span.setSpanValue(Util.initValue(a, 1));
     this.b = Span.setSpanValue(b);
 
@@ -46,13 +48,8 @@ export default class Scale extends Behaviour {
   }
 
   /**
-   * Initialize the behaviour's parameters for all particles
-   *
-   * @method initialize
-   * @memberof Proton#Proton.Scale
-   * @instance
-   *
-   * @param {Proton.Particle} particle
+   * Initializes the particle's scale values.
+   * @param {Particle} particle - The particle to initialize.
    */
   initialize(particle) {
     particle.data.scaleA = this.a.getValue();
@@ -61,15 +58,10 @@ export default class Scale extends Behaviour {
   }
 
   /**
-   * Apply this behaviour for all particles every time
-   *
-   * @method applyBehaviour
-   * @memberof Proton#Proton.Scale
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
+   * Applies the scale behaviour to the particle.
+   * @param {Particle} particle - The particle to apply the behaviour to.
+   * @param {number} time - The current simulation time.
+   * @param {number} index - The index of the particle.
    */
   applyBehaviour(particle, time, index) {
     this.calculate(particle, time, index);

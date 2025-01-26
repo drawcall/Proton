@@ -33,11 +33,9 @@ export default class Proton {
    *
    * @constructor Proton
    *
-   * @todo proParticleCount is not in use
    * @todo add more documentation of the single properties and parameters
    *
-   * @param {Number} [proParticleCount] not in use?
-   * @param {Number} [integrationType=Proton.EULER]
+   * @param {Number | undefined} [integrationType=Proton.EULER]
    *
    * @property {String} [integrationType=Proton.EULER]
    * @property {Array} emitters   All added emitter

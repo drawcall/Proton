@@ -4,7 +4,17 @@ import MathUtil from "../math/MathUtil";
 import BaseRenderer from "./BaseRenderer";
 
 let PIXIClass;
+
+/**
+ * Represents a PIXI-based renderer for particle systems.
+ * @extends BaseRenderer
+ */
 export default class PixiRenderer extends BaseRenderer {
+  /**
+   * Creates a new PixiRenderer instance.
+   * @param {PIXI.Container} element - The PIXI container to render to.
+   * @param {string|number} [stroke] - The stroke color for particles.
+   */
   constructor(element, stroke) {
     super(element);
 
@@ -106,6 +116,10 @@ export default class PixiRenderer extends BaseRenderer {
     return graphics;
   }
 
+  /**
+   * Destroys the renderer and cleans up resources.
+   * @param {Array<Particle>} particles - The particles to clean up.
+   */
   destroy(particles) {
     super.destroy();
 

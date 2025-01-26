@@ -1,7 +1,16 @@
 import Rectangle from "../math/Rectangle";
 import BaseRenderer from "./BaseRenderer";
 
+/**
+ * Represents a pixel-based renderer for particle systems.
+ * @extends BaseRenderer
+ */
 export default class PixelRenderer extends BaseRenderer {
+  /**
+   * Creates a new PixelRenderer instance.
+   * @param {HTMLCanvasElement} element - The canvas element to render to.
+   * @param {Rectangle} [rectangle] - The rectangle defining the rendering area.
+   */
   constructor(element, rectangle) {
     super(element);
 
@@ -64,6 +73,9 @@ export default class PixelRenderer extends BaseRenderer {
 
   onParticleDead(particle) {}
 
+  /**
+   * Destroys the renderer and cleans up resources.
+   */
   destroy() {
     super.destroy();
     this.stroke = null;

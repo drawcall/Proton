@@ -1,9 +1,22 @@
 import Zone from "./Zone";
 import Util from "../utils/Util";
 import MathUtil from "../math/MathUtil";
+import Vector2D from "../math/Vector2D";
 
+/**
+ * Represents a line zone for particle systems.
+ * @extends Zone
+ */
 export default class LineZone extends Zone {
-  constructor(x1, y1, x2, y2, direction) {
+  /**
+   * Creates a new LineZone.
+   * @param {number} x1 - The x-coordinate of the first point.
+   * @param {number} y1 - The y-coordinate of the first point.
+   * @param {number} [x2] - The x-coordinate of the second point.
+   * @param {number} [y2] - The y-coordinate of the second point.
+   * @param {string} [direction=">"] - The direction of the line.
+   */
+  constructor(x1, y1, x2, y2, direction = ">") {
     super();
 
     if (x2 - x1 >= 0) {
@@ -34,6 +47,10 @@ export default class LineZone extends Zone {
     this.direction = Util.initValue(direction, ">");
   }
 
+  /**
+   * Gets a random position on the line.
+   * @returns {Vector2D} A vector representing the random position.
+   */
   getPosition() {
     this.random = Math.random();
     this.vector.x = this.x1 + this.random * this.length * Math.cos(this.gradient);
@@ -42,6 +59,12 @@ export default class LineZone extends Zone {
     return this.vector;
   }
 
+  /**
+   * Determines which side of the line a point is on.
+   * @param {number} x - The x-coordinate of the point.
+   * @param {number} y - The y-coordinate of the point.
+   * @returns {boolean} True if the point is on the positive side of the line, false otherwise.
+   */
   getDirection(x, y) {
     const A = this.dy;
     const B = -this.dx;
@@ -52,6 +75,12 @@ export default class LineZone extends Zone {
     else return false;
   }
 
+  /**
+   * Calculates the distance of a point from the line.
+   * @param {number} x - The x-coordinate of the point.
+   * @param {number} y - The y-coordinate of the point.
+   * @returns {number} The distance from the point to the line.
+   */
   getDistance(x, y) {
     const A = this.dy;
     const B = -this.dx;
@@ -61,6 +90,11 @@ export default class LineZone extends Zone {
     return D / Math.sqrt(this.xxyy);
   }
 
+  /**
+   * Calculates the symmetric vector of a given vector with respect to the line.
+   * @param {Vector2D} v - The vector to reflect.
+   * @returns {Vector2D} The reflected vector.
+   */
   getSymmetric(v) {
     const tha2 = v.getGradient();
     const tha1 = this.getGradient();
@@ -75,10 +109,19 @@ export default class LineZone extends Zone {
     return v;
   }
 
+  /**
+   * Gets the gradient (angle) of the line.
+   * @returns {number} The gradient of the line in radians.
+   */
   getGradient() {
     return Math.atan2(this.dy, this.dx);
   }
 
+  /**
+   * Checks if a particle is outside the range of the line.
+   * @param {Particle} particle - The particle to check.
+   * @returns {boolean} True if the particle is within range, false otherwise.
+   */
   rangeOut(particle) {
     const angle = Math.abs(this.getGradient());
 
@@ -91,10 +134,18 @@ export default class LineZone extends Zone {
     return false;
   }
 
+  /**
+   * Gets the length of the line.
+   * @returns {number} The length of the line.
+   */
   getLength() {
     return Math.sqrt(this.dx * this.dx + this.dy * this.dy);
   }
 
+  /**
+   * Handles particle crossing behavior based on the crossType.
+   * @param {Particle} particle - The particle to check for crossing.
+   */
   crossing(particle) {
     if (this.crossType === "dead") {
       if (this.direction === ">" || this.direction === "R" || this.direction === "right" || this.direction === "down") {

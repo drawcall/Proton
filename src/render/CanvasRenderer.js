@@ -4,7 +4,38 @@ import ColorUtil from "../utils/ColorUtil";
 import MathUtil from "../math/MathUtil";
 import BaseRenderer from "./BaseRenderer";
 
+/**
+ * CanvasRenderer class for rendering particles on a canvas element.
+ * @extends BaseRenderer
+ */
 export default class CanvasRenderer extends BaseRenderer {
+  /**
+   * @type {object|null}
+   * @private
+   */
+  stroke;
+
+  /**
+   * @type {CanvasRenderingContext2D}
+   * @private
+   */
+  context;
+
+  /**
+   * @type {object}
+   * @private
+   */
+  bufferCache;
+
+  /**
+   * @type {string}
+   */
+  name;
+
+  /**
+   * Creates a new CanvasRenderer instance.
+   * @param {HTMLCanvasElement} element - The canvas element to render on.
+   */
   constructor(element) {
     super(element);
 
@@ -14,15 +45,27 @@ export default class CanvasRenderer extends BaseRenderer {
     this.name = "CanvasRenderer";
   }
 
+  /**
+   * Resizes the canvas element.
+   * @param {number} width - The new width of the canvas.
+   * @param {number} height - The new height of the canvas.
+   */
   resize(width, height) {
     this.element.width = width;
     this.element.height = height;
   }
 
+  /**
+   * Clears the canvas on Proton update.
+   */
   onProtonUpdate() {
     this.context.clearRect(0, 0, this.element.width, this.element.height);
   }
 
+  /**
+   * Handles particle creation.
+   * @param {object} particle - The created particle.
+   */
   onParticleCreated(particle) {
     if (particle.body) {
       ImgUtil.getImgFromCache(particle.body, this.addImg2Body, particle);
@@ -31,6 +74,10 @@ export default class CanvasRenderer extends BaseRenderer {
     }
   }
 
+  /**
+   * Handles particle updates.
+   * @param {object} particle - The updated particle.
+   */
   onParticleUpdate(particle) {
     if (particle.body) {
       if (Types.isImage(particle.body)) {
@@ -41,16 +88,29 @@ export default class CanvasRenderer extends BaseRenderer {
     }
   }
 
+  /**
+   * Handles particle destruction.
+   * @param {object} particle - The destroyed particle.
+   */
   onParticleDead(particle) {
     particle.body = null;
   }
 
-  // private method
+  /**
+   * Adds an image to the particle body.
+   * @param {HTMLImageElement} img - The image to add.
+   * @param {object} particle - The particle to add the image to.
+   * @private
+   */
   addImg2Body(img, particle) {
     particle.body = img;
   }
 
-  // private drawImage method
+  /**
+   * Draws an image particle.
+   * @param {object} particle - The particle to draw.
+   * @private
+   */
   drawImage(particle) {
     const w = (particle.body.width * particle.scale) | 0;
     const h = (particle.body.height * particle.scale) | 0;
@@ -96,7 +156,11 @@ export default class CanvasRenderer extends BaseRenderer {
     }
   }
 
-  // private drawCircle --
+  /**
+   * Draws a circular particle.
+   * @param {object} particle - The particle to draw.
+   * @private
+   */
   drawCircle(particle) {
     if (particle.rgb) {
       this.context.fillStyle = `rgba(${particle.rgb.r},${particle.rgb.g},${particle.rgb.b},${particle.alpha})`;
@@ -104,7 +168,6 @@ export default class CanvasRenderer extends BaseRenderer {
       this.context.fillStyle = particle.color;
     }
 
-    // draw circle
     this.context.beginPath();
     this.context.arc(particle.p.x, particle.p.y, particle.radius, 0, Math.PI * 2, true);
 
@@ -118,7 +181,12 @@ export default class CanvasRenderer extends BaseRenderer {
     this.context.fill();
   }
 
-  // private createBuffer
+  /**
+   * Creates a buffer for image particles.
+   * @param {HTMLImageElement} image - The image to create a buffer for.
+   * @returns {HTMLCanvasElement|undefined} The created buffer canvas.
+   * @private
+   */
   createBuffer(image) {
     if (Types.isImage(image)) {
       const size = image.width + "_" + image.height;
@@ -135,6 +203,9 @@ export default class CanvasRenderer extends BaseRenderer {
     }
   }
 
+  /**
+   * Destroys the renderer and cleans up resources.
+   */
   destroy() {
     super.destroy();
     this.stroke = null;

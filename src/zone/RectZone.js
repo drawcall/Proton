@@ -1,7 +1,18 @@
 import Zone from "./Zone";
 
+/**
+ * Represents a rectangular zone for particle systems.
+ * @extends Zone
+ */
 export default class RectZone extends Zone {
-  constructor(x, y, width, height) {
+  /**
+   * Creates a new RectZone.
+   * @param {number} x - The x-coordinate of the top-left corner of the rectangle.
+   * @param {number} y - The y-coordinate of the top-left corner of the rectangle.
+   * @param {number} [width] - The width of the rectangle.
+   * @param {number} [height] - The height of the rectangle.
+   */
+  constructor(x, y, width = 200, height = 200) {
     super();
 
     this.x = x;
@@ -10,13 +21,20 @@ export default class RectZone extends Zone {
     this.height = height;
   }
 
+  /**
+   * Gets a random position within the rectangular zone.
+   * @returns {Vector2D} A vector representing the random position.
+   */
   getPosition() {
     this.vector.x = this.x + Math.random() * this.width;
     this.vector.y = this.y + Math.random() * this.height;
-
     return this.vector;
   }
 
+  /**
+   * Handles particle crossing behavior based on the crossType.
+   * @param {Particle} particle - The particle to check for crossing.
+   */
   crossing(particle) {
     // particle dead zone
     if (this.crossType === "dead") {

@@ -1,46 +1,48 @@
 import Attraction from "./Attraction";
 
+/**
+ * The opposite of Attraction - turns the force
+ *
+ * @class
+ * @extends Proton.Attraction
+ * @memberof! Proton#
+ * @alias Proton.Repulsion
+ */
 export default class Repulsion extends Attraction {
   /**
-   * The oppisite of Proton.Attraction - turns the force
+   * Creates a new Repulsion behaviour instance
    *
-   * @memberof! Proton#
-   * @augments Proton#Proton.Attraction
    * @constructor
-   * @alias Proton.Repulsion
-   *
-   * @todo add description for 'force' and 'radius'
-   *
-   * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-   * @param {Number} [force=100]
-   * @param {Number} [radius=1000]
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-   *
-   * @property {Number} force
-   * @property {String} name The Behaviour name
+   * @param {Proton.Vector2D} targetPosition - The repulsion point coordinates
+   * @param {number} [force=100] - The strength of the repulsion force
+   * @param {number} [radius=1000] - The radius of influence for the repulsion
+   * @param {number} [life=Infinity] - The behaviour's life
+   * @param {string} [easing='easeLinear'] - The behaviour's easing function
    */
   constructor(targetPosition, force, radius, life, easing) {
     super(targetPosition, force, radius, life, easing);
 
+    /**
+     * The strength of the repulsion force
+     * @type {number}
+     */
     this.force *= -1;
+
+    /**
+     * The name of the behaviour
+     * @type {string}
+     */
     this.name = "Repulsion";
   }
 
   /**
    * Reset this behaviour's parameters
    *
-   * @method reset
-   * @memberof Proton#Proton.Repulsion
-   * @instance
-   *
-   * @todo add description for 'force' and 'radius'
-   *
-   * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-   * @param {Number} [force=100]
-   * @param {Number} [radius=1000]
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   * @param {Proton.Vector2D} targetPosition - The new repulsion point coordinates
+   * @param {number} [force=100] - The new strength of the repulsion force
+   * @param {number} [radius=1000] - The new radius of influence for the repulsion
+   * @param {number} [life=Infinity] - The new behaviour's life
+   * @param {string} [easing='easeLinear'] - The new behaviour's easing function
    */
   reset(targetPosition, force, radius, life, easing) {
     super.reset(targetPosition, force, radius, life, easing);

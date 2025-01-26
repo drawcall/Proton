@@ -39,7 +39,7 @@ const MathUtil = {
 
   toColor16(num) {
     return `#${num.toString(16)}`;
-  }
+  },
 };
 
 export default MathUtil;

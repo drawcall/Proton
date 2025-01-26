@@ -1,7 +1,40 @@
 import Util from "../utils/Util";
 import MathUtil from "../math/MathUtil";
 
+/**
+ * Represents a span of values or an array.
+ */
 export default class Span {
+  /**
+   * @type {boolean}
+   * @private
+   */
+  isArray;
+
+  /**
+   * @type {number|number[]}
+   * @private
+   */
+  a;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  b;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  center;
+
+  /**
+   * Creates a new Span instance.
+   * @param {number|number[]} a - The first value or an array of values.
+   * @param {number} [b] - The second value (if a is not an array).
+   * @param {boolean} [center=false] - Whether to use center-based calculation.
+   */
   constructor(a, b, center) {
     if (Util.isArray(a)) {
       this.isArray = true;
@@ -14,6 +47,11 @@ export default class Span {
     }
   }
 
+  /**
+   * Gets a value from the span.
+   * @param {boolean} [isInt=false] - Whether to return an integer value.
+   * @returns {number} A random value from the span.
+   */
   getValue(isInt = false) {
     if (this.isArray) {
       return Util.getRandFromArray(this.a);
@@ -27,18 +65,11 @@ export default class Span {
   }
 
   /**
-   * Returns a new Span object
-   *
-   * @memberof Proton#Proton.Util
-   * @method setSpanValue
-   *
-   * @todo a, b and c should be 'Mixed' or 'Number'?
-   *
-   * @param {Mixed | Span} a
-   * @param {Mixed}               b
-   * @param {Mixed}               c
-   *
-   * @return {Span}
+   * Returns a new Span object.
+   * @param {*|Span} a - The first value or a Span object.
+   * @param {*} [b] - The second value.
+   * @param {*} [c] - The third value.
+   * @returns {Span} A new Span instance.
    */
   static setSpanValue(a, b, c) {
     if (a instanceof Span) {
@@ -54,14 +85,9 @@ export default class Span {
   }
 
   /**
-   * Returns the value from a Span, if the param is not a Span it will return the given parameter
-   *
-   * @memberof Proton#Proton.Util
-   * @method getValue
-   *
-   * @param {Mixed | Span} pan
-   *
-   * @return {Mixed} the value of Span OR the parameter if it is not a Span
+   * Returns the value from a Span, if the param is not a Span it will return the given parameter.
+   * @param {*|Span} pan - The value or Span to get the value from.
+   * @returns {*} The value of Span OR the parameter if it is not a Span.
    */
   static getSpanValue(pan) {
     return pan instanceof Span ? pan.getValue() : pan;

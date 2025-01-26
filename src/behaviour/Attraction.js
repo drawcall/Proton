@@ -2,65 +2,78 @@ import Util from "../utils/Util";
 import Vector2D from "../math/Vector2D";
 import Behaviour from "./Behaviour";
 
+/**
+ * Attraction behavior for particles.
+ * This behaviour makes particles follow a specific target position.
+ * @extends Behaviour
+ */
 export default class Attraction extends Behaviour {
   /**
-   * This behaviour let the particles follow one specific Proton.Vector2D
-   *
-   * @memberof! Proton#
-   * @augments Proton.Behaviour
-   * @constructor
-   * @alias Proton.Attraction
-   *
-   * @todo add description for 'force' and 'radius'
-   *
-   * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-   * @param {Number} [force=100]
-   * @param {Number} [radius=1000]
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-   *
-   * @property {Proton.Vector2D} targetPosition
-   * @property {Number} radius
-   * @property {Number} force
-   * @property {Number} radiusSq
-   * @property {Proton.Vector2D} attractionForce
-   * @property {Number} lengthSq
-   * @property {String} name The Behaviour name
+   * Creates an instance of Attraction.
+   * @param {Vector2D} targetPosition - The attraction point coordinates.
+   * @param {number} [force=100] - The strength of the attraction force.
+   * @param {number} [radius=1000] - The radius of influence for the attraction.
+   * @param {number} [life=Infinity] - The life span of this behaviour.
+   * @param {string} [easing='ease.easeLinear'] - The easing function for this behaviour.
    */
   constructor(targetPosition, force, radius, life, easing) {
     super(life, easing);
 
+    /**
+     * The target position for attraction.
+     * @type {Vector2D}
+     */
     this.targetPosition = Util.initValue(targetPosition, new Vector2D());
+
+    /**
+     * The radius of influence for the attraction.
+     * @type {number}
+     */
     this.radius = Util.initValue(radius, 1000);
+
+    /**
+     * The strength of the attraction force.
+     * @type {number}
+     */
     this.force = Util.initValue(this.normalizeValue(force), 100);
 
+    /**
+     * The squared radius (for optimization).
+     * @type {number}
+     */
     this.radiusSq = this.radius * this.radius;
+
+    /**
+     * The attraction force vector.
+     * @type {Vector2D}
+     */
     this.attractionForce = new Vector2D();
+
+    /**
+     * The squared length of the attraction force.
+     * @type {number}
+     */
     this.lengthSq = 0;
 
+    /**
+     * The name of the behaviour.
+     * @type {string}
+     */
     this.name = "Attraction";
   }
 
   /**
-   * Reset this behaviour's parameters
-   *
-   * @method reset
-   * @memberof Proton#Proton.Attraction
-   * @instance
-   *
-   * @todo add description for 'force' and 'radius'
-   *
-   * @param {Proton.Vector2D} targetPosition the attraction point coordinates
-   * @param {Number} [force=100]
-   * @param {Number} [radius=1000]
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   * Resets the behaviour's parameters.
+   * @param {Vector2D} targetPosition - The new attraction point coordinates.
+   * @param {number} [force=100] - The new strength of the attraction force.
+   * @param {number} [radius=1000] - The new radius of influence for the attraction.
+   * @param {number} [life=Infinity] - The new life span of this behaviour.
+   * @param {string} [easing='ease.easeLinear'] - The new easing function for this behaviour.
    */
   reset(targetPosition, force, radius, life, easing) {
     this.targetPosition = Util.initValue(targetPosition, new Vector2D());
     this.radius = Util.initValue(radius, 1000);
     this.force = Util.initValue(this.normalizeValue(force), 100);
-
     this.radiusSq = this.radius * this.radius;
     this.attractionForce = new Vector2D();
     this.lengthSq = 0;
@@ -69,15 +82,10 @@ export default class Attraction extends Behaviour {
   }
 
   /**
-   * Apply this behaviour for all particles every time
-   *
-   * @memberof Proton#Proton.Attraction
-   * @method applyBehaviour
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
+   * Applies this behaviour to a particle.
+   * @param {Particle} particle - The particle to apply the behaviour to.
+   * @param {number} time - The current simulation time.
+   * @param {number} index - The index of the particle.
    */
   applyBehaviour(particle, time, index) {
     this.calculate(particle, time, index);

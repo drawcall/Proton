@@ -62,8 +62,8 @@ export default class Emitter extends Particle {
   /**
    * start emit particle
    * @method emit
-   * @param {Number} emitTime begin emit time;
-   * @param {String} life the life of this emitter
+   * @param {Number | String} [totalTime] begin emit time;
+   * @param {String | boolean} [life] the life of this emitter
    */
   emit(totalTime, life) {
     this.stoped = false;

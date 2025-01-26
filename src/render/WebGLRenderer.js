@@ -8,7 +8,15 @@ import DomUtil from "../utils/DomUtil";
 import WebGLUtil from "../utils/WebGLUtil";
 import MathUtil from "../math/MathUtil";
 
+/**
+ * Represents a WebGL-based renderer for particle systems.
+ * @extends BaseRenderer
+ */
 export default class WebGLRenderer extends BaseRenderer {
+  /**
+   * Creates a new WebGLRenderer instance.
+   * @param {HTMLCanvasElement} element - The canvas element to render to.
+   */
   constructor(element) {
     super(element);
 

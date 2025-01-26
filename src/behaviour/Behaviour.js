@@ -2,50 +2,72 @@ import Proton from "../core/Proton";
 import Util from "../utils/Util";
 import ease from "../math/ease";
 
+/**
+ * The Behaviour class is the base for the other Behaviour
+ * @class
+ */
 export default class Behaviour {
   static id = 0;
 
   /**
-   * The Behaviour class is the base for the other Behaviour
-   *
-   * @memberof! -
-   * @interface
-   * @alias Proton.Behaviour
-   *
-   * @param {Number} life 	the behaviours life
-   * @param {String} easing 	The behaviour's decaying trend, for example ease.easeOutQuart
-   *
-   * @property {String}  id 		The behaviours id
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-   * @property {Number}  age=0 	How long the particle should be 'alife'
-   * @property {Number}  energy=1
-   * @property {Boolean} dead=false The particle is dead at first
-   * @property {Array}   parents 	The behaviour's parents array
-   * @property {String}  name 	The behaviour name
+   * Create a new Behaviour instance
+   * @param {number} [life=Infinity] - The behaviour's life
+   * @param {string} [easing='easeLinear'] - The behaviour's decaying trend, for example ease.easeOutQuart
    */
   constructor(life, easing) {
+    /**
+     * The behaviour's life
+     * @type {number}
+     */
     this.life = Util.initValue(life, Infinity);
+
+    /**
+     * The behaviour's easing function
+     * @type {function}
+     */
     this.easing = ease.getEasing(easing);
 
+    /**
+     * The behaviour's current age
+     * @type {number}
+     */
     this.age = 0;
+
+    /**
+     * The behaviour's current energy
+     * @type {number}
+     */
     this.energy = 1;
+
+    /**
+     * Whether the behaviour is dead
+     * @type {boolean}
+     */
     this.dead = false;
+
+    /**
+     * The behaviour's parent emitters
+     * @type {Array}
+     */
     this.parents = [];
 
+    /**
+     * The behaviour's unique id
+     * @type {string}
+     */
     this.id = `Behaviour_${Behaviour.id++}`;
+
+    /**
+     * The behaviour's name
+     * @type {string}
+     */
     this.name = "Behaviour";
   }
 
   /**
    * Reset this behaviour's parameters
-   *
-   * @method reset
-   * @memberof Proton.Behaviour
-   * @instance
-   *
-   * @param {Number} [life=Infinity] 		this behaviour's life
-   * @param {String} [easing=easeLinear] 	this behaviour's easing
+   * @param {number} [life=Infinity] - This behaviour's new life
+   * @param {string} [easing='easeLinear'] - This behaviour's new easing
    */
   reset(life, easing) {
     this.life = Util.initValue(life, Infinity);
@@ -53,52 +75,34 @@ export default class Behaviour {
   }
 
   /**
-   * Normalize a force by 1:100;
-   *
-   * @method normalizeForce
-   * @memberof Proton.Behaviour
-   * @instance
-   *
-   * @param {Proton.Vector2D} force
+   * Normalize a force by 1:100
+   * @param {Proton.Vector2D} force - The force to normalize
+   * @returns {Proton.Vector2D} The normalized force
    */
   normalizeForce(force) {
     return force.multiplyScalar(Proton.MEASURE);
   }
 
   /**
-   * Normalize a value by 1:100;
-   *
-   * @method normalizeValue
-   * @memberof Proton.Behaviour
-   * @instance
-   *
-   * @param {Number} value
+   * Normalize a value by 1:100
+   * @param {number} value - The value to normalize
+   * @returns {number} The normalized value
    */
   normalizeValue(value) {
     return value * Proton.MEASURE;
   }
 
   /**
-   * Initialize the behaviour's parameters for all particles
-   *
-   * @method initialize
-   * @memberof Proton.Behaviour
-   * @instance
-   *
-   * @param {Proton.Particle} particle
+   * Initialize the behaviour's parameters for a particle
+   * @param {Proton.Particle} particle - The particle to initialize
    */
   initialize(particle) {}
 
   /**
-   * computing life cycle
-   *
-   * @method calculate
-   * @memberof Proton.Behaviour
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
+   * Compute the behaviour's life cycle
+   * @param {Proton.Particle} particle - The particle to calculate for
+   * @param {number} time - The integrate time 1/ms
+   * @param {number} index - The particle index
    */
   calculate(particle, time, index) {
     this.age += time;
@@ -114,26 +118,17 @@ export default class Behaviour {
   }
 
   /**
-   * Apply this behaviour for all particles every time
-   *
-   * @method applyBehaviour
-   * @memberof Proton#Proton.Color
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} the integrate time 1/ms
-   * @param {Int} the particle index
+   * Apply this behaviour to a particle
+   * @param {Proton.Particle} particle - The particle to apply the behaviour to
+   * @param {number} time - The integrate time 1/ms
+   * @param {number} index - The particle index
    */
   applyBehaviour(particle, time, index) {
     this.calculate(particle, time, index);
   }
 
   /**
-   * Destory this behaviour
-   *
-   * @method destroy
-   * @memberof Proton.Behaviour
-   * @instance
+   * Destroy this behaviour
    */
   destroy() {
     let i = this.parents.length;

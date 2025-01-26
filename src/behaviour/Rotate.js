@@ -2,22 +2,47 @@ import Span from "../math/Span";
 import Util from "../utils/Util";
 import Behaviour from "./Behaviour";
 
+/**
+ * Rotate behaviour for controlling particle rotation.
+ * @extends Behaviour
+ */
 export default class Rotate extends Behaviour {
   /**
-   * @memberof! Proton#
-   * @augments Proton.Behaviour
-   * @constructor
-   * @alias Proton.Rotate
-   *
-   * @todo add description for 'a', 'b' and 'style'
-   *
-   * @param {String} [influence=Velocity] The rotation's influence
-   * @param {String} b
-   * @param {String} [style=to]
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
-   *
-   * @property {String} name The Behaviour name
+   * @type {boolean}
+   * @private
+   */
+  same;
+
+  /**
+   * @type {Span}
+   * @private
+   */
+  a;
+
+  /**
+   * @type {Span}
+   * @private
+   */
+  b;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  style;
+
+  /**
+   * @type {string}
+   */
+  name;
+
+  /**
+   * Creates a new Rotate instance.
+   * @param {string|number|Span} [influence='Velocity'] - The rotation's influence or initial rotation.
+   * @param {string|number|Span} [b] - The final rotation value or range.
+   * @param {string} [style='to'] - The style of rotation ('to' or 'add').
+   * @param {number} [life=Infinity] - This behaviour's life.
+   * @param {string} [easing='easeLinear'] - This behaviour's easing function.
    */
   constructor(influence, b, style, life, easing) {
     super(life, easing);
@@ -27,22 +52,15 @@ export default class Rotate extends Behaviour {
   }
 
   /**
-   * Reset this behaviour's parameters
-   *
-   * @method reset
-   * @memberof Proton#Proton.Rotate
-   * @instance
-   *
-   * @todo add description for 'a', 'b' and 'style'
-   *
-   * @param {String} a
-   * @param {String} b
-   * @param {String} [style=to]
-   * @param {Number} [life=Infinity] 				this behaviour's life
-   * @param {String} [easing=ease.easeLinear] 	this behaviour's easing
+   * Resets this behaviour's parameters.
+   * @param {string|number|Span} [a='Velocity'] - The rotation's influence or initial rotation.
+   * @param {string|number|Span} [b] - The final rotation value or range.
+   * @param {string} [style='to'] - The style of rotation ('to' or 'add').
+   * @param {number} [life] - This behaviour's life.
+   * @param {string} [easing] - This behaviour's easing function.
    */
   reset(a, b, style, life, easing) {
-    this.same = b === null || b === undefined ? true : false;
+    this.same = b === null || b === undefined;
 
     this.a = Span.setSpanValue(Util.initValue(a, "Velocity"));
     this.b = Span.setSpanValue(Util.initValue(b, 0));
@@ -52,13 +70,10 @@ export default class Rotate extends Behaviour {
   }
 
   /**
-   * Initialize the behaviour's parameters for all particles
-   *
-   * @method initialize
-   * @memberof Proton#Proton.Rotate
-   * @instance
-   *
-   * @param {Proton.Particle} particle
+   * Initializes the behaviour's parameters for a particle.
+   * @param {object} particle - The particle to initialize.
+   * @param {number} particle.rotation - The particle's rotation.
+   * @param {object} particle.data - The particle's data object.
    */
   initialize(particle) {
     particle.rotation = this.a.getValue();
@@ -68,15 +83,10 @@ export default class Rotate extends Behaviour {
   }
 
   /**
-   * Apply this behaviour for all particles every time
-   *
-   * @method applyBehaviour
-   * @memberof Proton#Proton.Rotate
-   * @instance
-   *
-   * @param {Proton.Particle} particle
-   * @param {Number} 			time the integrate time 1/ms
-   * @param {Int} 			index the particle index
+   * Applies this behaviour to a particle.
+   * @param {object} particle - The particle to apply the behaviour to.
+   * @param {number} time - The integrate time (1/ms).
+   * @param {number} index - The particle index.
    */
   applyBehaviour(particle, time, index) {
     this.calculate(particle, time, index);

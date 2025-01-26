@@ -2,7 +2,15 @@ import DomUtil from "../utils/DomUtil";
 import ImgUtil from "../utils/ImgUtil";
 import BaseRenderer from "./BaseRenderer";
 
+/**
+ * Represents a DOM-based renderer for particle systems.
+ * @extends BaseRenderer
+ */
 export default class DomRenderer extends BaseRenderer {
+  /**
+   * Creates a new DomRenderer instance.
+   * @param {HTMLElement} element - The HTML element to render to.
+   */
   constructor(element) {
     super(element);
 
@@ -87,6 +95,9 @@ export default class DomRenderer extends BaseRenderer {
     return dom;
   }
 
+  /**
+   * Destroys the renderer and cleans up resources.
+   */
   destroy() {
     super.destroy();
     this.stroke = null;

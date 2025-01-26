@@ -1,7 +1,17 @@
 import Zone from "./Zone";
 import MathUtil from "../math/MathUtil";
 
+/**
+ * Represents a circular zone in a 2D space.
+ * @extends Zone
+ */
 export default class CircleZone extends Zone {
+  /**
+   * Creates a new CircleZone.
+   * @param {number} x - The x-coordinate of the circle's center.
+   * @param {number} y - The y-coordinate of the circle's center.
+   * @param {number} [radius] - The radius of the circle.
+   */
   constructor(x, y, radius) {
     super();
 
@@ -12,6 +22,10 @@ export default class CircleZone extends Zone {
     this.center = { x, y };
   }
 
+  /**
+   * Gets a random position within the circle.
+   * @returns {Object} An object with x and y coordinates.
+   */
   getPosition() {
     this.angle = MathUtil.PIx2 * Math.random();
     this.randomRadius = Math.random() * this.radius;
@@ -21,11 +35,20 @@ export default class CircleZone extends Zone {
     return this.vector;
   }
 
+  /**
+   * Sets the center of the circle.
+   * @param {number} x - The new x-coordinate of the center.
+   * @param {number} y - The new y-coordinate of the center.
+   */
   setCenter(x, y) {
     this.center.x = x;
     this.center.y = y;
   }
 
+  /**
+   * Handles particle crossing behavior.
+   * @param {Object} particle - The particle to check for crossing.
+   */
   crossing(particle) {
     const d = particle.p.distanceTo(this.center);
 
@@ -41,6 +64,10 @@ export default class CircleZone extends Zone {
     }
   }
 
+  /**
+   * Calculates the symmetric position of a particle.
+   * @param {Object} particle - The particle to calculate symmetry for.
+   */
   getSymmetric(particle) {
     const tha2 = particle.v.getGradient();
     const tha1 = this.getGradient(particle);
@@ -53,6 +80,11 @@ export default class CircleZone extends Zone {
     particle.v.y = oldx * Math.sin(tha) + oldy * Math.cos(tha);
   }
 
+  /**
+   * Calculates the gradient for a particle.
+   * @param {Object} particle - The particle to calculate the gradient for.
+   * @returns {number} The calculated gradient.
+   */
   getGradient(particle) {
     return -MathUtil.PI_2 + Math.atan2(particle.p.y - this.center.y, particle.p.x - this.center.x);
   }
