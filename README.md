@@ -123,7 +123,7 @@ proton.addRenderer(renderer);
 
 - Added `Proton.Cyclone` behavior, you can make vortex effects with Cyclone. Demo please check [here](https://codesandbox.io/s/proton-cyclone-rzweu).
 
-- `proton.fps` In most cases, you don't need to set this property. You can set this property when the game engine has fixed fps or some browsers have a higher refresh rate.
+- `proton.fps` In modern browsers, if the FPS exceeds 60 and you want to maintain a stable 60 FPS, you need to set `proton.fps = 60`. You can set this property when the game engine has fixed fps or some browsers have a higher refresh rate.
 
 - Use Euler integration calculation is more accurate (default false) `Proton.USE_CLOCK = false or true;`.
 
