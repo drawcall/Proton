@@ -2363,4 +2363,3 @@ declare namespace _default {
 }
 
 export { Alpha, ArraySpan, Attraction, Behaviour$1 as Behaviour, BehaviourEmitter, Body, CanvasRenderer, CircleZone, Collision, Color, _default$2 as ColorUtil, CrossZone, CustomRenderer, Cyclone, _default as Debug, DomRenderer, EaselRenderer, Emitter$1 as Emitter, FollowEmitter, Force, Gravity, GravityWell, ImageZone, Initialize, Life, LineZone, Mass, Mat3, MathUtil, Particle$1 as Particle, PixelRenderer, PixiRenderer, PointZone, Polar2D, Pool, Position, Radius, RandomDrift, Rate, RectZone, Rectangle, Repulsion, Rotate, Scale, Span, _default$3 as Util, Vector2D$1 as Vector2D, Velocity, WebGLRenderer, Zone, Proton$1 as default, _default$1 as ease };
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHJvdG9uLmQudHMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiIn0=

@@ -1,8 +1,8 @@
 import babel from "@rollup/plugin-babel";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import license from "rollup-plugin-license";
 import typescript from "@rollup/plugin-typescript";
-import dts from "rollup-plugin-dts";
+import { dts } from "rollup-plugin-dts";
 import pkjson from "./package.json";
 import babelrc from "./.babelrc.json";
 
@@ -24,7 +24,7 @@ const removeExportsPlugin = {
   name: "remove-exports",
   transform(code, id) {
     if (id.endsWith(INPUT_FILE)) {
-      console.log("Removing exports from", id);
+      console.log("remove-exports: Removing exports from", id);
       return code.replace(/export\s*{[\s\S]*?};/g, "");
     }
     return null;
@@ -39,31 +39,32 @@ const createBabelPlugin = () =>
     ...babelrc,
   });
 
-const createConfig = (outputFile, format, plugins) => ({
+const createConfig = (outputFile, isWeb, plugins) => ({
   input: INPUT_FILE,
   output: {
     file: outputFile,
-    format,
+    format: isWeb ? "iife" : "umd",
     name: "Proton",
+    exports: isWeb ? "auto" : "named",
     sourcemap: true,
-    ...(format === "iife" ? { extend: true } : {}),
+    ...(isWeb ? { extend: true } : {}),
   },
   plugins,
 });
 
 const devConfigs = [
-  createConfig("build/proton.js", "umd", [createBabelPlugin()]),
-  createConfig("build/proton.web.js", "iife", [removeExportsPlugin, createBabelPlugin()]),
+  createConfig("build/proton.js", false, [createBabelPlugin()]),
+  createConfig("build/proton.web.js", true, [removeExportsPlugin, createBabelPlugin()]),
 ];
 
 const prodConfigs = [
-  createConfig("build/proton.min.js", "umd", [
+  createConfig("build/proton.min.js", false, [
     createBabelPlugin(),
     typescript({ tsconfig: "./tsconfig.json" }),
     terser(),
     license({ banner: createBanner() }),
   ]),
-  createConfig("build/proton.web.min.js", "iife", [
+  createConfig("build/proton.web.min.js", true, [
     removeExportsPlugin,
     createBabelPlugin(),
     typescript({ tsconfig: "./tsconfig.json" }),

@@ -12,11 +12,11 @@
   "main": "./build/proton.min.js",
   "types": "./build/proton.d.ts",
   "scripts": {
-    "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"NODE_ENV=dev rollup -c -w -m inline\" \"serve --listen 3001\"",
+    "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"NODE_ENV=dev rollup -c --bundleConfigAsCjs -w -m inline\" \"serve --listen 3001\"",
     "page": "node ./script/makeexamplepage",
     "lint": "eslint ./src --config=eslintrc.json",
     "travis": "npm run lint",
-    "build": "NODE_ENV=pub rollup -c"
+    "build": "NODE_ENV=pub rollup -c --bundleConfigAsCjs"
   },
   "repository": {
     "type": "git",
@@ -35,17 +35,17 @@
     "@babel/eslint-parser": "^7.15.4",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/preset-env": "^7.15.6",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-typescript": "^12.1.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@rollup/plugin-terser": "^0.4.3",
     "concurrently": "^3.5.1",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
-    "rollup": "^2.56.3",
-    "rollup-plugin-dts": "^6.1.1",
-    "rollup-plugin-license": "^2.8.1",
-    "rollup-plugin-terser": "^7.0.2",
+    "rollup": "^3.29.4",
+    "rollup-plugin-dts": "^5.3.1",
+    "rollup-plugin-license": "^3.0.1",
     "serve": "^14.1.2",
     "tslib": "^2.8.1",
     "typescript": "^5.7.3"
