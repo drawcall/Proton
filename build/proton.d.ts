@@ -147,8 +147,16 @@ declare class Proton$1 {
     integrator: Integration;
     _fps: string;
     _interval: number;
-    set fps(fps: string);
-    get fps(): string;
+    /**
+     * Sets the frames per second (FPS) for the Proton system.
+     * @param {number|string} fps - The desired FPS. Use "auto" for default behavior, or a number for a specific FPS.
+     */
+    set fps(fps: number | string);
+    /**
+     * Gets the current frames per second (FPS) setting.
+     * @returns {number|string} The current FPS setting. Returns "auto" if set to default, or a number representing the specific FPS.
+     */
+    get fps(): number | string;
     /**
      * add a type of Renderer
      *
