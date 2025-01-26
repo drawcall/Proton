@@ -1,6 +1,6 @@
 {
   "name": "proton-engine",
-  "version": "7.0.4",
+  "version": "7.1.0",
   "description": "Proton is a simple and powerful javascript particle animation engine.",
   "keywords": [
     "particle",
