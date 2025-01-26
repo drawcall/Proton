@@ -174,5 +174,5 @@ export {
   PointZone,
   RectZone,
   ImageZone,
-  Debug,
+  Debug
 };
