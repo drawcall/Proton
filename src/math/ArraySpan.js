@@ -40,4 +40,3 @@ export default class ArraySpan extends Span {
     else return new ArraySpan(arr);
   }
 }
-
