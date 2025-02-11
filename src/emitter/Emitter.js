@@ -268,10 +268,12 @@ export default class Emitter extends Particle {
   }
 
   /**
-   * create single particle;
+   * Creates a single particle.
    *
-   * can use emit({x:10},new Gravity(10),{'particleUpdate',fun}) or emit([{x:10},new Initialize],new Gravity(10),{'particleUpdate',fun})
-   * @method removeAllParticles
+   * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
+   * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
+   * @returns {Particle} The created particle.
+   *
    */
   createParticle(initialize, behaviour) {
     const particle = this.parent.pool.get(Particle);
@@ -281,6 +283,13 @@ export default class Emitter extends Particle {
     return particle;
   }
 
+  /**
+   * Sets up a particle with initialization and behavior.
+   *
+   * @param {Particle} particle - The particle to set up.
+   * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
+   * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
+   */
   setupParticle(particle, initialize, behaviour) {
     let initializes = this.initializes;
     let behaviours = this.behaviours;
@@ -296,6 +305,9 @@ export default class Emitter extends Particle {
     this.particles.push(particle);
   }
 
+  /**
+   * Removes all particles and stops the emitter.
+   */
   remove() {
     this.stop();
     Util.destroyAll(this.particles);

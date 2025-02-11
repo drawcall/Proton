@@ -700,21 +700,30 @@ declare class Span {
     getValue(isInt?: boolean): number;
 }
 
+/**
+ * Represents an ArraySpan, a subclass of Span that works with arrays.
+ * @extends Span
+ */
 declare class ArraySpan extends Span {
     /**
-     * Make sure that the color is an instance of Proton.ArraySpan, if not it makes a new instance
-     *
-     * @method setSpanValue
-     * @memberof Proton#Proton.Color
-     * @instance
-     *
-     * @param {Proton.Particle} particle
-     * @param {Number} the integrate time 1/ms
-     * @param {Int} the particle index
+     * Creates an ArraySpan instance from the given array.
+     * If the input is already an ArraySpan instance, it returns the input.
+     * @static
+     * @param {Array|ArraySpan|any} arr - The array or ArraySpan instance.
+     * @returns {ArraySpan|null} A new ArraySpan instance or null if the input is falsy.
      */
-    static createArraySpan(arr: any): ArraySpan | null;
-    constructor(color: any);
+    static createArraySpan(arr: any[] | ArraySpan | any): ArraySpan | null;
+    /**
+     * Creates an instance of ArraySpan.
+     * @param {Array|*|any} arr - The array or value to be converted to an array.
+     */
+    constructor(arr: any[] | any | any);
     _arr: any;
+    /**
+     * Gets a random value from the array.
+     * If the value is "random" or "Random", it returns a random color.
+     * @returns {*} A random value from the array or a random color.
+     */
     getValue(): any;
 }
 
@@ -1035,11 +1044,11 @@ declare class Radius extends Initialize {
 declare class Body extends Initialize {
     /**
      * Creates a new Body instance.
-     * @param {string|object|ArraySpan} image - The image source or object to use for the particle body.
+     * @param {string|object|Image|HTMLImageElement|ArraySpan} image - The image source or object to use for the particle body.
      * @param {number} [w=20] - The width of the particle body.
      * @param {number} [h] - The height of the particle body. Defaults to the width if not provided.
      */
-    constructor(image: string | object | ArraySpan, w?: number, h?: number);
+    constructor(image: string | object | (new (width?: number, height?: number) => HTMLImageElement) | HTMLImageElement | ArraySpan, w?: number, h?: number);
     /**
      * @type {ArraySpan}
      * @private
@@ -1058,7 +1067,7 @@ declare class Body extends Initialize {
     initialize(particle: object): void;
     /**
      * Sets the span value for the image.
-     * @param {string|object|ArraySpan} image - The image source or object to set as span value.
+     * @param {string|object|Image|HTMLImageElement|ArraySpan} image - The image source or object to set as span value.
      * @returns {ArraySpan} The ArraySpan instance.
      * @private
      */
@@ -1840,13 +1849,25 @@ declare class Emitter$1 extends Particle$1 {
     dispatch(event: any, target: any): void;
     emitting(time: any): void;
     /**
-     * create single particle;
+     * Creates a single particle.
      *
-     * can use emit({x:10},new Gravity(10),{'particleUpdate',fun}) or emit([{x:10},new Initialize],new Gravity(10),{'particleUpdate',fun})
-     * @method removeAllParticles
+     * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
+     * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
+     * @returns {Particle} The created particle.
+     *
      */
-    createParticle(initialize: any, behaviour: any): any;
-    setupParticle(particle: any, initialize: any, behaviour: any): void;
+    createParticle(initialize?: Object | any[], behaviour?: Object | any[]): Particle$1;
+    /**
+     * Sets up a particle with initialization and behavior.
+     *
+     * @param {Particle} particle - The particle to set up.
+     * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
+     * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
+     */
+    setupParticle(particle: Particle$1, initialize?: Object | any[], behaviour?: Object | any[]): void;
+    /**
+     * Removes all particles and stops the emitter.
+     */
     remove(): void;
 }
 

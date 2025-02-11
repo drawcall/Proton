@@ -20,7 +20,7 @@ export default class Body extends Initialize {
 
   /**
    * Creates a new Body instance.
-   * @param {string|object|ArraySpan} image - The image source or object to use for the particle body.
+   * @param {string|object|Image|HTMLImageElement|ArraySpan} image - The image source or object to use for the particle body.
    * @param {number} [w=20] - The width of the particle body.
    * @param {number} [h] - The height of the particle body. Defaults to the width if not provided.
    */
@@ -55,7 +55,7 @@ export default class Body extends Initialize {
 
   /**
    * Sets the span value for the image.
-   * @param {string|object|ArraySpan} image - The image source or object to set as span value.
+   * @param {string|object|Image|HTMLImageElement|ArraySpan} image - The image source or object to set as span value.
    * @returns {ArraySpan} The ArraySpan instance.
    * @private
    */
