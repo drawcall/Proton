@@ -2076,6 +2076,7 @@ declare class PixelRenderer extends BaseRenderer {
 
 /**
  * Represents a PIXI-based renderer for particle systems.
+ * Compatible with Pixi.js v8.
  * @extends BaseRenderer
  */
 declare class PixiRenderer extends BaseRenderer {
@@ -2089,8 +2090,14 @@ declare class PixiRenderer extends BaseRenderer {
     color: boolean;
     setColor: boolean;
     blendMode: any;
-    setPIXI(PIXI: any): void;
+    /**
+     * Set the PIXI class to use for rendering
+     * Updated for Pixi.js v8 compatibility
+     * @param {object} PIXI - The PIXI library
+     */
+    setPIXI(PIXI: object): void;
     createFromImage: any;
+    isV8: boolean | undefined;
     /**
      * @param particle
      */
@@ -2106,7 +2113,13 @@ declare class PixiRenderer extends BaseRenderer {
     transform(particle: any, target: any): void;
     createBody(body: any, particle: any): any;
     createSprite(body: any): any;
-    createCircle(particle: any): any;
+    /**
+     * Create a circle graphic
+     * Updated for Pixi.js v8 compatibility
+     * @param {object} particle - The particle to render
+     * @returns {PIXI.Graphics} The graphics object
+     */
+    createCircle(particle: object): PIXI.Graphics;
     /**
      * Destroys the renderer and cleans up resources.
      * @param {Array<Particle>} particles - The particles to clean up.
