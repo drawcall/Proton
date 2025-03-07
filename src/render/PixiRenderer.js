@@ -7,6 +7,7 @@ let PIXIClass;
 
 /**
  * Represents a PIXI-based renderer for particle systems.
+ * Compatible with Pixi.js v8.
  * @extends BaseRenderer
  */
 export default class PixiRenderer extends BaseRenderer {
@@ -28,11 +29,23 @@ export default class PixiRenderer extends BaseRenderer {
     this.name = "PixiRenderer";
   }
 
+  /**
+   * Set the PIXI class to use for rendering
+   * Updated for Pixi.js v8 compatibility
+   * @param {object} PIXI - The PIXI library
+   */
   setPIXI(PIXI) {
     try {
       PIXIClass = PIXI || { Sprite: {} };
+      // Handle both v7 and v8 style Sprite creation
       this.createFromImage = PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
-    } catch (e) {}
+      
+      // Check if we're using v8
+      this.isV8 = typeof PIXIClass.VERSION === 'string' && 
+                  parseInt(PIXIClass.VERSION.split('.')[0], 10) >= 8;
+    } catch (e) {
+      console.warn('Error setting up PIXI in PixiRenderer:', e);
+    }
   }
 
   onProtonUpdate() {}
@@ -61,7 +74,12 @@ export default class PixiRenderer extends BaseRenderer {
     this.transform(particle, particle.body);
 
     if (this.setColor === true || this.color === true) {
-      particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+      // In v8, tint is handled differently depending on object type
+      if (this.isV8 && particle.body.tint !== undefined) {
+        particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+      } else if (!this.isV8) {
+        particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+      }
     }
   }
 
@@ -84,7 +102,7 @@ export default class PixiRenderer extends BaseRenderer {
     target.scale.y = particle.scale;
 
     // using cached version of MathUtil.PI_180 for slight performance increase.
-    target.rotation = particle.rotation * MathUtil.PI_180; // MathUtil.PI_180;
+    target.rotation = particle.rotation * MathUtil.PI_180;
   }
 
   createBody(body, particle) {
@@ -101,17 +119,41 @@ export default class PixiRenderer extends BaseRenderer {
     return sprite;
   }
 
+  /**
+   * Create a circle graphic
+   * Updated for Pixi.js v8 compatibility
+   * @param {object} particle - The particle to render
+   * @returns {PIXI.Graphics} The graphics object
+   */
   createCircle(particle) {
     const graphics = new PIXIClass.Graphics();
-
-    if (this.stroke) {
-      const stroke = Types.isString(this.stroke) ? this.stroke : 0x000000;
-      graphics.beginStroke(stroke);
+    const color = particle.color || 0x008ced;
+    
+    // Check if we're using Pixi.js v8
+    if (this.isV8) {
+      // Pixi.js v8 style
+      if (this.stroke) {
+        const strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
+        graphics
+          .circle(0, 0, particle.radius)
+          .fill(color)
+          .stroke({ width: 1, color: strokeColor });
+      } else {
+        graphics
+          .circle(0, 0, particle.radius)
+          .fill(color);
+      }
+    } else {
+      // Pixi.js v7 and earlier style
+      if (this.stroke) {
+        const strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
+        graphics.lineStyle(1, strokeColor);
+      }
+      
+      graphics.beginFill(color);
+      graphics.drawCircle(0, 0, particle.radius);
+      graphics.endFill();
     }
-
-    graphics.beginFill(particle.color || 0x008ced);
-    graphics.drawCircle(0, 0, particle.radius);
-    graphics.endFill();
 
     return graphics;
   }
