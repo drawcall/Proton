@@ -13,10 +13,11 @@ let PIXIClass;
 export default class PixiRenderer extends BaseRenderer {
   /**
    * Creates a new PixiRenderer instance.
-   * @param {PIXI.Container} element - The PIXI container to render to.
+   * @param {PIXI.Container|PIXI.ParticleContainer} element - The PIXI container to render to.
    * @param {string|number} [stroke] - The stroke color for particles.
+   * @param {object} [options] - ParticleContainer options
    */
-  constructor(element, stroke) {
+  constructor(element, stroke, options = {}) {
     super(element);
 
     this.stroke = stroke;
@@ -25,6 +26,22 @@ export default class PixiRenderer extends BaseRenderer {
     this.blendMode = null;
     this.pool.create = (body, particle) => this.createBody(body, particle);
     this.setPIXI(window.PIXI);
+
+    // Create ParticleContainer if element is not provided
+    if (!element && PIXIClass) {
+      const defaultOptions = {
+        scale: true,
+        position: true,
+        rotation: true,
+        uvs: true,
+        alpha: true
+      };
+      this.element = new PIXIClass.ParticleContainer(
+        options.maxSize || 10000,
+        { ...defaultOptions, ...options },
+        options.batchSize
+      );
+    }
 
     this.name = "PixiRenderer";
   }
@@ -36,7 +53,7 @@ export default class PixiRenderer extends BaseRenderer {
    */
   setPIXI(PIXI) {
     try {
-      PIXIClass = PIXI || { Sprite: {} };
+      PIXIClass = PIXI || { Sprite: {}, ParticleContainer: {} };
       // Handle both v7 and v8 style Sprite creation
       this.createFromImage = PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
       
@@ -60,7 +77,7 @@ export default class PixiRenderer extends BaseRenderer {
       particle.body = this.pool.get(this.circleConf, particle);
     }
 
-    if (this.blendMode) {
+    if (this.blendMode && particle.body.blendMode !== undefined) {
       particle.body.blendMode = this.blendMode;
     }
 

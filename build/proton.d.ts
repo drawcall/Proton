@@ -2103,10 +2103,11 @@ declare class PixelRenderer extends BaseRenderer {
 declare class PixiRenderer extends BaseRenderer {
     /**
      * Creates a new PixiRenderer instance.
-     * @param {PIXI.Container} element - The PIXI container to render to.
+     * @param {PIXI.Container|PIXI.ParticleContainer} element - The PIXI container to render to.
      * @param {string|number} [stroke] - The stroke color for particles.
+     * @param {object} [options] - ParticleContainer options
      */
-    constructor(element: PIXI.Container, stroke?: string | number);
+    constructor(element: PIXI.Container | PIXI.ParticleContainer, stroke?: string | number, options?: object);
     stroke: string | number | undefined;
     color: boolean;
     setColor: boolean;
