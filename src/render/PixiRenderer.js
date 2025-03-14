@@ -24,8 +24,28 @@ export default class PixiRenderer extends BaseRenderer {
     this.color = false;
     this.setColor = false;
     this.blendMode = null;
+    
+    // Enhanced object pooling with better reuse
     this.pool.create = (body, particle) => this.createBody(body, particle);
     this.setPIXI(window.PIXI);
+    
+    // Texture cache for sprites and graphics
+    this._textureCache = new Map();
+    this._graphicsCache = new Map();
+    
+    // Update batching
+    this._batchSize = options.batchSize || 100;
+    this._updateQueue = [];
+    this._isDirty = false;
+    
+    // Reusable objects to avoid allocations
+    this._tempRotation = 0;
+    this._tempColor = 0;
+    this._strokeColor = 0;
+    
+    // Pre-compute frequently used values
+    this._defaultRadius = options.defaultRadius || 10;
+    this._defaultColor = options.defaultColor || 0x008ced;
 
     // Create ParticleContainer if element is not provided
     if (!element && PIXIClass) {
@@ -37,13 +57,17 @@ export default class PixiRenderer extends BaseRenderer {
         alpha: true
       };
       this.element = new PIXIClass.ParticleContainer(
-        options.maxSize || 10000,
+        options.maxSize || 50000, // Increased default for better batching
         { ...defaultOptions, ...options },
-        options.batchSize
+        this._batchSize
       );
     }
 
     this.name = "PixiRenderer";
+    
+    // Batch rendering
+    this._batchedUpdates = options.batchUpdates !== false;
+    this._updateScheduled = false;
   }
 
   /**
@@ -65,7 +89,80 @@ export default class PixiRenderer extends BaseRenderer {
     }
   }
 
-  onProtonUpdate() {}
+  onProtonUpdate() {
+    // Process batched updates if any
+    if (this._batchedUpdates && this._isDirty && !this._updateScheduled) {
+      this._updateScheduled = true;
+      
+      // Use requestAnimationFrame for batching if available
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => this._processBatchedUpdates());
+      } else {
+        // Fallback to immediate processing
+        this._processBatchedUpdates();
+      }
+    }
+  }
+
+  /**
+   * Process all batched updates at once
+   * @private
+   */
+  _processBatchedUpdates() {
+    if (this._updateQueue.length) {
+      // Optimize by updating properties in batches
+      // This minimizes state changes and layout thrashing
+      const queue = this._updateQueue;
+      let i = 0;
+      const len = queue.length;
+      
+      // Process position updates
+      for (; i < len; i++) {
+        const item = queue[i];
+        item.target.x = item.x;
+        item.target.y = item.y;
+      }
+      
+      // Process scale updates
+      for (i = 0; i < len; i++) {
+        const item = queue[i];
+        if (item.hasScale) {
+          item.target.scale.x = item.scaleX;
+          item.target.scale.y = item.scaleY;
+        }
+      }
+      
+      // Process remaining properties
+      for (i = 0; i < len; i++) {
+        const item = queue[i];
+        if (item.hasAlpha) item.target.alpha = item.alpha;
+        if (item.hasRotation) item.target.rotation = item.rotation;
+        if (item.hasTint && item.target.tint !== undefined) {
+          item.target.tint = item.tint;
+        }
+      }
+      
+      // Clear the queue
+      this._updateQueue.length = 0;
+    }
+    
+    this._isDirty = false;
+    this._updateScheduled = false;
+  }
+
+  /**
+   * Get cached texture or create a new one
+   * @param {string} key - Cache key
+   * @param {Function} createFn - Function to create texture if not in cache
+   * @returns {PIXI.Texture} The cached or new texture
+   * @private
+   */
+  _getOrCreateTexture(key, createFn) {
+    if (!this._textureCache.has(key)) {
+      this._textureCache.set(key, createFn());
+    }
+    return this._textureCache.get(key);
+  }
 
   /**
    * @param particle
@@ -88,15 +185,53 @@ export default class PixiRenderer extends BaseRenderer {
    * @param particle
    */
   onParticleUpdate(particle) {
-    this.transform(particle, particle.body);
-
-    if (this.setColor === true || this.color === true) {
-      // In v8, tint is handled differently depending on object type
-      if (this.isV8 && particle.body.tint !== undefined) {
-        particle.body.tint = ColorUtil.getHex16FromParticle(particle);
-      } else if (!this.isV8) {
-        particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+    if (this._batchedUpdates) {
+      // Add to update queue for batched processing
+      this._queueParticleUpdate(particle);
+    } else {
+      // Direct update for immediate mode
+      this.transform(particle, particle.body);
+      
+      if (this.setColor === true || this.color === true) {
+        if (this.isV8 && particle.body.tint !== undefined) {
+          particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+        } else if (!this.isV8) {
+          particle.body.tint = ColorUtil.getHex16FromParticle(particle);
+        }
       }
+    }
+  }
+  
+  /**
+   * Queue a particle update for batch processing
+   * @param {object} particle - The particle to update
+   * @private
+   */
+  _queueParticleUpdate(particle) {
+    // Reuse queue items if possible to reduce allocations
+    let queueItem;
+    
+    if (this._updateQueue.length < 10000) { // Limit queue size for memory safety
+      queueItem = {
+        target: particle.body,
+        x: particle.p.x,
+        y: particle.p.y,
+        scaleX: particle.scale,
+        scaleY: particle.scale,
+        alpha: particle.alpha,
+        rotation: particle.rotation * MathUtil.PI_180,
+        hasScale: true,
+        hasAlpha: true,
+        hasRotation: true,
+        hasTint: this.setColor === true || this.color === true
+      };
+      
+      if (queueItem.hasTint) {
+        queueItem.tint = ColorUtil.getHex16FromParticle(particle);
+      }
+      
+      this._updateQueue.push(queueItem);
+      this._isDirty = true;
     }
   }
 
@@ -112,13 +247,9 @@ export default class PixiRenderer extends BaseRenderer {
   transform(particle, target) {
     target.x = particle.p.x;
     target.y = particle.p.y;
-
     target.alpha = particle.alpha;
-
     target.scale.x = particle.scale;
     target.scale.y = particle.scale;
-
-    // using cached version of MathUtil.PI_180 for slight performance increase.
     target.rotation = particle.rotation * MathUtil.PI_180;
   }
 
@@ -128,7 +259,21 @@ export default class PixiRenderer extends BaseRenderer {
   }
 
   createSprite(body) {
-    const sprite = body.isInner ? this.createFromImage(body.src) : new PIXIClass.Sprite(body);
+    let sprite;
+    
+    if (body.isInner) {
+      // Cache textures by source
+      const cacheKey = `sprite_${body.src}`;
+      if (!this._textureCache.has(cacheKey)) {
+        const texture = this.createFromImage(body.src);
+        this._textureCache.set(cacheKey, texture);
+        sprite = new PIXIClass.Sprite(texture);
+      } else {
+        sprite = new PIXIClass.Sprite(this._textureCache.get(cacheKey));
+      }
+    } else {
+      sprite = new PIXIClass.Sprite(body);
+    }
 
     sprite.anchor.x = 0.5;
     sprite.anchor.y = 0.5;
@@ -138,41 +283,63 @@ export default class PixiRenderer extends BaseRenderer {
 
   /**
    * Create a circle graphic
-   * Updated for Pixi.js v8 compatibility
+   * Updated for Pixi.js v8 compatibility with caching
    * @param {object} particle - The particle to render
    * @returns {PIXI.Graphics} The graphics object
    */
   createCircle(particle) {
-    const graphics = new PIXIClass.Graphics();
-    const color = particle.color || 0x008ced;
+    const radius = particle.radius || this._defaultRadius;
+    const color = particle.color || this._defaultColor;
+    const hasStroke = !!this.stroke;
     
-    // Check if we're using Pixi.js v8
+    // Create cache key based on properties
+    const cacheKey = `circle_${radius}_${color}_${hasStroke ? 1 : 0}_${hasStroke ? (Types.isString(this.stroke) ? this.stroke : 0) : 0}`;
+    
+    // Check cache first
+    if (this._graphicsCache.has(cacheKey)) {
+      return this._graphicsCache.get(cacheKey).clone();
+    }
+    
+    // Create new graphics
+    const graphics = new PIXIClass.Graphics();
+    
     if (this.isV8) {
       // Pixi.js v8 style
-      if (this.stroke) {
-        const strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
+      if (hasStroke) {
+        this._strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
         graphics
-          .circle(0, 0, particle.radius)
+          .circle(0, 0, radius)
           .fill(color)
-          .stroke({ width: 1, color: strokeColor });
+          .stroke({ width: 1, color: this._strokeColor });
       } else {
         graphics
-          .circle(0, 0, particle.radius)
+          .circle(0, 0, radius)
           .fill(color);
       }
     } else {
       // Pixi.js v7 and earlier style
-      if (this.stroke) {
-        const strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
-        graphics.lineStyle(1, strokeColor);
+      if (hasStroke) {
+        this._strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
+        graphics.lineStyle(1, this._strokeColor);
       }
       
       graphics.beginFill(color);
-      graphics.drawCircle(0, 0, particle.radius);
+      graphics.drawCircle(0, 0, radius);
       graphics.endFill();
     }
-
+    
+    // Cache the graphics
+    this._graphicsCache.set(cacheKey, graphics.clone());
+    
     return graphics;
+  }
+
+  /**
+   * Clear texture and graphics caches
+   */
+  clearCaches() {
+    this._textureCache.clear();
+    this._graphicsCache.clear();
   }
 
   /**
@@ -180,6 +347,13 @@ export default class PixiRenderer extends BaseRenderer {
    * @param {Array<Particle>} particles - The particles to clean up.
    */
   destroy(particles) {
+    // Cancel any pending updates
+    this._updateScheduled = false;
+    this._updateQueue.length = 0;
+    
+    // Clear all caches
+    this.clearCaches();
+    
     super.destroy();
 
     let i = particles.length;

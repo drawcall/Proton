@@ -2112,6 +2112,18 @@ declare class PixiRenderer extends BaseRenderer {
     color: boolean;
     setColor: boolean;
     blendMode: any;
+    _textureCache: Map<any, any>;
+    _graphicsCache: Map<any, any>;
+    _batchSize: any;
+    _updateQueue: any[];
+    _isDirty: boolean;
+    _tempRotation: number;
+    _tempColor: number;
+    _strokeColor: number;
+    _defaultRadius: any;
+    _defaultColor: any;
+    _batchedUpdates: boolean;
+    _updateScheduled: boolean;
     /**
      * Set the PIXI class to use for rendering
      * Updated for Pixi.js v8 compatibility
@@ -2121,6 +2133,19 @@ declare class PixiRenderer extends BaseRenderer {
     createFromImage: any;
     isV8: boolean | undefined;
     /**
+     * Process all batched updates at once
+     * @private
+     */
+    private _processBatchedUpdates;
+    /**
+     * Get cached texture or create a new one
+     * @param {string} key - Cache key
+     * @param {Function} createFn - Function to create texture if not in cache
+     * @returns {PIXI.Texture} The cached or new texture
+     * @private
+     */
+    private _getOrCreateTexture;
+    /**
      * @param particle
      */
     onParticleCreated(particle: any): void;
@@ -2128,6 +2153,12 @@ declare class PixiRenderer extends BaseRenderer {
      * @param particle
      */
     onParticleUpdate(particle: any): void;
+    /**
+     * Queue a particle update for batch processing
+     * @param {object} particle - The particle to update
+     * @private
+     */
+    private _queueParticleUpdate;
     /**
      * @param particle
      */
@@ -2137,11 +2168,15 @@ declare class PixiRenderer extends BaseRenderer {
     createSprite(body: any): any;
     /**
      * Create a circle graphic
-     * Updated for Pixi.js v8 compatibility
+     * Updated for Pixi.js v8 compatibility with caching
      * @param {object} particle - The particle to render
      * @returns {PIXI.Graphics} The graphics object
      */
     createCircle(particle: object): PIXI.Graphics;
+    /**
+     * Clear texture and graphics caches
+     */
+    clearCaches(): void;
     /**
      * Destroys the renderer and cleans up resources.
      * @param {Array<Particle>} particles - The particles to clean up.
