@@ -89,34 +89,10 @@ class EmitterAwarePool extends Pool {
 export default class PixiRenderer extends BaseRenderer {
   /**
    * Creates a new PixiRenderer instance.
-   * @param {PIXI.Container|Object} element - The PIXI container to render to, or options object.
+   * @param {PIXI.Container} element - The PIXI container to render to.
    * @param {string|number} [stroke] - The stroke color for particles.
-   * @param {Object} [options] - Configuration options.
    */
-  constructor(element, stroke, options = {}) {
-    // Handle case where first parameter is an options object (backwards compatibility)
-    if (typeof element === 'object' && element !== null && !(element.addChild)) {
-      options = element;
-      element = options.container || options.element;
-      stroke = options.stroke;
-    }
-    
-    // Default options
-    this.options = {
-      useParticleContainer: true,
-      autoResize: true,
-      scale: 1,
-      maxParticles: 10000,
-      properties: {
-        position: true,
-        rotation: true,
-        scale: true,
-        uvs: true,
-        alpha: true
-      },
-      ...options
-    };
-
+  constructor(element, stroke) {
     super(element);
 
     this.stroke = stroke;
@@ -134,48 +110,15 @@ export default class PixiRenderer extends BaseRenderer {
     // Track emitters and their particles
     this.emitterMap = new Map();
     
-    // Initialize containers
-    this.initializeContainers();
-    
     this.setPIXI(window.PIXI);
 
     this.name = "PixiRenderer";
-  }
-
-  /**
-   * Initialize normal and particle containers
-   */
-  initializeContainers() {
-    if (this.options.useParticleContainer && PIXIClass && PIXIClass.ParticleContainer) {
-      // Create ParticleContainer for sprites
-      this.particleContainer = new PIXIClass.ParticleContainer(
-        this.options.maxParticles,
-        this.options.properties,
-        this.options.batchSize
-      );
-      
-      // Create regular container for graphics (circles)
-      this.graphicsContainer = new PIXIClass.Container();
-      
-      // Add both containers to the main element
-      this.element.addChild(this.particleContainer);
-      this.element.addChild(this.graphicsContainer);
-    } else {
-      // No ParticleContainer, just use the element directly
-      this.particleContainer = null;
-      this.graphicsContainer = null;
-    }
   }
 
   setPIXI(PIXI) {
     try {
       PIXIClass = PIXI || { Sprite: {} };
       this.createFromImage = PIXIClass.Sprite.from;
-      
-      // Reinitialize containers if PIXI is set after construction
-      if (!this.particleContainer && this.options.useParticleContainer && PIXIClass.ParticleContainer) {
-        this.initializeContainers();
-      }
     } catch (e) {}
   }
 
@@ -220,14 +163,7 @@ export default class PixiRenderer extends BaseRenderer {
       this.emitterMap.get(emitterId).add(particle);
     }
 
-    // Add to the appropriate container based on particle type
-    if (this.particleContainer && particle.body instanceof PIXIClass.Sprite) {
-      this.particleContainer.addChild(particle.body);
-    } else if (this.graphicsContainer && particle.body instanceof PIXIClass.Graphics) {
-      this.graphicsContainer.addChild(particle.body);
-    } else {
-      this.element.addChild(particle.body);
-    }
+    this.element.addChild(particle.body);
   }
 
   /**
@@ -247,14 +183,7 @@ export default class PixiRenderer extends BaseRenderer {
   onParticleDead(particle) {
     if (!particle.body) return;
     
-    // Remove from the appropriate container
-    if (this.particleContainer && particle.body instanceof PIXIClass.Sprite) {
-      this.particleContainer.removeChild(particle.body);
-    } else if (this.graphicsContainer && particle.body instanceof PIXIClass.Graphics) {
-      this.graphicsContainer.removeChild(particle.body);
-    } else {
-      this.element.removeChild(particle.body);
-    }
+    this.element.removeChild(particle.body);
     
     // Use the cached emitter ID instead of accessing parent which might be null
     const emitterId = particle.__emitterId || (particle.parent ? particle.parent.id : 'orphaned');
@@ -283,16 +212,8 @@ export default class PixiRenderer extends BaseRenderer {
   }
 
   createBody(body, particle) {
-    // When using ParticleContainer, prefer sprites for circles too
-    if (body.isCircle) {
-      if (this.options.useParticleContainer && PIXIClass && PIXIClass.ParticleContainer) {
-        return this.createCircleTexture(particle);
-      } else {
-        return this.createCircle(particle);
-      }
-    } else {
-      return this.createSprite(body);
-    }
+    if (body.isCircle) return this.createCircle(particle);
+    else return this.createSprite(body);
   }
 
   createSprite(body) {
@@ -317,49 +238,6 @@ export default class PixiRenderer extends BaseRenderer {
 
     return graphics;
   }
-  
-  /**
-   * Create a simple sprite texture for particles, more efficient than graphics
-   * for use with ParticleContainer
-   * @param {Object} particle 
-   * @returns {PIXI.Sprite}
-   */
-  createCircleTexture(particle) {
-    // Check if we already have a texture for this radius and color
-    const key = `circle_${particle.radius}_${particle.color || 0x008ced}`;
-    
-    if (!this.textureCache) {
-      this.textureCache = new Map();
-    }
-    
-    if (!this.textureCache.has(key) && PIXIClass.RenderTexture) {
-      // Create a temporary graphics object to draw the circle
-      const graphics = new PIXIClass.Graphics();
-      if (this.stroke) {
-        const stroke = Types.isString(this.stroke) ? this.stroke : 0x000000;
-        graphics.lineStyle(1, stroke);
-      }
-      graphics.beginFill(particle.color || 0x008ced);
-      graphics.drawCircle(particle.radius, particle.radius, particle.radius);
-      graphics.endFill();
-      
-      // Create a texture from the graphics object
-      const texture = PIXIClass.RenderTexture.create({
-        width: particle.radius * 2, 
-        height: particle.radius * 2
-      });
-      
-      if (PIXIClass.renderer) {
-        PIXIClass.renderer.render(graphics, { renderTexture: texture });
-        this.textureCache.set(key, texture);
-      }
-    }
-    
-    // Create a sprite using the cached texture if available
-    const sprite = new PIXIClass.Sprite(this.textureCache.get(key) || PIXIClass.Texture.WHITE);
-    sprite.anchor.set(0.5, 0.5);
-    return sprite;
-  }
 
   /**
    * Destroys the renderer and cleans up resources.
@@ -367,30 +245,6 @@ export default class PixiRenderer extends BaseRenderer {
    */
   destroy(particles) {
     super.destroy();
-
-    // Clean up texture cache if used
-    if (this.textureCache) {
-      this.textureCache.forEach(texture => {
-        if (texture.destroy) {
-          texture.destroy(true);
-        }
-      });
-      this.textureCache.clear();
-      this.textureCache = null;
-    }
-
-    // Clean up containers
-    if (this.particleContainer) {
-      this.element.removeChild(this.particleContainer);
-      this.particleContainer.destroy();
-      this.particleContainer = null;
-    }
-    
-    if (this.graphicsContainer) {
-      this.element.removeChild(this.graphicsContainer);
-      this.graphicsContainer.destroy();
-      this.graphicsContainer = null;
-    }
 
     // Clean up tracking maps
     this.emitterMap.clear();
@@ -404,10 +258,7 @@ export default class PixiRenderer extends BaseRenderer {
     while (i--) {
       let particle = particles[i];
       if (particle.body) {
-        // The container might already be destroyed, so check before removing
-        if (particle.body.parent) {
-          particle.body.parent.removeChild(particle.body);
-        }
+        this.element.removeChild(particle.body);
         particle.body.destroy({ children: true });
       }
     }

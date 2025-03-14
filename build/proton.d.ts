@@ -2102,31 +2102,10 @@ declare class PixelRenderer extends BaseRenderer {
 declare class PixiRenderer extends BaseRenderer {
     /**
      * Creates a new PixiRenderer instance.
-     * @param {PIXI.Container|Object} element - The PIXI container to render to, or options object.
+     * @param {PIXI.Container} element - The PIXI container to render to.
      * @param {string|number} [stroke] - The stroke color for particles.
-     * @param {Object} [options] - Configuration options.
      */
-    constructor(element: PIXI.Container | Object, stroke?: string | number, options?: Object);
-    options: {
-        constructor?: Function | undefined;
-        toString?: (() => string) | undefined;
-        toLocaleString?: (() => string) | undefined;
-        valueOf?: (() => Object) | undefined;
-        hasOwnProperty?: ((v: PropertyKey) => boolean) | undefined;
-        isPrototypeOf?: ((v: Object) => boolean) | undefined;
-        propertyIsEnumerable?: ((v: PropertyKey) => boolean) | undefined;
-        useParticleContainer: boolean;
-        autoResize: boolean;
-        scale: number;
-        maxParticles: number;
-        properties: {
-            position: boolean;
-            rotation: boolean;
-            scale: boolean;
-            uvs: boolean;
-            alpha: boolean;
-        };
-    };
+    constructor(element: PIXI.Container, stroke?: string | number);
     stroke: string | number | undefined;
     color: boolean;
     setColor: boolean;
@@ -2134,12 +2113,6 @@ declare class PixiRenderer extends BaseRenderer {
     rendererId: number;
     pixiPool: EmitterAwarePool;
     emitterMap: Map<any, any>;
-    /**
-     * Initialize normal and particle containers
-     */
-    initializeContainers(): void;
-    particleContainer: any;
-    graphicsContainer: any;
     setPIXI(PIXI: any): void;
     createFromImage: any;
     /**
@@ -2158,14 +2131,6 @@ declare class PixiRenderer extends BaseRenderer {
     createBody(body: any, particle: any): any;
     createSprite(body: any): any;
     createCircle(particle: any): any;
-    /**
-     * Create a simple sprite texture for particles, more efficient than graphics
-     * for use with ParticleContainer
-     * @param {Object} particle
-     * @returns {PIXI.Sprite}
-     */
-    createCircleTexture(particle: Object): PIXI.Sprite;
-    textureCache: Map<any, any> | null | undefined;
     /**
      * Destroys the renderer and cleans up resources.
      * @param {Array<Particle>} particles - The particles to clean up.
