@@ -15,6 +15,15 @@
       writable: !1
     }), e;
   }
+  function _extends() {
+    return _extends = Object.assign ? Object.assign.bind() : function (n) {
+      for (var e = 1; e < arguments.length; e++) {
+        var t = arguments[e];
+        for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+      }
+      return n;
+    }, _extends.apply(null, arguments);
+  }
   function _inheritsLoose(t, o) {
     t.prototype = Object.create(o.prototype), t.prototype.constructor = t, _setPrototypeOf(t, o);
   }
@@ -5066,11 +5075,36 @@
   var PixiRenderer = /*#__PURE__*/function (_BaseRenderer) {
     /**
      * Creates a new PixiRenderer instance.
-     * @param {PIXI.Container} element - The PIXI container to render to.
+     * @param {PIXI.Container|Object} element - The PIXI container to render to, or options object.
      * @param {string|number} [stroke] - The stroke color for particles.
+     * @param {Object} [options] - Configuration options.
      */
-    function PixiRenderer(element, stroke) {
+    function PixiRenderer(element, stroke, options) {
       var _this2;
+      if (options === void 0) {
+        options = {};
+      }
+      // Handle case where first parameter is an options object (backwards compatibility)
+      if (typeof element === 'object' && element !== null && !element.addChild) {
+        options = element;
+        element = options.container || options.element;
+        stroke = options.stroke;
+      }
+
+      // Default options
+      _this2.options = _extends({
+        useParticleContainer: true,
+        autoResize: true,
+        scale: 1,
+        maxParticles: 10000,
+        properties: {
+          position: true,
+          rotation: true,
+          scale: true,
+          uvs: true,
+          alpha: true
+        }
+      }, options);
       _this2 = _BaseRenderer.call(this, element) || this;
       _this2.stroke = stroke;
       _this2.color = false;
@@ -5088,18 +5122,47 @@
 
       // Track emitters and their particles
       _this2.emitterMap = new Map();
+
+      // Initialize containers
+      _this2.initializeContainers();
       _this2.setPIXI(window.PIXI);
       _this2.name = "PixiRenderer";
       return _this2;
     }
+
+    /**
+     * Initialize normal and particle containers
+     */
     _inheritsLoose(PixiRenderer, _BaseRenderer);
     var _proto2 = PixiRenderer.prototype;
+    _proto2.initializeContainers = function initializeContainers() {
+      if (this.options.useParticleContainer && PIXIClass && PIXIClass.ParticleContainer) {
+        // Create ParticleContainer for sprites
+        this.particleContainer = new PIXIClass.ParticleContainer(this.options.maxParticles, this.options.properties, this.options.batchSize);
+
+        // Create regular container for graphics (circles)
+        this.graphicsContainer = new PIXIClass.Container();
+
+        // Add both containers to the main element
+        this.element.addChild(this.particleContainer);
+        this.element.addChild(this.graphicsContainer);
+      } else {
+        // No ParticleContainer, just use the element directly
+        this.particleContainer = null;
+        this.graphicsContainer = null;
+      }
+    };
     _proto2.setPIXI = function setPIXI(PIXI) {
       try {
         PIXIClass = PIXI || {
           Sprite: {}
         };
         this.createFromImage = PIXIClass.Sprite.from;
+
+        // Reinitialize containers if PIXI is set after construction
+        if (!this.particleContainer && this.options.useParticleContainer && PIXIClass.ParticleContainer) {
+          this.initializeContainers();
+        }
       } catch (e) {}
     };
     _proto2.onProtonUpdate = function onProtonUpdate() {};
@@ -5138,7 +5201,15 @@
       if (this.emitterMap.has(emitterId)) {
         this.emitterMap.get(emitterId).add(particle);
       }
-      this.element.addChild(particle.body);
+
+      // Add to the appropriate container based on particle type
+      if (this.particleContainer && particle.body instanceof PIXIClass.Sprite) {
+        this.particleContainer.addChild(particle.body);
+      } else if (this.graphicsContainer && particle.body instanceof PIXIClass.Graphics) {
+        this.graphicsContainer.addChild(particle.body);
+      } else {
+        this.element.addChild(particle.body);
+      }
     }
 
     /**
@@ -5156,7 +5227,15 @@
      */;
     _proto2.onParticleDead = function onParticleDead(particle) {
       if (!particle.body) return;
-      this.element.removeChild(particle.body);
+
+      // Remove from the appropriate container
+      if (this.particleContainer && particle.body instanceof PIXIClass.Sprite) {
+        this.particleContainer.removeChild(particle.body);
+      } else if (this.graphicsContainer && particle.body instanceof PIXIClass.Graphics) {
+        this.graphicsContainer.removeChild(particle.body);
+      } else {
+        this.element.removeChild(particle.body);
+      }
 
       // Use the cached emitter ID instead of accessing parent which might be null
       var emitterId = particle.__emitterId || (particle.parent ? particle.parent.id : 'orphaned');
@@ -5179,7 +5258,16 @@
       target.rotation = particle.rotation * MathUtil.PI_180;
     };
     _proto2.createBody = function createBody(body, particle) {
-      if (body.isCircle) return this.createCircle(particle);else return this.createSprite(body);
+      // When using ParticleContainer, prefer sprites for circles too
+      if (body.isCircle) {
+        if (this.options.useParticleContainer && PIXIClass && PIXIClass.ParticleContainer) {
+          return this.createCircleTexture(particle);
+        } else {
+          return this.createCircle(particle);
+        }
+      } else {
+        return this.createSprite(body);
+      }
     };
     _proto2.createSprite = function createSprite(body) {
       var sprite = body.isInner ? this.createFromImage(body.src) : new PIXIClass.Sprite(body);
@@ -5199,11 +5287,76 @@
     }
 
     /**
+     * Create a simple sprite texture for particles, more efficient than graphics
+     * for use with ParticleContainer
+     * @param {Object} particle 
+     * @returns {PIXI.Sprite}
+     */;
+    _proto2.createCircleTexture = function createCircleTexture(particle) {
+      // Check if we already have a texture for this radius and color
+      var key = "circle_" + particle.radius + "_" + (particle.color || 0x008ced);
+      if (!this.textureCache) {
+        this.textureCache = new Map();
+      }
+      if (!this.textureCache.has(key) && PIXIClass.RenderTexture) {
+        // Create a temporary graphics object to draw the circle
+        var graphics = new PIXIClass.Graphics();
+        if (this.stroke) {
+          var stroke = Types.isString(this.stroke) ? this.stroke : 0x000000;
+          graphics.lineStyle(1, stroke);
+        }
+        graphics.beginFill(particle.color || 0x008ced);
+        graphics.drawCircle(particle.radius, particle.radius, particle.radius);
+        graphics.endFill();
+
+        // Create a texture from the graphics object
+        var texture = PIXIClass.RenderTexture.create({
+          width: particle.radius * 2,
+          height: particle.radius * 2
+        });
+        if (PIXIClass.renderer) {
+          PIXIClass.renderer.render(graphics, {
+            renderTexture: texture
+          });
+          this.textureCache.set(key, texture);
+        }
+      }
+
+      // Create a sprite using the cached texture if available
+      var sprite = new PIXIClass.Sprite(this.textureCache.get(key) || PIXIClass.Texture.WHITE);
+      sprite.anchor.set(0.5, 0.5);
+      return sprite;
+    }
+
+    /**
      * Destroys the renderer and cleans up resources.
      * @param {Array<Particle>} particles - The particles to clean up.
      */;
     _proto2.destroy = function destroy(particles) {
       _BaseRenderer.prototype.destroy.call(this);
+
+      // Clean up texture cache if used
+      if (this.textureCache) {
+        this.textureCache.forEach(function (texture) {
+          if (texture.destroy) {
+            texture.destroy(true);
+          }
+        });
+        this.textureCache.clear();
+        this.textureCache = null;
+      }
+
+      // Clean up containers
+      if (this.particleContainer) {
+        this.element.removeChild(this.particleContainer);
+        this.particleContainer.destroy();
+        this.particleContainer = null;
+      }
+      if (this.graphicsContainer) {
+        this.element.removeChild(this.graphicsContainer);
+        this.graphicsContainer.destroy();
+        this.graphicsContainer = null;
+      }
 
       // Clean up tracking maps
       this.emitterMap.clear();
@@ -5216,7 +5369,10 @@
       while (i--) {
         var particle = particles[i];
         if (particle.body) {
-          this.element.removeChild(particle.body);
+          // The container might already be destroyed, so check before removing
+          if (particle.body.parent) {
+            particle.body.parent.removeChild(particle.body);
+          }
           particle.body.destroy({
             children: true
           });
