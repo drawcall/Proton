@@ -17,7 +17,7 @@
         }
     </style>
     <!-- Import Pixi.js v8 -->
-    <script src="https://pixijs.download/v8.0.0/pixi.min.js"></script>
+    <script src="https://pixijs.download/v8.8.1/pixi.min.js"></script>
     <!-- Import Proton - Use proton.web.js instead of proton.js -->
     <script src="../build/proton.web.js"></script>
 </head>
@@ -45,7 +45,7 @@
             
             // Create an emitter
             const emitter = new Proton.Emitter();
-            emitter.rate = new Proton.Rate(new Proton.Span(10, 10), new Proton.Span(0.01, 0.05));
+            emitter.rate = new Proton.Rate(new Proton.Span(1000, 1000), new Proton.Span(0.01, 0.05));
             
             // Set emitter position to center of screen
             emitter.p.x = app.screen.width / 2;
@@ -70,9 +70,26 @@
             emitter.emit();
             proton.addEmitter(emitter);
             
+            // Create text to display particle count
+            const countText = new PIXI.Text({
+                text: 'Particles: 0',
+                style: {
+                    fontFamily: 'Arial',
+                    fontSize: 16,
+                    fill: 0xffffff,
+                    align: 'left'
+                }
+            });
+            countText.position.set(10, 10);
+            app.stage.addChild(countText);
+            
             // Update Proton in animation loop
             app.ticker.add(() => {
                 proton.update();
+                
+                // Update particle count display
+                const particleCount = proton.getCount();
+                countText.text = `Particles: ${particleCount}`;
             });
             
             // Handle window resize

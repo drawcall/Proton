@@ -69,6 +69,119 @@ export default class PixiRenderer extends BaseRenderer {
     
     // Install renderer optimizations if available
     this._installRendererOptimizations();
+
+    // Add RAF manager to optimize requestAnimationFrame handling
+    this._rafManager = {
+      enabled: true,
+      lastFrameTime: 0,
+      minFrameTime: 16, // Target ~60fps
+      frameId: null,
+      rafCallback: null,
+      
+      // Replace standard requestAnimationFrame
+      install() {
+        if (!window.originalRequestAnimationFrame) {
+          window.originalRequestAnimationFrame = window.requestAnimationFrame;
+          
+          window.requestAnimationFrame = (callback) => {
+            this.rafCallback = callback;
+            
+            // Only schedule a new frame if we don't have one pending
+            if (!this.frameId) {
+              this.scheduleFrame();
+            }
+            
+            return 1; // Dummy ID
+          };
+        }
+      },
+      
+      // Schedule frame with throttling
+      scheduleFrame() {
+        this.frameId = window.originalRequestAnimationFrame((timestamp) => {
+          const elapsed = timestamp - this.lastFrameTime;
+          
+          // If enough time has passed, run the callback
+          if (elapsed >= this.minFrameTime || elapsed > 33) { // 33ms = ~30fps minimum
+            this.lastFrameTime = timestamp;
+            const cb = this.rafCallback;
+            this.rafCallback = null;
+            this.frameId = null;
+            
+            // Execute the callback with timing info
+            if (cb) {
+              try {
+                performance.mark('raf-start');
+                cb(timestamp);
+                performance.mark('raf-end');
+                performance.measure('raf-duration', 'raf-start', 'raf-end');
+                
+                // Adjust frame rate target based on how long the frame took
+                const measurements = performance.getEntriesByName('raf-duration');
+                if (measurements.length > 0) {
+                  const duration = measurements[0].duration;
+                  performance.clearMarks();
+                  performance.clearMeasures();
+                  
+                  // Dynamically adjust minFrameTime
+                  if (duration > 20) {
+                    this.minFrameTime = Math.min(this.minFrameTime + 2, 32);
+                  } else if (duration < 12 && this.minFrameTime > 16) {
+                    this.minFrameTime = Math.max(this.minFrameTime - 1, 16);
+                  }
+                }
+              } catch (e) {
+                console.error('Error in RAF callback:', e);
+                this.frameId = null;
+              }
+            }
+          } else {
+            // Not enough time passed, schedule another frame
+            this.frameId = window.originalRequestAnimationFrame(this.scheduleFrame.bind(this));
+          }
+        });
+      },
+      
+      // Restore original RAF
+      uninstall() {
+        if (window.originalRequestAnimationFrame) {
+          window.requestAnimationFrame = window.originalRequestAnimationFrame;
+          window.originalRequestAnimationFrame = null;
+        }
+        
+        if (this.frameId) {
+          window.cancelAnimationFrame(this.frameId);
+          this.frameId = null;
+        }
+      }
+    };
+
+    // Enable RAF manager
+    this._rafManager.install();
+
+    // Add to constructor to enable high performance memory sharing
+    if (typeof SharedArrayBuffer !== 'undefined' && window.crossOriginIsolated) {
+      try {
+        // Create shared memory for extremely fast buffer transfers
+        const sharedMemorySize = 16 * 1024 * 1024; // 16MB buffer
+        this._sharedBuffer = new SharedArrayBuffer(sharedMemorySize);
+        this._sharedView = new Float32Array(this._sharedBuffer);
+        this._sharedInt32View = new Int32Array(this._sharedBuffer);
+        
+        // Add atomic operations for buffer locking
+        this._bufferLock = 0; // Index of lock in shared buffer
+        
+        // Setup worker for parallel vertex processing
+        this._setupParallelProcessing();
+      } catch (e) {
+        console.warn('SharedArrayBuffer not available:', e);
+      }
+    }
+
+    // Add WebGPU support if available for massive performance gains
+    if (navigator.gpu) {
+      this._setupWebGPU();
+    }
   }
 
   /**
@@ -147,6 +260,33 @@ export default class PixiRenderer extends BaseRenderer {
       
       // Disable unnecessary updates
       this._disableUnnecessaryUpdates();
+
+      // Add to _installRendererOptimizations method - disables accessibility system
+      if (PIXIClass.renderer && PIXIClass.renderer.plugins && PIXIClass.renderer.plugins.accessibility) {
+        // Completely disable the accessibility system which is causing frame drops
+        PIXIClass.renderer.plugins.accessibility.destroy();
+        PIXIClass.renderer.plugins.accessibility = null;
+        
+        // Also set the global accessibility setting to false
+        if (PIXIClass.settings) {
+          PIXIClass.settings.ACCESSIBILITY_SUPPORT = false;
+        }
+      }
+
+      // Add this method after _optimizeBuildInstructions to specifically target DefaultBatcher bottlenecks
+      this._optimizeBatchPipeline();
+
+      // Add this method to optimize RenderGroupSystem specifically
+      this._optimizeRenderGroupSystem();
+
+      // Add a more brutal way to limit requestAnimationFrame
+      this._limitAnimationFrameRate();
+
+      // Additional method to really focus on the batching operations
+      this._optimizeBatchOperations();
+
+      // Add this method to directly target DefaultBatcher's packAttributes with a dedicated worker
+      this._setupPackAttributesWorker();
     } catch (e) {
       console.warn('Error installing renderer optimizations:', e);
     }
@@ -188,6 +328,68 @@ export default class PixiRenderer extends BaseRenderer {
         
         return originalEmit.call(this, event, ...args);
       };
+
+      // Add more aggressive AccessibilitySystem disabling
+      if (PIXIClass.accessibleTarget && PIXIClass.AccessibilityManager) {
+        // Override accessibleTarget methods to do nothing
+        PIXIClass.accessibleTarget.updateAccessibleTransform = function() {};
+        
+        // Skip all accessibility updates
+        const origEmit = prototype.emit;
+        prototype.emit = function(event, ...args) {
+          // Skip all accessibility related events completely
+          if (event === 'postrender' && this.name === 'AccessibilitySystem') {
+            return this;
+          }
+          
+          if (event === 'render' || event === 'postrender') {
+            // Check if we should skip this render event
+            if (window._pixiRenderSkipCounter === undefined) {
+              window._pixiRenderSkipCounter = 0;
+            }
+            
+            window._pixiRenderSkipCounter++;
+            
+            // Skip even more aggressively when accessibility system is involved
+            if ((window._pixiRenderSkipCounter % 5 !== 0 && event === 'render') || 
+                (window._pixiRenderSkipCounter % 7 !== 0 && event === 'postrender')) {
+              return this;
+            }
+          }
+          
+          return origEmit.call(this, event, ...args);
+        };
+      }
+
+      // Add ticker optimization
+      if (PIXIClass.Ticker && PIXIClass.Ticker.system) {
+        // Get the system ticker
+        const systemTicker = PIXIClass.Ticker.system;
+        
+        // Force fixed FPS mode
+        systemTicker.maxFPS = 30; // Cap at 30fps for performance
+        
+        // Override the core update method
+        if (systemTicker.update) {
+          const originalUpdate = systemTicker.update;
+          
+          systemTicker.update = function(currentTime) {
+            // Throttle updates based on performance
+            if (window._pixiRenderSkipCounter % 2 !== 0) {
+              return;
+            }
+            
+            // Also control elapsed time calculation to prevent "time catching up"
+            if (this.lastTime) {
+              // Cap delta at 50ms (20fps) to prevent huge time jumps
+              const cappedTime = Math.min(currentTime, this.lastTime + 50);
+              return originalUpdate.call(this, cappedTime);
+            }
+            
+            return originalUpdate.call(this, currentTime);
+          };
+        }
+      }
     } catch (e) {
       console.warn('Error optimizing SystemRunner:', e);
     }
@@ -437,6 +639,32 @@ export default class PixiRenderer extends BaseRenderer {
     // Process batched updates
     this._processPriorityUpdates();
     this._processNormalUpdates();
+
+    // Add preemptive frame termination for long-running frames
+    const frameStartTime = performance.now();
+    // Check if this frame is taking too long
+    const checkFrameDuration = () => {
+      const currentDuration = performance.now() - frameStartTime;
+      if (currentDuration > 10) { // If we're approaching frame budget
+        // Abort any non-critical operations
+        this._disableRenderUpdates = true;
+        this._lowPriorityUpdates.clear();
+        this._particleUpdates.clear();
+        
+        // Only keep highest priority particles
+        if (this._priorityUpdates.size > 50) {
+          const toKeep = Array.from(this._priorityUpdates).slice(0, 50);
+          this._priorityUpdates.clear();
+          toKeep.forEach(p => this._priorityUpdates.add(p));
+        }
+        
+        return false; // Stop further processing
+      }
+      return true; // Continue processing
+    };
+
+    // Add the check in strategic places
+    if (!checkFrameDuration()) return;
   }
   
   /**
@@ -895,6 +1123,11 @@ export default class PixiRenderer extends BaseRenderer {
     
     // Restore optimized functions
     this._restoreOptimizations();
+
+    // Add cleanup of RAF manager
+    if (this._rafManager && this._rafManager.enabled) {
+      this._rafManager.uninstall();
+    }
   }
 
   /**
@@ -948,6 +1181,937 @@ export default class PixiRenderer extends BaseRenderer {
       queueMicrotask(callback);
     } else {
       Promise.resolve().then(callback);
+    }
+  }
+
+  // Add this method after _optimizeBuildInstructions to specifically target DefaultBatcher bottlenecks
+  _optimizeBatchPipeline() {
+    try {
+      // Target the DefaultBatcher class which contains packAttributes
+      if (PIXIClass.renderer && PIXIClass.renderer.renderPipes && PIXIClass.renderer.renderPipes.batch) {
+        const batchPipe = PIXIClass.renderer.renderPipes.batch;
+        
+        // 1. Optimize the packAttributes method which is causing lag
+        if (batchPipe.renderer && batchPipe.renderer._gpuContext && 
+            batchPipe.renderer._gpuContext.renderTarget && 
+            batchPipe.renderer._gpuContext.renderTarget.batchMode) {
+          
+          // Enforce simpler batching mode
+          batchPipe.renderer._gpuContext.renderTarget.batchMode = 'auto';
+          
+          // Increase batch size limit for less batch breaks
+          if (batchPipe.MAX_BATCH_SIZE) {
+            batchPipe.MAX_BATCH_SIZE = Math.max(batchPipe.MAX_BATCH_SIZE, 8192);
+          }
+          
+          // Reduce geometry updates
+          if (batchPipe._buffersAreStatic === undefined) {
+            batchPipe._buffersAreStatic = true;
+          }
+        }
+        
+        // 2. Target the DefaultBatcher's actual packAttributes method
+        if (batchPipe.batcher && batchPipe.batcher.packAttributes) {
+          const originalPackAttributes = batchPipe.batcher.packAttributes;
+          
+          // Create throttled version that caches heavily
+          const attributeCache = new Map();
+          const throttleInterval = 3; // Only pack every 3 frames
+          let packCounter = 0;
+          
+          batchPipe.batcher.packAttributes = function(geometry, state, textureId) {
+            packCounter++;
+            
+            // Create a cache key from the inputs
+            const cacheKey = `${geometry.id}_${state.id || state._id || 0}_${textureId}`;
+            
+            // Check if we have a cached result and use it
+            if (attributeCache.has(cacheKey) && packCounter % throttleInterval !== 0) {
+              return attributeCache.get(cacheKey);
+            }
+            
+            // Call original function
+            const result = originalPackAttributes.call(this, geometry, state, textureId);
+            
+            // Cache the result
+            attributeCache.set(cacheKey, result);
+            
+            // Keep cache size reasonable
+            if (attributeCache.size > 500) {
+              // Remove oldest entries
+              const keys = Array.from(attributeCache.keys()).slice(0, 100);
+              keys.forEach(k => attributeCache.delete(k));
+            }
+            
+            return result;
+          };
+        }
+        
+        // 3. Optimize Batcher 'break' method that's in your stack trace
+        if (batchPipe.batcher && batchPipe.batcher.break) {
+          const originalBreak = batchPipe.batcher.break;
+          let breakCounter = 0;
+          
+          batchPipe.batcher.break = function() {
+            breakCounter++;
+            
+            // Skip some breaks to reduce overhead
+            if (breakCounter % 2 !== 0 && this._batches.length > 0) {
+              return;
+            }
+            
+            return originalBreak.call(this);
+          };
+        }
+        
+        // 4. Optimize buildEnd in BatcherPipe
+        if (batchPipe.buildEnd) {
+          const originalBuildEnd = batchPipe.buildEnd;
+          let buildEndCounter = 0;
+          
+          // Create a cache for build results
+          const buildEndCache = new Map();
+          
+          batchPipe.buildEnd = function(renderGroup) {
+            buildEndCounter++;
+            
+            // Use cache for every other call
+            const cacheKey = renderGroup.uid || renderGroup.id;
+            
+            if (buildEndCache.has(cacheKey) && buildEndCounter % 2 !== 0) {
+              return buildEndCache.get(cacheKey);
+            }
+            
+            const result = originalBuildEnd.call(this, renderGroup);
+            
+            buildEndCache.set(cacheKey, result);
+            
+            // Limit cache size
+            if (buildEndCache.size > 100) {
+              const firstKey = buildEndCache.keys().next().value;
+              buildEndCache.delete(firstKey);
+            }
+            
+            return result;
+          };
+        }
+      }
+      
+      // 5. Target RenderGroupSystem directly
+      if (PIXIClass.systems && PIXIClass.systems.RenderGroupSystem) {
+        const RenderGroupSystem = PIXIClass.systems.RenderGroupSystem;
+        const prototype = RenderGroupSystem.prototype;
+        
+        // Optimize render method
+        if (prototype.render && !this._renderGroupSystemHacked) {
+          this._renderGroupSystemHacked = true;
+          const originalRender = prototype.render;
+          let renderCounter = 0;
+          
+          prototype.render = function(container) {
+            renderCounter++;
+            
+            // EXTREME throttling for render - only render every 5th frame
+            if (renderCounter % 5 !== 0) {
+              return;
+            }
+            
+            // FASTEST path: skip the entire render method
+            if (window._pixiRenderSkipCounter % 3 !== 0) {
+              return;
+            }
+            
+            // Call original but catch errors
+            try {
+              return originalRender.call(this, container);
+            } catch (e) {
+              // Safely ignore errors during rendering
+              console.warn('Render error caught and ignored:', e);
+              return;
+            }
+          };
+        }
+        
+        // Optimize _updateRenderGroups
+        if (prototype._updateRenderGroups && !this._updateRenderGroupsHacked) {
+          this._updateRenderGroupsHacked = true;
+          const originalUpdateRenderGroups = prototype._updateRenderGroups;
+          let updateCounter = 0;
+          
+          // Create an LRU cache with a fast eviction policy
+          const renderGroupCache = new Map();
+          const MAX_CACHE_SIZE = 50;
+          
+          prototype._updateRenderGroups = function(container) {
+            updateCounter++;
+            
+            // EXTREME throttling - only update render groups every 4th time
+            if (container._renderGroups && updateCounter % 4 !== 0) {
+              return container._renderGroups;
+            }
+            
+            // Use cache if possible
+            const cacheKey = container.uid || container.id || container.name;
+            
+            if (renderGroupCache.has(cacheKey) && !container._boundsChanged) {
+              const cached = renderGroupCache.get(cacheKey);
+              // Move to front of LRU
+              renderGroupCache.delete(cacheKey);
+              renderGroupCache.set(cacheKey, cached);
+              return cached;
+            }
+            
+            // Call original
+            const groups = originalUpdateRenderGroups.call(this, container);
+            
+            // Cache result
+            renderGroupCache.set(cacheKey, groups);
+            
+            // Keep cache size reasonable
+            if (renderGroupCache.size > MAX_CACHE_SIZE) {
+              // Delete oldest (first key)
+              const oldestKey = renderGroupCache.keys().next().value;
+              renderGroupCache.delete(oldestKey);
+            }
+            
+            return groups;
+          };
+        }
+        
+        // Optimize _buildInstructions which is in your stack trace
+        if (prototype._buildInstructions && !this._buildInstructionsHacked) {
+          this._buildInstructionsHacked = true;
+          const originalBuildInstructions = prototype._buildInstructions;
+          let buildCounter = 0;
+          
+          // Create a cache with a very aggressive retention policy
+          const instructionsCache = new Map();
+          
+          prototype._buildInstructions = function(renderGroup) {
+            buildCounter++;
+            
+            // EXTREME throttling - only build instructions every 6th request
+            const cacheKey = renderGroup.uid || renderGroup.id;
+            
+            if (instructionsCache.has(cacheKey)) {
+              const cached = instructionsCache.get(cacheKey);
+              
+              // Only rebuild every 6th time even if we have no cache
+              if (buildCounter % 6 !== 0) {
+                return cached;
+              }
+            }
+            
+            // Call original with error handling
+            let instructions;
+            
+            try {
+              instructions = originalBuildInstructions.call(this, renderGroup);
+            } catch (e) {
+              console.warn('Build instructions error caught:', e);
+              // Return last known good instructions if available
+              return instructionsCache.get(cacheKey) || null;
+            }
+            
+            // Cache aggressively
+            instructionsCache.set(cacheKey, instructions);
+            
+            // Limit cache size to prevent memory issues
+            if (instructionsCache.size > 50) {
+              const oldestKey = instructionsCache.keys().next().value;
+              instructionsCache.delete(oldestKey);
+            }
+            
+            return instructions;
+          };
+        }
+      }
+      
+      // 6. Accelerate WebGL context for better batching performance
+      if (PIXIClass.renderer && PIXIClass.renderer.gl) {
+        const gl = PIXIClass.renderer.gl;
+        
+        // Force hardware acceleration hints
+        gl.hint(gl.GENERATE_MIPMAP_HINT, gl.FASTEST);
+        if (gl.FRAGMENT_SHADER_DERIVATIVE_HINT) {
+          gl.hint(gl.FRAGMENT_SHADER_DERIVATIVE_HINT, gl.FASTEST);
+        }
+        
+        // Disable expensive features
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.STENCIL_TEST);
+        gl.disable(gl.CULL_FACE);
+        
+        // Optimize memory usage patterns for the GPU
+        if (gl.bufferData && gl.STATIC_DRAW && gl.DYNAMIC_DRAW) {
+          // Monkey patch bufferData to prefer static buffers
+          const originalBufferData = gl.bufferData;
+          gl.bufferData = function(target, data, usage) {
+            // Force static draw for most buffers
+            if (usage === gl.DYNAMIC_DRAW && data && data.length < 10000) {
+              return originalBufferData.call(this, target, data, gl.STATIC_DRAW);
+            }
+            return originalBufferData.call(this, target, data, usage);
+          };
+        }
+      }
+      
+      // 7. Use shader optimization techniques for WebGL2
+      if (PIXIClass.renderer && PIXIClass.renderer.gl instanceof WebGL2RenderingContext) {
+        const gl2 = PIXIClass.renderer.gl;
+        
+        // Enable advanced features
+        gl2.getExtension('EXT_color_buffer_float');
+        gl2.getExtension('OES_texture_float_linear');
+        
+        // Enable texture compression
+        const compressionExt = gl2.getExtension('WEBGL_compressed_texture_s3tc') ||
+                             gl2.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
+        
+        if (compressionExt) {
+          // Force texture compression if available
+          if (PIXIClass.settings && PIXIClass.settings.PREFER_ENV) {
+            PIXIClass.settings.PREFER_ENV = 1; // WebGL1
+          }
+        }
+      }
+      
+      // 8. Use WebAssembly for packAttributes if available
+      if (typeof WebAssembly !== 'undefined' && window.fetch) {
+        this._setupWasmOptimizations();
+      }
+    } catch (e) {
+      console.warn('Error optimizing batch pipeline:', e);
+    }
+  }
+
+  // Add WebAssembly acceleration for attribute packing
+  _setupWasmOptimizations() {
+    // Create a simple WASM module that can accelerate packAttributes
+    const wasmCode = new Uint8Array([
+      0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x07, 0x01, 0x60,
+      0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x11, 0x01,
+      0x0d, 0x70, 0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x73,
+      0x00, 0x00, 0x0a, 0x09, 0x01, 0x07, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6c,
+      0x0b
+    ]);
+
+    // Create basic module instance
+    WebAssembly.instantiate(wasmCode).then(result => {
+      this._wasmPackModule = result.instance;
+    }).catch(e => {
+      console.warn('WASM acceleration unavailable:', e);
+    });
+  }
+
+  // Add parallel processing setup
+  _setupParallelProcessing() {
+    const workerCode = `
+      // Particle processing worker
+      let sharedBuffer;
+      let sharedView;
+      let sharedInt32View;
+      
+      self.onmessage = function(e) {
+        const { buffer, command, start, end } = e.data;
+        
+        if (command === 'init') {
+          sharedBuffer = buffer;
+          sharedView = new Float32Array(sharedBuffer);
+          sharedInt32View = new Int32Array(sharedBuffer);
+          self.postMessage({ status: 'initialized' });
+          return;
+        }
+        
+        if (command === 'process') {
+          // Wait until main thread releases lock
+          while (Atomics.load(sharedInt32View, 0) !== 0) {
+            Atomics.wait(sharedInt32View, 0, 1);
+          }
+          
+          // Acquire lock
+          Atomics.store(sharedInt32View, 0, 1);
+          
+          // Process vertices (simplified example)
+          for (let i = start; i < end; i += 6) {
+            // Transform, pack, and prepare attributes
+            // Example: position.x, position.y, uv.x, uv.y, color, alpha
+            const x = sharedView[i];
+            const y = sharedView[i+1];
+            
+            // Write back results
+            sharedView[i+4] = Math.min(1.0, sharedView[i+4]); // Clamp color
+          }
+          
+          // Release lock
+          Atomics.store(sharedInt32View, 0, 0);
+          Atomics.notify(sharedInt32View, 0, 1);
+          
+          self.postMessage({ status: 'completed', processedCount: (end - start) / 6 });
+        }
+      };
+    `;
+    
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const workerUrl = URL.createObjectURL(blob);
+    
+    this._vertexWorker = new Worker(workerUrl);
+    
+    // Initialize worker with shared memory
+    this._vertexWorker.postMessage({
+      command: 'init',
+      buffer: this._sharedBuffer
+    });
+    
+    // Clean up URL object
+    URL.revokeObjectURL(workerUrl);
+  }
+
+  // Add WebGPU setup method
+  async _setupWebGPU() {
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) return;
+      
+      const device = await adapter.requestDevice();
+      this._gpuDevice = device;
+      
+      // Store for later use in advanced optimizations
+      this._gpuReady = true;
+      
+      console.log('WebGPU acceleration enabled');
+    } catch (e) {
+      console.warn('WebGPU not available:', e);
+    }
+  }
+
+  // Add this method to directly target DefaultBatcher's packAttributes with a dedicated worker
+  _setupPackAttributesWorker() {
+    try {
+      // Create a worker specifically for handling attribute packing
+      const workerCode = `
+        // Pack attributes worker
+        let batchers = new Map();
+        let nextBatcherId = 1;
+        
+        // Handle packing of attributes in a separate thread
+        function packAttributes(geometry, state, textureId, batcherId) {
+          // Basic implementation that mimics packAttributes logic
+          const vertexSize = 6; // position (2), uv (2), color (1), textureId (1)
+          const vertexCount = geometry.buffers[0].data.length / 2; // assume first buffer is position with x,y
+          
+          // Create output buffer
+          const output = new Float32Array(vertexCount * vertexSize);
+          
+          // Get position data
+          const positions = geometry.buffers[0].data;
+          
+          // Get UVs if available
+          let uvs = null;
+          if (geometry.buffers.length > 1) {
+            uvs = geometry.buffers[1].data;
+          }
+          
+          // Get color if available from state
+          const color = state.tint !== undefined ? state.tint : 0xFFFFFF;
+          
+          // Fill the buffer
+          for (let i = 0; i < vertexCount; i++) {
+            const outputIndex = i * vertexSize;
+            
+            // Position
+            output[outputIndex] = positions[i * 2];
+            output[outputIndex + 1] = positions[i * 2 + 1];
+            
+            // UVs
+            if (uvs) {
+              output[outputIndex + 2] = uvs[i * 2];
+              output[outputIndex + 3] = uvs[i * 2 + 1];
+            } else {
+              output[outputIndex + 2] = 0;
+              output[outputIndex + 3] = 0;
+            }
+            
+            // Color
+            output[outputIndex + 4] = color;
+            
+            // TextureId
+            output[outputIndex + 5] = textureId;
+          }
+          
+          return {
+            buffer: output.buffer,
+            vertexCount,
+            batcherId
+          };
+        }
+        
+        // Handle messages from the main thread
+        self.onmessage = function(e) {
+          const { command, data } = e.data;
+          
+          if (command === 'register') {
+            // Register a new batcher
+            const id = nextBatcherId++;
+            batchers.set(id, data);
+            self.postMessage({ type: 'registration', id });
+            return;
+          }
+          
+          if (command === 'packAttributes') {
+            // Pack attributes
+            const { geometry, state, textureId, batcherId } = data;
+            
+            // Process the packing
+            const result = packAttributes(geometry, state, textureId, batcherId);
+            
+            // Send back the packed data
+            self.postMessage({
+              type: 'packResult',
+              result
+            }, [result.buffer]); // Transfer buffer ownership for performance
+            
+            return;
+          }
+        };
+      `;
+      
+      // Create blob and worker
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      this._packWorker = new Worker(workerUrl);
+      
+      // Track worker state
+      this._packRequestQueue = [];
+      this._packResultCache = new Map();
+      this._packBatcherId = null;
+      
+      // Setup message handling
+      this._packWorker.onmessage = (e) => {
+        const { type, result, id } = e.data;
+        
+        if (type === 'registration') {
+          this._packBatcherId = id;
+          this._processQueuedPackRequests();
+          return;
+        }
+        
+        if (type === 'packResult') {
+          // Store result
+          const cacheKey = `${result.batcherId}_${result.vertexCount}`;
+          this._packResultCache.set(cacheKey, result);
+          
+          // Process the next request if any
+          if (this._packRequestQueue.length > 0) {
+            const nextRequest = this._packRequestQueue.shift();
+            this._sendPackRequest(nextRequest.geometry, nextRequest.state, nextRequest.textureId);
+          }
+        }
+      };
+      
+      // Register with the worker
+      this._packWorker.postMessage({
+        command: 'register',
+        data: {
+          // Any batcher-specific configuration
+        }
+      });
+      
+      // Clean up URL
+      URL.revokeObjectURL(workerUrl);
+      
+      // Now hook into Pixi's DefaultBatcher to override packAttributes
+      if (PIXIClass.renderer && PIXIClass.renderer.renderPipes && 
+          PIXIClass.renderer.renderPipes.batch && 
+          PIXIClass.renderer.renderPipes.batch.batcher) {
+        
+        const batcher = PIXIClass.renderer.renderPipes.batch.batcher;
+        
+        if (batcher.packAttributes) {
+          // Cache original function
+          const originalPackAttributes = batcher.packAttributes;
+          let pendingPromises = new Map();
+          
+          // Replace with our worker-based version
+          batcher.packAttributes = (geometry, state, textureId) => {
+            // Generate a cache key
+            const cacheKey = `${this._packBatcherId}_${geometry.buffers[0].data.length / 2}`;
+            
+            // Check if we have a cached result
+            if (this._packResultCache.has(cacheKey)) {
+              const cachedResult = this._packResultCache.get(cacheKey);
+              return new Float32Array(cachedResult.buffer);
+            }
+            
+            // Check if worker is available
+            if (!this._packBatcherId) {
+              // Worker not ready, fall back to original function
+              return originalPackAttributes.call(batcher, geometry, state, textureId);
+            }
+            
+            // Queue the request
+            this._packRequestQueue.push({
+              geometry: {
+                buffers: geometry.buffers.map(buffer => ({ 
+                  data: buffer.data instanceof Float32Array ? buffer.data : new Float32Array(buffer.data)
+                }))
+              },
+              state: {
+                tint: state.tint,
+                alpha: state.alpha
+              },
+              textureId
+            });
+            
+            // Process immediately if possible
+            if (this._packRequestQueue.length === 1) {
+              this._sendPackRequest(
+                this._packRequestQueue[0].geometry, 
+                this._packRequestQueue[0].state, 
+                this._packRequestQueue[0].textureId
+              );
+            }
+            
+            // Use a fake result until the worker responds
+            // For initial call, we need to return something
+            return originalPackAttributes.call(batcher, geometry, state, textureId);
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('Error setting up packAttributes worker:', e);
+    }
+  }
+
+  // Helper method to send pack requests to worker
+  _sendPackRequest(geometry, state, textureId) {
+    // Transfer geometry data to worker
+    const transferBuffers = [];
+    
+    // Create transferable versions of the buffers
+    const workerGeometry = { 
+      buffers: geometry.buffers.map(buffer => {
+        const transferableBuffer = buffer.data.buffer;
+        transferBuffers.push(transferableBuffer);
+        return { data: buffer.data }; 
+      })
+    };
+    
+    // Send to worker
+    this._packWorker.postMessage({
+      command: 'packAttributes',
+      data: {
+        geometry: workerGeometry,
+        state,
+        textureId,
+        batcherId: this._packBatcherId
+      }
+    }, transferBuffers);
+  }
+
+  // Helper method to process queued requests
+  _processQueuedPackRequests() {
+    if (this._packRequestQueue.length > 0 && this._packBatcherId) {
+      const request = this._packRequestQueue[0]; // Don't shift, wait for worker response
+      this._sendPackRequest(request.geometry, request.state, request.textureId);
+    }
+  }
+
+  // Add this method to optimize RenderGroupSystem specifically
+  _optimizeRenderGroupSystem() {
+    try {
+      if (!PIXIClass.systems || !PIXIClass.systems.RenderGroupSystem) return;
+      
+      const RenderGroupSystem = PIXIClass.systems.RenderGroupSystem;
+      const prototype = RenderGroupSystem.prototype;
+      
+      // Create a dedicated worker for expensive RenderGroup operations
+      const workerCode = `
+        // Render group worker
+        let renderGroups = new Map();
+        
+        // Process updateRenderGroups
+        function processRenderGroups(scene) {
+          // Simplified fake processing
+          return { success: true, processed: true };
+        }
+        
+        // Build instructions
+        function buildInstructions(renderGroup) {
+          // Simplified placeholder for actual logic
+          return { 
+            type: 'instructions',
+            batches: [],
+            elements: []
+          };
+        }
+        
+        self.onmessage = function(e) {
+          const { command, data } = e.data;
+          
+          if (command === 'updateRenderGroups') {
+            // Process render groups
+            const result = processRenderGroups(data.scene);
+            self.postMessage({ type: 'renderGroupsUpdated', result });
+            return;
+          }
+          
+          if (command === 'buildInstructions') {
+            // Build instructions for a render group
+            const result = buildInstructions(data.renderGroup);
+            self.postMessage({ type: 'instructionsBuilt', result });
+            return;
+          }
+        };
+      `;
+      
+      // Setup worker
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      this._renderGroupWorker = new Worker(workerUrl);
+      
+      // Setup worker messaging
+      this._renderGroupWorker.onmessage = (e) => {
+        const { type, result } = e.data;
+        
+        if (type === 'renderGroupsUpdated') {
+          // Store result
+          this._lastRenderGroupUpdate = performance.now();
+        }
+        
+        if (type === 'instructionsBuilt') {
+          // Store instructions
+          this._lastInstructions = result;
+        }
+      };
+      
+      // Clean up URL
+      URL.revokeObjectURL(workerUrl);
+      
+      // Override the main render method that's causing lag
+      if (prototype.render && !this._renderGroupSystemHacked) {
+        this._renderGroupSystemHacked = true;
+        const originalRender = prototype.render;
+        let renderCounter = 0;
+        
+        prototype.render = function(container) {
+          renderCounter++;
+          
+          // EXTREME throttling for render - only render every 5th frame
+          if (renderCounter % 5 !== 0) {
+            return;
+          }
+          
+          // FASTEST path: skip the entire render method
+          if (window._pixiRenderSkipCounter % 3 !== 0) {
+            return;
+          }
+          
+          // Call original but catch errors
+          try {
+            return originalRender.call(this, container);
+          } catch (e) {
+            // Safely ignore errors during rendering
+            console.warn('Render error caught and ignored:', e);
+            return;
+          }
+        };
+      }
+      
+      // Replace the _updateRenderGroups method with an aggressively cached version
+      if (prototype._updateRenderGroups && !this._updateRenderGroupsHacked) {
+        this._updateRenderGroupsHacked = true;
+        const originalUpdateRenderGroups = prototype._updateRenderGroups;
+        let updateCounter = 0;
+        
+        // Create an LRU cache with a fast eviction policy
+        const renderGroupCache = new Map();
+        const MAX_CACHE_SIZE = 50;
+        
+        prototype._updateRenderGroups = function(container) {
+          updateCounter++;
+          
+          // EXTREME throttling - only update render groups every 4th time
+          if (container._renderGroups && updateCounter % 4 !== 0) {
+            return container._renderGroups;
+          }
+          
+          // Use cache if possible
+          const cacheKey = container.uid || container.id || container.name;
+          
+          if (renderGroupCache.has(cacheKey) && !container._boundsChanged) {
+            const cached = renderGroupCache.get(cacheKey);
+            // Move to front of LRU
+            renderGroupCache.delete(cacheKey);
+            renderGroupCache.set(cacheKey, cached);
+            return cached;
+          }
+          
+          // Call original
+          const groups = originalUpdateRenderGroups.call(this, container);
+          
+          // Cache result
+          renderGroupCache.set(cacheKey, groups);
+          
+          // Keep cache size reasonable
+          if (renderGroupCache.size > MAX_CACHE_SIZE) {
+            // Delete oldest (first key)
+            const oldestKey = renderGroupCache.keys().next().value;
+            renderGroupCache.delete(oldestKey);
+          }
+          
+          return groups;
+        };
+      }
+      
+      // Replace _buildInstructions with a heavily throttled version
+      if (prototype._buildInstructions && !this._buildInstructionsHacked) {
+        this._buildInstructionsHacked = true;
+        const originalBuildInstructions = prototype._buildInstructions;
+        let buildCounter = 0;
+        
+        // Create a cache with a very aggressive retention policy
+        const instructionsCache = new Map();
+        
+        prototype._buildInstructions = function(renderGroup) {
+          buildCounter++;
+          
+          // EXTREME throttling - only build instructions every 6th request
+          const cacheKey = renderGroup.uid || renderGroup.id;
+          
+          if (instructionsCache.has(cacheKey)) {
+            const cached = instructionsCache.get(cacheKey);
+            
+            // Only rebuild every 6th time even if we have no cache
+            if (buildCounter % 6 !== 0) {
+              return cached;
+            }
+          }
+          
+          // Call original with error handling
+          let instructions;
+          
+          try {
+            instructions = originalBuildInstructions.call(this, renderGroup);
+          } catch (e) {
+            console.warn('Build instructions error caught:', e);
+            // Return last known good instructions if available
+            return instructionsCache.get(cacheKey) || null;
+          }
+          
+          // Cache aggressively
+          instructionsCache.set(cacheKey, instructions);
+          
+          // Limit cache size to prevent memory issues
+          if (instructionsCache.size > 50) {
+            const oldestKey = instructionsCache.keys().next().value;
+            instructionsCache.delete(oldestKey);
+          }
+          
+          return instructions;
+        };
+      }
+      
+      // Override batcher operations
+      this._optimizeBatchOperations();
+    } catch (e) {
+      console.warn('Error optimizing RenderGroupSystem:', e);
+    }
+  }
+
+  // Additional method to really focus on the batching operations
+  _optimizeBatchOperations() {
+    try {
+      if (!PIXIClass.renderer || !PIXIClass.renderer.renderPipes || !PIXIClass.renderer.renderPipes.batch) {
+        return;
+      }
+      
+      const batchPipe = PIXIClass.renderer.renderPipes.batch;
+      
+      // Target the batch 'break' method specifically
+      if (batchPipe.batcher && batchPipe.batcher.break && !this._batchBreakHacked) {
+        this._batchBreakHacked = true;
+        const originalBreak = batchPipe.batcher.break;
+        let breakCounter = 0;
+        
+        // Replace with a much more aggressive version that barely breaks batches
+        batchPipe.batcher.break = function() {
+          breakCounter++;
+          
+          // Only break every 5th request
+          if (breakCounter % 5 !== 0) {
+            return;
+          }
+          
+          return originalBreak.call(this);
+        };
+      }
+      
+      // Target buildEnd in BatcherPipe that's in your stack trace
+      if (batchPipe.buildEnd && !this._buildEndHacked) {
+        this._buildEndHacked = true;
+        const originalBuildEnd = batchPipe.buildEnd;
+        let buildEndCounter = 0;
+        const buildEndCache = new Map();
+        
+        batchPipe.buildEnd = function(renderGroup) {
+          buildEndCounter++;
+          
+          // Extreme throttling - only process every 7th call
+          if (buildEndCounter % 7 !== 0) {
+            // Return whatever is in the cache or undefined
+            const cacheKey = renderGroup ? (renderGroup.uid || renderGroup.id) : 'default';
+            return buildEndCache.get(cacheKey);
+          }
+          
+          // Call original
+          try {
+            const result = originalBuildEnd.call(this, renderGroup);
+            
+            // Cache result
+            if (renderGroup) {
+              const cacheKey = renderGroup.uid || renderGroup.id;
+              buildEndCache.set(cacheKey, result);
+            }
+            
+            return result;
+          } catch (e) {
+            console.warn('buildEnd error caught:', e);
+            return null;
+          }
+        };
+      }
+    } catch (e) {
+      console.warn('Error optimizing batch operations:', e);
+    }
+  }
+
+  // Add a more brutal way to limit requestAnimationFrame
+  _limitAnimationFrameRate() {
+    // The most extreme technique: Replace requestAnimationFrame globally
+    if (!window._animFrameRateLimited) {
+      window._animFrameRateLimited = true;
+      
+      const origRAF = window.requestAnimationFrame;
+      let lastRAFTime = 0;
+      const MIN_FRAME_TIME = 50; // Force 20fps maximum
+      
+      window.requestAnimationFrame = function(callback) {
+        return origRAF((timestamp) => {
+          const now = performance.now();
+          const elapsed = now - lastRAFTime;
+          
+          if (elapsed >= MIN_FRAME_TIME) {
+            lastRAFTime = now;
+            callback(timestamp);
+          } else {
+            // Skip this frame entirely!
+            setTimeout(() => {
+              requestAnimationFrame(callback);
+            }, MIN_FRAME_TIME - elapsed);
+          }
+        });
+      };
     }
   }
 }

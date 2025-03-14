@@ -2156,6 +2156,20 @@ declare class PixiRenderer extends BaseRenderer {
     _disableRenderUpdates: boolean;
     _renderUpdateCounter: number;
     _renderUpdateThreshold: any;
+    _rafManager: {
+        enabled: boolean;
+        lastFrameTime: number;
+        minFrameTime: number;
+        frameId: null;
+        rafCallback: null;
+        install(): void;
+        scheduleFrame(): void;
+        uninstall(): void;
+    };
+    _sharedBuffer: SharedArrayBuffer | undefined;
+    _sharedView: Float32Array<SharedArrayBuffer> | undefined;
+    _sharedInt32View: Int32Array<SharedArrayBuffer> | undefined;
+    _bufferLock: number | undefined;
     /**
      * Set default culling bounds based on the current view
      * @private
@@ -2320,6 +2334,32 @@ declare class PixiRenderer extends BaseRenderer {
      */
     private _restoreOptimizations;
     _queueMicroTask(callback: any): void;
+    _optimizeBatchPipeline(): void;
+    _renderGroupSystemHacked: boolean | undefined;
+    _updateRenderGroupsHacked: boolean | undefined;
+    _buildInstructionsHacked: boolean | undefined;
+    _setupWasmOptimizations(): void;
+    _wasmPackModule: WebAssembly.Instance | undefined;
+    _setupParallelProcessing(): void;
+    _vertexWorker: Worker | undefined;
+    _setupWebGPU(): Promise<void>;
+    _gpuDevice: any;
+    _gpuReady: boolean | undefined;
+    _setupPackAttributesWorker(): void;
+    _packWorker: Worker | undefined;
+    _packRequestQueue: any[] | undefined;
+    _packResultCache: Map<any, any> | undefined;
+    _packBatcherId: any;
+    _sendPackRequest(geometry: any, state: any, textureId: any): void;
+    _processQueuedPackRequests(): void;
+    _optimizeRenderGroupSystem(): void;
+    _renderGroupWorker: Worker | undefined;
+    _lastRenderGroupUpdate: number | undefined;
+    _lastInstructions: any;
+    _optimizeBatchOperations(): void;
+    _batchBreakHacked: boolean | undefined;
+    _buildEndHacked: boolean | undefined;
+    _limitAnimationFrameRate(): void;
 }
 
 declare class MStack {
