@@ -2097,8 +2097,7 @@ declare class PixelRenderer extends BaseRenderer {
 
 /**
  * Represents a PIXI-based renderer for particle systems.
- * Compatible with Pixi.js v7 and v8.
- * Uses the high-performance ParticleContainer for v8.
+ * Compatible with Pixi.js v8.
  * @extends BaseRenderer
  */
 declare class PixiRenderer extends BaseRenderer {
@@ -2106,214 +2105,38 @@ declare class PixiRenderer extends BaseRenderer {
      * Creates a new PixiRenderer instance.
      * @param {PIXI.Container} element - The PIXI container to render to.
      * @param {string|number} [stroke] - The stroke color for particles.
-     * @param {Object} [options] - ParticleContainer options for v8
      */
-    constructor(element: PIXI.Container, stroke?: string | number, options?: Object);
+    constructor(element: PIXI.Container, stroke?: string | number);
     stroke: string | number | undefined;
     color: boolean;
     setColor: boolean;
     blendMode: any;
-    options: Object;
-    _textureCache: Map<any, any>;
-    _updateThrottle: any;
-    _updateCounter: number;
-    _particleUpdates: Set<any>;
-    _frameSkipCounter: number;
-    _frameSkipThreshold: any;
-    _enableCulling: boolean;
-    _cullingBounds: {
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-    } | {
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-    } | {
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-    } | {
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-    } | null;
-    _priorityUpdates: Set<any>;
-    _lowPriorityUpdates: Set<any>;
-    _updatePriorityThreshold: any;
-    _piBy180: number;
-    _lastUpdateTime: number;
-    _frameTime: number;
-    _throttleAdjustCounter: number;
-    _autoAdjustThrottle: boolean;
-    _useStableSort: boolean;
-    _renderBatchSize: any;
-    _disableAlphaDirty: any;
-    _disableRenderUpdates: boolean;
-    _renderUpdateCounter: number;
-    _renderUpdateThreshold: any;
-    _rafManager: {
-        enabled: boolean;
-        lastFrameTime: number;
-        minFrameTime: number;
-        frameId: null;
-        rafCallback: null;
-        install(): void;
-        scheduleFrame(): void;
-        uninstall(): void;
-    };
-    _sharedBuffer: SharedArrayBuffer | undefined;
-    _sharedView: Float32Array<SharedArrayBuffer> | undefined;
-    _sharedInt32View: Int32Array<SharedArrayBuffer> | undefined;
-    _bufferLock: number | undefined;
-    /**
-     * Set default culling bounds based on the current view
-     * @private
-     */
-    private _setDefaultCullingBounds;
-    /**
-     * Install optimizations for the Pixi renderer if available
-     * @private
-     */
-    private _installRendererOptimizations;
-    /**
-     * Optimize the SystemRunner for better performance
-     * @private
-     */
-    private _optimizeSystemRunner;
-    _systemRunnerOptimized: boolean | undefined;
-    /**
-     * Optimize buildInstructions to reduce CPU usage
-     * @private
-     */
-    private _optimizeBuildInstructions;
-    _buildInstructionsOptimized: boolean | undefined;
-    /**
-     * Disable unnecessary updates that impact performance
-     * @private
-     */
-    private _disableUnnecessaryUpdates;
-    _updateTransformOptimized: boolean | undefined;
     /**
      * Set the PIXI class to use for rendering
+     * Updated for Pixi.js v8 compatibility
      * @param {object} PIXI - The PIXI library
      */
     setPIXI(PIXI: object): void;
     createFromImage: any;
     isV8: boolean | undefined;
     /**
-     * Set up ParticleContainer for Pixi.js v8
-     * @private
+     * @param particle
      */
-    private _setupParticleContainer;
-    particleContainer: any;
-    originalContainer: any;
+    onParticleCreated(particle: any): void;
     /**
-     * Checks if an update should be processed this frame
-     * @returns {boolean} Whether to process updates this frame
-     * @private
+     * @param particle
      */
-    private _shouldProcessUpdates;
+    onParticleUpdate(particle: any): void;
     /**
-     * Dynamically adjust throttling based on frame time
-     * @private
+     * @param particle
      */
-    private _adjustThrottleIfNeeded;
+    onParticleDead(particle: any): void;
+    transform(particle: any, target: any): void;
+    createBody(body: any, particle: any): any;
+    createSprite(body: any): any;
     /**
-     * Process high priority updates first
-     * @private
-     */
-    private _processPriorityUpdates;
-    /**
-     * Process normal and low priority updates
-     * @private
-     */
-    private _processNormalUpdates;
-    /**
-     * Handle particle creation
-     * @param {object} particle - The particle
-     */
-    onParticleCreated(particle: object): void;
-    /**
-     * Create a particle for Pixi.js v8
-     * @private
-     * @param {object} particle - The particle
-     */
-    private _createV8Particle;
-    _particlesToAdd: any[] | undefined;
-    /**
-     * Create a legacy particle for Pixi.js v7 and earlier
-     * @private
-     * @param {object} particle - The particle
-     */
-    private _createLegacyParticle;
-    /**
-     * Determines particle update priority based on its properties
-     * @param {object} particle - The particle
-     * @returns {string} Priority level: 'high', 'normal', or 'low'
-     * @private
-     */
-    private _getParticlePriority;
-    /**
-     * Gets a texture for the particle - with caching for performance
-     * @param {object} particle - The particle
-     * @returns {PIXI.Texture} The texture to use
-     */
-    getTexture(particle: object): PIXI.Texture;
-    /**
-     * Update particle render properties
-     * @param {object} particle - The particle to update
-     */
-    onParticleUpdate(particle: object): void;
-    /**
-     * Checks if a particle is within the visible bounds
-     * @param {object} particle - The particle to check
-     * @returns {boolean} Whether the particle is visible
-     * @private
-     */
-    private _isParticleVisible;
-    /**
-     * Update a particle for Pixi.js v8
-     * @private
-     * @param {object} particle - The particle
-     */
-    private _updateV8Particle;
-    /**
-     * Update a legacy particle for Pixi.js v7 and earlier
-     * @private
-     * @param {object} particle - The particle
-     */
-    private _updateLegacyParticle;
-    /**
-     * Handle particle removal
-     * @param {object} particle - The particle to remove
-     */
-    onParticleDead(particle: object): void;
-    /**
-     * Apply transform properties to the target
-     * @param {object} particle - The particle
-     * @param {object} target - The target to transform
-     */
-    transform(particle: object, target: object): void;
-    /**
-     * Create a body for the particle
-     * @param {object} body - The body template
-     * @param {object} particle - The particle
-     * @returns {object} The created body
-     */
-    createBody(body: object, particle: object): object;
-    /**
-     * Create a sprite
-     * @param {object} body - The body to create a sprite from
-     * @returns {PIXI.Sprite} The created sprite
-     */
-    createSprite(body: object): PIXI.Sprite;
-    /**
-     * Create a circle graphic - with caching for performance
+     * Create a circle graphic
+     * Updated for Pixi.js v8 compatibility
      * @param {object} particle - The particle to render
      * @returns {PIXI.Graphics} The graphics object
      */
@@ -2323,43 +2146,6 @@ declare class PixiRenderer extends BaseRenderer {
      * @param {Array<Particle>} particles - The particles to clean up.
      */
     destroy(particles: Array<Particle>): void;
-    /**
-     * Restore the original container if it was replaced
-     * @private
-     */
-    private _restoreOriginalContainer;
-    /**
-     * Restore any optimizations that need to be cleaned up
-     * @private
-     */
-    private _restoreOptimizations;
-    _queueMicroTask(callback: any): void;
-    _optimizeBatchPipeline(): void;
-    _renderGroupSystemHacked: boolean | undefined;
-    _updateRenderGroupsHacked: boolean | undefined;
-    _buildInstructionsHacked: boolean | undefined;
-    _setupWasmOptimizations(): void;
-    _wasmPackModule: WebAssembly.Instance | undefined;
-    _setupParallelProcessing(): void;
-    _vertexWorker: Worker | undefined;
-    _setupWebGPU(): Promise<void>;
-    _gpuDevice: any;
-    _gpuReady: boolean | undefined;
-    _setupPackAttributesWorker(): void;
-    _packWorker: Worker | undefined;
-    _packRequestQueue: any[] | undefined;
-    _packResultCache: Map<any, any> | undefined;
-    _packBatcherId: any;
-    _sendPackRequest(geometry: any, state: any, textureId: any): void;
-    _processQueuedPackRequests(): void;
-    _optimizeRenderGroupSystem(): void;
-    _renderGroupWorker: Worker | undefined;
-    _lastRenderGroupUpdate: number | undefined;
-    _lastInstructions: any;
-    _optimizeBatchOperations(): void;
-    _batchBreakHacked: boolean | undefined;
-    _buildEndHacked: boolean | undefined;
-    _limitAnimationFrameRate(): void;
 }
 
 declare class MStack {

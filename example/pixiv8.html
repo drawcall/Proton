@@ -34,7 +34,7 @@
             await app.init({
                 resizeTo: window,
                 background: '#000',
-                antialias: true
+                antialias: true,
             });
             
             // Add the view to the DOM
@@ -70,9 +70,9 @@
             emitter.emit();
             proton.addEmitter(emitter);
             
-            // Create text to display particle count
+            // Create text to display particle count and renderer info
             const countText = new PIXI.Text({
-                text: 'Particles: 0',
+                text: 'Particles: 0\nRenderer: ' + app.renderer.type,
                 style: {
                     fontFamily: 'Arial',
                     fontSize: 16,
@@ -87,9 +87,53 @@
             app.ticker.add(() => {
                 proton.update();
                 
-                // Update particle count display
+                // Update particle count display and show detailed renderer info
                 const particleCount = proton.getCount();
-                countText.text = `Particles: ${particleCount}`;
+                
+                // Map renderer type numbers to names
+                const rendererTypes = {
+                    0: 'Unknown',
+                    1: 'WebGL',
+                    2: 'WebGPU',
+                    3: 'Canvas2D'
+                };
+                
+                // Get detailed renderer information
+                let rendererType = app.renderer.type;
+                let detailedType = rendererTypes[rendererType] || "Unknown";
+                
+                // Add more specific information for WebGL
+                if (rendererType === 1 && app.renderer.gl) {
+                    try {
+                        const version = app.renderer.gl.getParameter(app.renderer.gl.VERSION);
+                        const vendor = app.renderer.gl.getParameter(app.renderer.gl.VENDOR);
+                        detailedType += ` (${version} - ${vendor})`;
+                    } catch (e) {
+                        // Fallback if parameter retrieval fails
+                        if (app.renderer.gl.webGLVersion) {
+                            detailedType += ` ${app.renderer.gl.webGLVersion}.0`;
+                        }
+                    }
+                }
+                
+                // Print additional GPU info for WebGPU if available
+                if (rendererType === 2 && app.renderer.gpu) {
+                    try {
+                        const adapter = app.renderer.gpu.adapter;
+                        if (adapter && adapter.name) {
+                            detailedType += ` (${adapter.name})`;
+                        }
+                    } catch (e) {
+                        // Ignore errors when trying to get adapter info
+                    }
+                }
+                
+                countText.text = `Particles: ${particleCount}\nRenderer: ${rendererTypes[rendererType]} (${rendererType})`;
+                
+                // Add GPU info if we have it
+                if (detailedType !== rendererTypes[rendererType]) {
+                    countText.text += `\nGPU: ${detailedType}`;
+                }
             });
             
             // Handle window resize
