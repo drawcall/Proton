@@ -45,7 +45,7 @@
             
             // Create an emitter
             const emitter = new Proton.Emitter();
-            emitter.rate = new Proton.Rate(new Proton.Span(10, 20), new Proton.Span(0.1, 0.25));
+            emitter.rate = new Proton.Rate(new Proton.Span(10000, 10000), new Proton.Span(0.01, 0.05));
             
             // Set emitter position to center of screen
             emitter.p.x = app.screen.width / 2;

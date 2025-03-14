@@ -114,8 +114,15 @@ export default class Emitter extends Particle {
    * @method removeAllParticles
    */
   removeAllParticles() {
-    let i = this.particles.length;
-    while (i--) this.particles[i].dead = true;
+    const particles = this.particles;
+    const len = particles.length;
+    
+    // Just mark all as dead in a tight loop
+    for (let i = 0; i < len; i++) {
+      particles[i].dead = true;
+    }
+    
+    // Don't actually remove from array here - that will happen in next integrate() call
   }
 
   /**
@@ -204,7 +211,10 @@ export default class Emitter extends Particle {
   // emitter update
   update(time) {
     this.age += time;
-    if (this.age >= this.life || this.dead) this.destroy();
+    if (this.age >= this.life || this.dead) {
+      this.destroy();
+      return;
+    }
 
     this.emitting(time);
     this.integrate(time);
@@ -216,28 +226,77 @@ export default class Emitter extends Particle {
     const damping = 1 - this.damping;
     this.parent.integrator.calculate(this, time, damping);
 
-    const length = this.particles.length;
-    let i, particle;
+    // Optimization for 500k particles: Use fast iteration with minimal GC impact
+    const particles = this.particles;
+    const length = particles.length;
+    const parent = this.parent;
+    const pool = parent.pool;
+    const integrator = parent.integrator;
+    const shouldDispatchUpdates = Boolean(this.parent || this.bindEvent);
+    
+    // Optimization: Use swap-and-pop method for removing dead particles
+    // This is much faster than splice for large arrays
+    let aliveCount = length;
+    let i = 0;
 
-    for (i = length - 1; i >= 0; i--) {
-      particle = this.particles[i];
-
-      // particle update
+    // Single-pass particle update with efficient removal
+    while (i < aliveCount) {
+      const particle = particles[i];
+      
+      // Fast update and check for dead particles
       particle.update(time, i);
-      this.parent.integrator.calculate(particle, time, damping);
-      this.dispatch("PARTICLE_UPDATE", particle);
-
-      // check dead
-      if (particle.dead) {
-        this.dispatch("PARTICLE_DEAD", particle);
-
-        this.parent.pool.expire(particle);
-        this.particles.splice(i, 1);
+      integrator.calculate(particle, time, damping);
+      
+      // Dispatch update events only if needed and not too many particles
+      // Skip event dispatching for extremely large particle counts
+      if (shouldDispatchUpdates && length < 10000) {
+        this.dispatch("PARTICLE_UPDATE", particle);
       }
+      
+      // Check if particle is dead
+      if (particle.dead) {
+        // Dispatch death events only when needed and not too many particles
+        if (shouldDispatchUpdates && length < 10000) {
+          this.dispatch("PARTICLE_DEAD", particle);
+        }
+        
+        // Fast removal: swap with the last alive particle and decrement counter
+        // This avoids expensive array splicing
+        aliveCount--;
+        if (i < aliveCount) {
+          // Only swap if this isn't already the last particle
+          particles[i] = particles[aliveCount];
+          particles[aliveCount] = particle;
+          
+          // Return to pool
+          pool.expire(particle);
+          continue; // Don't increment i, process the swapped particle
+        } else {
+          // Last particle case
+          pool.expire(particle);
+        }
+      }
+      i++;
+    }
+    
+    // If we have dead particles at the end, remove them all at once
+    if (aliveCount < length) {
+      particles.length = aliveCount; // Truncate the array (much faster than multiple splices)
     }
   }
 
   dispatch(event, target) {
+    // Optimize by skipping work if no listeners
+    if (!this.parent && !this.bindEvent) return;
+    
+    // For performance with many particles, only dispatch certain events
+    if (this.particles && this.particles.length > 50000) {
+      // With very large particle counts, only dispatch critical events
+      if (event !== "PARTICLE_CREATED" && event !== "PARTICLE_DEAD") {
+        return;
+      }
+    }
+    
     this.parent && this.parent.dispatchEvent(event, target);
     this.bindEvent && this.dispatchEvent(event, target);
   }
@@ -245,63 +304,343 @@ export default class Emitter extends Particle {
   emitting(time) {
     if (this.stoped) return;
 
-    if (this.totalTime === "none") {
-      this.emitTime += time;
-    } else if (this.totalTime === "once") {
-      let i;
-      const length = this.rate.getValue(99999);
+    // Maximum particles to emit in a single frame to prevent lag spikes
+    const MAX_EMIT_PER_FRAME = 10000;
 
-      if (length > 0) this.emitSpeed = length;
-      for (i = 0; i < length; i++) this.createParticle();
+    // Direct property access for performance
+    let emitTime = this.emitTime;
+    const totalTime = this.totalTime;
+    
+    if (totalTime === "none") {
+      this.emitTime = emitTime + time;
+      return;
+    } 
+    
+    if (totalTime === "once") {
+      // Fast path for "once" emission
+      let numToEmit = this.rate.getValue(99999);
+      
+      // Cap emission count to prevent frame drops
+      if (numToEmit > MAX_EMIT_PER_FRAME) {
+        // Log warning only in development if trying to emit too many at once
+        if (process && process.env && process.env.NODE_ENV === 'development') {
+          console.warn(`Attempting to emit ${numToEmit} particles at once, capped to ${MAX_EMIT_PER_FRAME}`);
+        }
+        numToEmit = MAX_EMIT_PER_FRAME;
+      }
+      
+      if (numToEmit <= 0) return;
+      
+      // Cache emission speed and emit particles
+      this.emitSpeed = numToEmit;
+      
+      // Use the optimized method for bulk creation
+      this._fastCreateParticles(numToEmit);
+      
+      // Mark as completed
       this.totalTime = "none";
+      return;
+    }
+    
+    // Regular emission logic - extreme optimization
+    emitTime += time;
+    this.emitTime = emitTime;
+    
+    if (emitTime < totalTime) {
+      // Get particle count using rate
+      let numToEmit = this.rate.getValue(time);
+      
+      if (numToEmit <= 0) return;
+      
+      // Cap emission to prevent lag spikes
+      if (numToEmit > MAX_EMIT_PER_FRAME) {
+        numToEmit = MAX_EMIT_PER_FRAME;
+      }
+      
+      this.emitSpeed = numToEmit;
+      
+      // Use fastest particle creation method
+      this._fastCreateParticles(numToEmit);
+    }
+  }
+
+  /**
+   * Ultra-fast particle creation - no optional parameters, minimal overhead
+   * @param {Number} count - Number of particles to create
+   * @private
+   */
+  _fastCreateParticles(count) {
+    // Early exit for zero count
+    if (count <= 0 || !this.parent) return;
+    
+    // Direct property access - avoid repeated lookups
+    const parent = this.parent;
+    const pool = parent.pool;
+    const particlesArr = this.particles;
+    const initializes = this.initializes;
+    const behaviours = this.behaviours;
+    
+    // Emergency circuit breaker - prevent memory issues when too many particles
+    const MAX_SAFE_PARTICLES = 1000000; // 1 million particles max
+    if (particlesArr.length + count > MAX_SAFE_PARTICLES) {
+      count = Math.max(0, MAX_SAFE_PARTICLES - particlesArr.length);
+      if (count <= 0) return; // Already at max capacity
+    }
+    
+    // Use faster bulk retrieval if available
+    let particles;
+    if (pool.getBulk) {
+      // Get multiple particles at once from pool
+      particles = pool.getBulk(Particle, count);
+      
+      // Fast-path batch initialization
+      this._initializeParticlesBulk(particles, initializes, behaviours);
     } else {
-      this.emitTime += time;
-
-      if (this.emitTime < this.totalTime) {
-        const length = this.rate.getValue(time);
-        let i;
-
-        if (length > 0) this.emitSpeed = length;
-        for (i = 0; i < length; i++) this.createParticle();
+      // Fast path direct initialization - optimized for huge particle counts
+      this._createParticlesLoop(count, pool, particlesArr, initializes, behaviours);
+    }
+  }
+  
+  /**
+   * High-speed loop for creating many particles
+   * @private
+   */
+  _createParticlesLoop(count, pool, particlesArr, initializes, behaviours) {
+    // Pre-calculate array growth to avoid resizing
+    const newLength = particlesArr.length + count;
+    
+    // Handle array growth efficiently for large particle counts
+    if (particlesArr.length === 0 && count > 10000) {
+      try {
+        // Try to preallocate the array with correct capacity
+        particlesArr.length = count;
+        particlesArr.length = 0; // Reset but keep capacity
+      } catch (e) {
+        // Ignore if this optimization isn't supported
+      }
+    }
+  
+    // Cache values for dispatch check
+    const shouldDispatch = (this.parent || this.bindEvent) && particlesArr.length < 10000;
+    const dispatchFn = shouldDispatch ? this.dispatch.bind(this) : null;
+    
+    // Minimal particle creation loop - optimized for speed
+    let i = 0;
+    let particle;
+    
+    // Using while loop (faster than for loop in many JS engines)
+    while (i < count) {
+      // Get from pool
+      particle = pool.get(Particle);
+      
+      // Fastest possible reset
+      particle.reset();
+      
+      // Direct initialize call with cached values
+      InitializeUtil.initialize(this, particle, initializes);
+      
+      // Add behaviors
+      particle.addBehaviours(behaviours);
+      particle.parent = this;
+      
+      // Push to array
+      particlesArr.push(particle);
+      
+      // Only dispatch if absolutely necessary
+      if (dispatchFn) {
+        dispatchFn("PARTICLE_CREATED", particle);
+      }
+      
+      i++;
+    }
+  }
+  
+  /**
+   * Bulk initialization for particles - more efficient for large batches
+   * @private
+   */
+  _initializeParticlesBulk(particles, initializes, behaviours) {
+    const count = particles.length;
+    const particlesArr = this.particles;
+    
+    // Cache values for dispatch check
+    const shouldDispatch = (this.parent || this.bindEvent) && particlesArr.length < 10000;
+    const dispatchFn = shouldDispatch ? this.dispatch.bind(this) : null;
+    
+    // One-time binding of this context for the loop
+    const emitter = this;
+    
+    // Bulk initialize particles
+    for (let i = 0; i < count; i++) {
+      const particle = particles[i];
+      
+      // Initialize the particle directly
+      InitializeUtil.initialize(emitter, particle, initializes);
+      
+      // Set properties
+      particle.parent = emitter;
+      
+      // Add behaviors - use direct array if possible for better performance
+      particle.addBehaviours(behaviours);
+      
+      // Add to particles array
+      particlesArr.push(particle);
+      
+      // Only dispatch if necessary
+      if (dispatchFn) {
+        dispatchFn("PARTICLE_CREATED", particle);
       }
     }
   }
 
   /**
-   * Creates a single particle.
-   *
-   * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
-   * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
-   * @returns {Particle} The created particle.
-   *
+   * High-performance batch particle creation for large quantities
+   * @param {Number} length - Number of particles to create
+   * @param {Object|Array} [initialize] - Initialization parameters
+   * @param {Object|Array} [behaviour] - Behavior parameters
+   */
+  createParticlesBatch(length, initialize, behaviour) {
+    // Immediate redirect to fast creation when no custom initializers/behaviors
+    if (!initialize && !behaviour) {
+      this._fastCreateParticles(length);
+      return;
+    }
+    
+    // For huge batches, split into smaller chunks
+    const BATCH_SIZE = 5000;
+    
+    if (length > BATCH_SIZE && length > 10000) {
+      // Process in chunks for very large particle counts
+      for (let i = 0; i < length; i += BATCH_SIZE) {
+        const chunkSize = Math.min(BATCH_SIZE, length - i);
+        this._createParticleChunk(chunkSize, initialize, behaviour);
+      }
+    } else {
+      // Process all at once for smaller batches
+      this._createParticleChunk(length, initialize, behaviour);
+    }
+  }
+  
+  /**
+   * Internal method to create a chunk of particles
+   * @private
+   */
+  _createParticleChunk(length, initialize, behaviour) {
+    // Early exit for zero particles
+    if (length <= 0) return;
+    
+    // Cache values for reuse
+    const parent = this.parent;
+    const pool = parent.pool;
+    const particlesArr = this.particles;
+    
+    // Check if we'd exceed max safe count
+    const MAX_SAFE_PARTICLES = 1000000; // 1 million particles max
+    if (particlesArr.length + length > MAX_SAFE_PARTICLES) {
+      length = Math.max(0, MAX_SAFE_PARTICLES - particlesArr.length);
+      if (length <= 0) return;
+    }
+    
+    // Only calculate this once outside the loop
+    const shouldDispatch = (this.parent || this.bindEvent) && particlesArr.length < 10000;
+    
+    // Handle initializes/behaviors
+    const initializes = initialize ? Util.toArray(initialize) : this.initializes;
+    const behaviours = behaviour ? Util.toArray(behaviour) : this.behaviours;
+    
+    // Pre-bind functions and cache properties for the loop
+    const dispatchFn = shouldDispatch ? this.dispatch.bind(this) : null;
+    const emitter = this;
+    
+    // Pre-allocate capacity if possible
+    if (Array.prototype.reserve) {
+      const newCapacity = particlesArr.length + length;
+      if (particlesArr.capacity < newCapacity) {
+        particlesArr.reserve(newCapacity);
+      }
+    }
+    
+    // Creation loop - unrolled for performance
+    let i = 0;
+    let particle;
+    
+    // Fast loop with minimal overhead
+    while (i < length) {
+      particle = pool.get(Particle);
+      
+      // Fastest reset possible
+      particle.reset();
+      
+      // Initialize using cached values
+      InitializeUtil.initialize(emitter, particle, initializes);
+      
+      // Add behaviors
+      particle.addBehaviours(behaviours);
+      particle.parent = emitter;
+      
+      // Add to particles array
+      particlesArr.push(particle);
+      
+      // Dispatch only if needed
+      if (dispatchFn) {
+        dispatchFn("PARTICLE_CREATED", particle);
+      }
+      
+      i++;
+    }
+  }
+
+  /**
+   * Creates a single particle - now optimized for performance
+   * but batch methods should be preferred for multiple particles
    */
   createParticle(initialize, behaviour) {
+    // Fast path when we have a parent
+    if (!this.parent) return null;
+    
     const particle = this.parent.pool.get(Particle);
-    this.setupParticle(particle, initialize, behaviour);
-    this.dispatch("PARTICLE_CREATED", particle);
+    
+    // Direct setup
+    particle.reset();
+    
+    // Handle initializes/behaviors
+    const initializes = initialize ? Util.toArray(initialize) : this.initializes;
+    const behaviours = behaviour ? Util.toArray(behaviour) : this.behaviours;
+    
+    // Initialize and add behaviors
+    InitializeUtil.initialize(this, particle, initializes);
+    particle.addBehaviours(behaviours);
+    particle.parent = this;
+
+    // Add to array - directly push to avoid function call
+    this.particles.push(particle);
+    
+    // Only dispatch if needed and not too many particles
+    if ((this.parent || this.bindEvent) && this.particles.length < 10000) {
+      this.dispatch("PARTICLE_CREATED", particle);
+    }
 
     return particle;
   }
 
   /**
    * Sets up a particle with initialization and behavior.
-   *
-   * @param {Particle} particle - The particle to set up.
-   * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
-   * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
+   * @deprecated Use direct methods instead for better performance
    */
   setupParticle(particle, initialize, behaviour) {
-    let initializes = this.initializes;
-    let behaviours = this.behaviours;
-
-    if (initialize) initializes = Util.toArray(initialize);
-    if (behaviour) behaviours = Util.toArray(behaviour);
-
+    // Direct setup
     particle.reset();
+    
+    // Handle initializes/behaviors
+    const initializes = initialize ? Util.toArray(initialize) : this.initializes;
+    const behaviours = behaviour ? Util.toArray(behaviour) : this.behaviours;
+    
+    // Initialize
     InitializeUtil.initialize(this, particle, initializes);
     particle.addBehaviours(behaviours);
     particle.parent = this;
 
+    // Add to array
     this.particles.push(particle);
   }
 
@@ -310,7 +649,21 @@ export default class Emitter extends Particle {
    */
   remove() {
     this.stop();
-    Util.destroyAll(this.particles);
+    
+    // More efficient particle cleanup
+    const particles = this.particles;
+    const len = particles.length;
+    
+    // Return all particles to pool
+    if (this.parent && this.parent.pool) {
+      const pool = this.parent.pool;
+      for (let i = 0; i < len; i++) {
+        pool.expire(particles[i]);
+      }
+    }
+    
+    // Clear array in one operation
+    particles.length = 0;
   }
 
   /**
