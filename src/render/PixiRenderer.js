@@ -2,22 +2,97 @@ import Types from "../utils/Types";
 import ColorUtil from "../utils/ColorUtil";
 import MathUtil from "../math/MathUtil";
 import BaseRenderer from "./BaseRenderer";
+import Pool from "../core/Pool";
 
 let PIXIClass;
 
+// Counter to generate unique IDs for each renderer instance
+let rendererIdCounter = 0;
+
+/**
+ * A specialized pool that ensures particles are never shared between different emitters
+ */
+class EmitterAwarePool extends Pool {
+  constructor() {
+    super();
+    // Store pools by emitter ID to ensure separation
+    this.emitterPools = new Map();
+  }
+
+  /**
+   * Get an item from the pool, ensuring it's specific to the emitter
+   */
+  get(target, params, emitterId) {
+    // Ensure we have a valid emitter ID
+    emitterId = emitterId || (params && params.parent && params.parent.id) || 'default';
+    
+    // Get or create the emitter-specific pool
+    if (!this.emitterPools.has(emitterId)) {
+      this.emitterPools.set(emitterId, []);
+    }
+    
+    const emitterPool = this.emitterPools.get(emitterId);
+    
+    // Get from the emitter-specific pool or create new
+    let p;
+    if (emitterPool.length > 0) {
+      p = emitterPool.pop();
+    } else {
+      p = this.createOrClone(target, params);
+      // Tag with emitter ID for tracking
+      p.__emitterId = emitterId;
+    }
+    
+    return p;
+  }
+
+  /**
+   * Return an item to its emitter-specific pool
+   */
+  expire(target, emitterId) {
+    if (!emitterId && target.__emitterId) {
+      emitterId = target.__emitterId;
+    }
+    
+    // Default to the general pool if no emitter ID is found
+    emitterId = emitterId || 'default';
+    
+    // Get or create the emitter-specific pool
+    if (!this.emitterPools.has(emitterId)) {
+      this.emitterPools.set(emitterId, []);
+    }
+    
+    // Return to the emitter-specific pool
+    return this.emitterPools.get(emitterId).push(target);
+  }
+
+  /**
+   * Clean up all pools
+   */
+  destroy() {
+    super.destroy();
+    
+    // Clear all emitter-specific pools
+    this.emitterPools.forEach(pool => {
+      pool.length = 0;
+    });
+    
+    this.emitterPools.clear();
+    this.emitterPools = null;
+  }
+}
+
 /**
  * Represents a PIXI-based renderer for particle systems.
- * Compatible with Pixi.js v8.
  * @extends BaseRenderer
  */
 export default class PixiRenderer extends BaseRenderer {
   /**
    * Creates a new PixiRenderer instance.
-   * @param {PIXI.Container|PIXI.ParticleContainer} element - The PIXI container to render to.
+   * @param {PIXI.Container} element - The PIXI container to render to.
    * @param {string|number} [stroke] - The stroke color for particles.
-   * @param {object} [options] - ParticleContainer options
    */
-  constructor(element, stroke, options = {}) {
+  constructor(element, stroke) {
     super(element);
 
     this.stroke = stroke;
@@ -25,157 +100,67 @@ export default class PixiRenderer extends BaseRenderer {
     this.setColor = false;
     this.blendMode = null;
     
-    // Enhanced object pooling with better reuse
-    this.pool.create = (body, particle) => this.createBody(body, particle);
+    // Assign a unique ID to this renderer instance
+    this.rendererId = ++rendererIdCounter;
+    
+    // Create a new emitter-aware pool for this renderer
+    this.pixiPool = new EmitterAwarePool();
+    this.pixiPool.create = (body, particle) => this.createBody(body, particle);
+    
+    // Track emitters and their particles
+    this.emitterMap = new Map();
+    
     this.setPIXI(window.PIXI);
-    
-    // Texture cache for sprites and graphics
-    this._textureCache = new Map();
-    this._graphicsCache = new Map();
-    
-    // Update batching
-    this._batchSize = options.batchSize || 100;
-    this._updateQueue = [];
-    this._isDirty = false;
-    
-    // Reusable objects to avoid allocations
-    this._tempRotation = 0;
-    this._tempColor = 0;
-    this._strokeColor = 0;
-    
-    // Pre-compute frequently used values
-    this._defaultRadius = options.defaultRadius || 10;
-    this._defaultColor = options.defaultColor || 0x008ced;
-
-    // Create ParticleContainer if element is not provided
-    if (!element && PIXIClass) {
-      const defaultOptions = {
-        scale: true,
-        position: true,
-        rotation: true,
-        uvs: true,
-        alpha: true
-      };
-      this.element = new PIXIClass.ParticleContainer(
-        options.maxSize || 50000, // Increased default for better batching
-        { ...defaultOptions, ...options },
-        this._batchSize
-      );
-    }
 
     this.name = "PixiRenderer";
-    
-    // Batch rendering
-    this._batchedUpdates = options.batchUpdates !== false;
-    this._updateScheduled = false;
   }
 
-  /**
-   * Set the PIXI class to use for rendering
-   * Updated for Pixi.js v8 compatibility
-   * @param {object} PIXI - The PIXI library
-   */
   setPIXI(PIXI) {
     try {
-      PIXIClass = PIXI || { Sprite: {}, ParticleContainer: {} };
-      // Handle both v7 and v8 style Sprite creation
-      this.createFromImage = PIXIClass.Sprite.from || PIXIClass.Sprite.fromImage;
-      
-      // Check if we're using v8
-      this.isV8 = typeof PIXIClass.VERSION === 'string' && 
-                  parseInt(PIXIClass.VERSION.split('.')[0], 10) >= 8;
-    } catch (e) {
-      console.warn('Error setting up PIXI in PixiRenderer:', e);
+      PIXIClass = PIXI || { Sprite: {} };
+      this.createFromImage = PIXIClass.Sprite.from;
+    } catch (e) {}
+  }
+
+  onProtonUpdate() {}
+
+  onEmitterAdded(emitter) {
+    // Add emitter to tracking map
+    if (!this.emitterMap.has(emitter.id)) {
+      this.emitterMap.set(emitter.id, new Set());
     }
   }
 
-  onProtonUpdate() {
-    // Process batched updates if any
-    if (this._batchedUpdates && this._isDirty && !this._updateScheduled) {
-      this._updateScheduled = true;
-      
-      // Use requestAnimationFrame for batching if available
-      if (typeof requestAnimationFrame !== 'undefined') {
-        requestAnimationFrame(() => this._processBatchedUpdates());
-      } else {
-        // Fallback to immediate processing
-        this._processBatchedUpdates();
-      }
+  onEmitterRemoved(emitter) {
+    // Clean up emitter's tracked particles
+    if (this.emitterMap.has(emitter.id)) {
+      this.emitterMap.delete(emitter.id);
     }
-  }
-
-  /**
-   * Process all batched updates at once
-   * @private
-   */
-  _processBatchedUpdates() {
-    if (this._updateQueue.length) {
-      // Optimize by updating properties in batches
-      // This minimizes state changes and layout thrashing
-      const queue = this._updateQueue;
-      let i = 0;
-      const len = queue.length;
-      
-      // Process position updates
-      for (; i < len; i++) {
-        const item = queue[i];
-        item.target.x = item.x;
-        item.target.y = item.y;
-      }
-      
-      // Process scale updates
-      for (i = 0; i < len; i++) {
-        const item = queue[i];
-        if (item.hasScale) {
-          item.target.scale.x = item.scaleX;
-          item.target.scale.y = item.scaleY;
-        }
-      }
-      
-      // Process remaining properties
-      for (i = 0; i < len; i++) {
-        const item = queue[i];
-        if (item.hasAlpha) item.target.alpha = item.alpha;
-        if (item.hasRotation) item.target.rotation = item.rotation;
-        if (item.hasTint && item.target.tint !== undefined) {
-          item.target.tint = item.tint;
-        }
-      }
-      
-      // Clear the queue
-      this._updateQueue.length = 0;
-    }
-    
-    this._isDirty = false;
-    this._updateScheduled = false;
-  }
-
-  /**
-   * Get cached texture or create a new one
-   * @param {string} key - Cache key
-   * @param {Function} createFn - Function to create texture if not in cache
-   * @returns {PIXI.Texture} The cached or new texture
-   * @private
-   */
-  _getOrCreateTexture(key, createFn) {
-    if (!this._textureCache.has(key)) {
-      this._textureCache.set(key, createFn());
-    }
-    return this._textureCache.get(key);
   }
 
   /**
    * @param particle
    */
   onParticleCreated(particle) {
+    // Get the emitter ID for this particle and store it directly on the particle
+    const emitterId = particle.parent ? particle.parent.id : 'orphaned';
+    
+    // Store emitter ID directly on the particle for when parent reference is lost
+    particle.__emitterId = emitterId;
+    
     if (particle.body) {
-      particle.body = this.pool.get(particle.body, particle);
+      particle.body = this.pixiPool.get(particle.body, particle, emitterId);
     } else {
-      particle.body = this.pool.get(this.circleConf, particle);
+      particle.body = this.pixiPool.get(this.circleConf, particle, emitterId);
     }
 
-    if (this.blendMode && particle.body.blendMode !== undefined) {
+    if (this.blendMode) {
       particle.body.blendMode = this.blendMode;
+    }
+
+    // Track this particle with its emitter
+    if (this.emitterMap.has(emitterId)) {
+      this.emitterMap.get(emitterId).add(particle);
     }
 
     this.element.addChild(particle.body);
@@ -185,53 +170,10 @@ export default class PixiRenderer extends BaseRenderer {
    * @param particle
    */
   onParticleUpdate(particle) {
-    if (this._batchedUpdates) {
-      // Add to update queue for batched processing
-      this._queueParticleUpdate(particle);
-    } else {
-      // Direct update for immediate mode
-      this.transform(particle, particle.body);
-      
-      if (this.setColor === true || this.color === true) {
-        if (this.isV8 && particle.body.tint !== undefined) {
-          particle.body.tint = ColorUtil.getHex16FromParticle(particle);
-        } else if (!this.isV8) {
-          particle.body.tint = ColorUtil.getHex16FromParticle(particle);
-        }
-      }
-    }
-  }
-  
-  /**
-   * Queue a particle update for batch processing
-   * @param {object} particle - The particle to update
-   * @private
-   */
-  _queueParticleUpdate(particle) {
-    // Reuse queue items if possible to reduce allocations
-    let queueItem;
-    
-    if (this._updateQueue.length < 10000) { // Limit queue size for memory safety
-      queueItem = {
-        target: particle.body,
-        x: particle.p.x,
-        y: particle.p.y,
-        scaleX: particle.scale,
-        scaleY: particle.scale,
-        alpha: particle.alpha,
-        rotation: particle.rotation * MathUtil.PI_180,
-        hasScale: true,
-        hasAlpha: true,
-        hasRotation: true,
-        hasTint: this.setColor === true || this.color === true
-      };
-      
-      if (queueItem.hasTint) {
-        queueItem.tint = ColorUtil.getHex16FromParticle(particle);
-      }
-      
-      this._updateQueue.push(queueItem);
-      this._isDirty = true;
+    this.transform(particle, particle.body);
+
+    if (this.setColor === true || this.color === true) {
+      particle.body.tint = ColorUtil.getHex16FromParticle(particle);
     }
   }
 
@@ -239,17 +181,33 @@ export default class PixiRenderer extends BaseRenderer {
    * @param particle
    */
   onParticleDead(particle) {
+    if (!particle.body) return;
+    
     this.element.removeChild(particle.body);
-    this.pool.expire(particle.body);
+    
+    // Use the cached emitter ID instead of accessing parent which might be null
+    const emitterId = particle.__emitterId || (particle.parent ? particle.parent.id : 'orphaned');
+    
+    // Return to the emitter-specific pool
+    this.pixiPool.expire(particle.body, emitterId);
+    
+    // Remove from tracked particles
+    if (this.emitterMap.has(emitterId)) {
+      this.emitterMap.get(emitterId).delete(particle);
+    }
+    
     particle.body = null;
   }
 
   transform(particle, target) {
     target.x = particle.p.x;
     target.y = particle.p.y;
+
     target.alpha = particle.alpha;
+
     target.scale.x = particle.scale;
     target.scale.y = particle.scale;
+
     target.rotation = particle.rotation * MathUtil.PI_180;
   }
 
@@ -259,87 +217,26 @@ export default class PixiRenderer extends BaseRenderer {
   }
 
   createSprite(body) {
-    let sprite;
-    
-    if (body.isInner) {
-      // Cache textures by source
-      const cacheKey = `sprite_${body.src}`;
-      if (!this._textureCache.has(cacheKey)) {
-        const texture = this.createFromImage(body.src);
-        this._textureCache.set(cacheKey, texture);
-        sprite = new PIXIClass.Sprite(texture);
-      } else {
-        sprite = new PIXIClass.Sprite(this._textureCache.get(cacheKey));
-      }
-    } else {
-      sprite = new PIXIClass.Sprite(body);
-    }
+    const sprite = body.isInner ? this.createFromImage(body.src) : new PIXIClass.Sprite(body);
 
-    sprite.anchor.x = 0.5;
-    sprite.anchor.y = 0.5;
+    sprite.anchor.set(0.5, 0.5);
 
     return sprite;
   }
 
-  /**
-   * Create a circle graphic
-   * Updated for Pixi.js v8 compatibility with caching
-   * @param {object} particle - The particle to render
-   * @returns {PIXI.Graphics} The graphics object
-   */
   createCircle(particle) {
-    const radius = particle.radius || this._defaultRadius;
-    const color = particle.color || this._defaultColor;
-    const hasStroke = !!this.stroke;
-    
-    // Create cache key based on properties
-    const cacheKey = `circle_${radius}_${color}_${hasStroke ? 1 : 0}_${hasStroke ? (Types.isString(this.stroke) ? this.stroke : 0) : 0}`;
-    
-    // Check cache first
-    if (this._graphicsCache.has(cacheKey)) {
-      return this._graphicsCache.get(cacheKey).clone();
-    }
-    
-    // Create new graphics
     const graphics = new PIXIClass.Graphics();
     
-    if (this.isV8) {
-      // Pixi.js v8 style
-      if (hasStroke) {
-        this._strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
-        graphics
-          .circle(0, 0, radius)
-          .fill(color)
-          .stroke({ width: 1, color: this._strokeColor });
-      } else {
-        graphics
-          .circle(0, 0, radius)
-          .fill(color);
-      }
-    } else {
-      // Pixi.js v7 and earlier style
-      if (hasStroke) {
-        this._strokeColor = Types.isString(this.stroke) ? this.stroke : 0x000000;
-        graphics.lineStyle(1, this._strokeColor);
-      }
-      
-      graphics.beginFill(color);
-      graphics.drawCircle(0, 0, radius);
-      graphics.endFill();
+    if (this.stroke) {
+      const stroke = Types.isString(this.stroke) ? this.stroke : 0x000000;
+      graphics.lineStyle(1, stroke);
     }
-    
-    // Cache the graphics
-    this._graphicsCache.set(cacheKey, graphics.clone());
-    
-    return graphics;
-  }
 
-  /**
-   * Clear texture and graphics caches
-   */
-  clearCaches() {
-    this._textureCache.clear();
-    this._graphicsCache.clear();
+    graphics.beginFill(particle.color || 0x008ced);
+    graphics.drawCircle(0, 0, particle.radius);
+    graphics.endFill();
+
+    return graphics;
   }
 
   /**
@@ -347,20 +244,22 @@ export default class PixiRenderer extends BaseRenderer {
    * @param {Array<Particle>} particles - The particles to clean up.
    */
   destroy(particles) {
-    // Cancel any pending updates
-    this._updateScheduled = false;
-    this._updateQueue.length = 0;
-    
-    // Clear all caches
-    this.clearCaches();
-    
     super.destroy();
+
+    // Clean up tracking maps
+    this.emitterMap.clear();
+    this.emitterMap = null;
+
+    // Clean up the instance-specific particle pool
+    this.pixiPool.destroy();
+    this.pixiPool = null;
 
     let i = particles.length;
     while (i--) {
       let particle = particles[i];
       if (particle.body) {
         this.element.removeChild(particle.body);
+        particle.body.destroy({ children: true });
       }
     }
   }

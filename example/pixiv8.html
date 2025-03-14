@@ -43,32 +43,53 @@
             // Create a Proton instance - use Proton directly without window.
             const proton = new Proton();
             
-            // Create an emitter
-            const emitter = new Proton.Emitter();
-            emitter.rate = new Proton.Rate(new Proton.Span(1000, 1000), new Proton.Span(0.01, 0.05));
+            // Create left emitter with warm colors
+            const leftEmitter = new Proton.Emitter();
+            leftEmitter.rate = new Proton.Rate(new Proton.Span(50, 80), new Proton.Span(0.01, 0.05));
             
-            // Set emitter position to center of screen
-            emitter.p.x = app.screen.width / 2;
-            emitter.p.y = app.screen.height / 2;
+            // Set left emitter position to left side of screen
+            leftEmitter.p.x = app.screen.width * 0.25;
+            leftEmitter.p.y = app.screen.height / 2;
             
-            // Configure the particles
-            emitter.addInitialize(new Proton.Mass(1));
-            emitter.addInitialize(new Proton.Radius(new Proton.Span(10, 30)));
-            emitter.addInitialize(new Proton.Life(1, 3));
-            emitter.addInitialize(new Proton.Velocity(new Proton.Span(2, 4), new Proton.Span(0, 360), 'polar'));
+            // Configure the left emitter particles
+            leftEmitter.addInitialize(new Proton.Mass(1));
+            leftEmitter.addInitialize(new Proton.Radius(new Proton.Span(10, 30)));
+            leftEmitter.addInitialize(new Proton.Life(1, 3));
+            leftEmitter.addInitialize(new Proton.Velocity(new Proton.Span(2, 4), new Proton.Span(0, 360), 'polar'));
             
-            // Add behaviors
-            emitter.addBehaviour(new Proton.Color(['#FF0026', '#FFFF00', '#00FF35', '#00FFFF', '#0000FF']));
-            emitter.addBehaviour(new Proton.Alpha(1, 0));
-            emitter.addBehaviour(new Proton.Scale(1, 0.5));
+            // Add behaviors with warm colors
+            leftEmitter.addBehaviour(new Proton.Color(['#FF0026', '#FF5500', '#FFAA00', '#FFFF00']));
+            leftEmitter.addBehaviour(new Proton.Alpha(1, 0));
+            leftEmitter.addBehaviour(new Proton.Scale(1, 0.5));
+            
+            // Create right emitter with cold colors
+            const rightEmitter = new Proton.Emitter();
+            rightEmitter.rate = new Proton.Rate(new Proton.Span(50, 80), new Proton.Span(0.01, 0.05));
+            
+            // Set right emitter position to right side of screen
+            rightEmitter.p.x = app.screen.width * 0.75;
+            rightEmitter.p.y = app.screen.height / 2;
+            
+            // Configure the right emitter particles
+            rightEmitter.addInitialize(new Proton.Mass(1));
+            rightEmitter.addInitialize(new Proton.Radius(new Proton.Span(10, 30)));
+            rightEmitter.addInitialize(new Proton.Life(1, 3));
+            rightEmitter.addInitialize(new Proton.Velocity(new Proton.Span(2, 4), new Proton.Span(0, 360), 'polar'));
+            
+            // Add behaviors with cold colors
+            rightEmitter.addBehaviour(new Proton.Color(['#00FFFF', '#0000FF', '#0055FF', '#00FF35']));
+            rightEmitter.addBehaviour(new Proton.Alpha(1, 0));
+            rightEmitter.addBehaviour(new Proton.Scale(1, 0.5));
             
             // Add the Pixi renderer to Proton
             const renderer = new Proton.PixiRenderer(app.stage);
             proton.addRenderer(renderer);
             
-            // Start the emitter
-            emitter.emit();
-            proton.addEmitter(emitter);
+            // Start both emitters
+            leftEmitter.emit();
+            rightEmitter.emit();
+            proton.addEmitter(leftEmitter);
+            proton.addEmitter(rightEmitter);
             
             // Create text to display particle count and renderer info
             const countText = new PIXI.Text({
@@ -138,8 +159,10 @@
             
             // Handle window resize
             window.addEventListener('resize', () => {
-                emitter.p.x = app.screen.width / 2;
-                emitter.p.y = app.screen.height / 2;
+                leftEmitter.p.x = app.screen.width * 0.25;
+                leftEmitter.p.y = app.screen.height / 2;
+                rightEmitter.p.x = app.screen.width * 0.75;
+                rightEmitter.p.y = app.screen.height / 2;
             });
         })();
     </script>

@@ -2097,54 +2097,24 @@ declare class PixelRenderer extends BaseRenderer {
 
 /**
  * Represents a PIXI-based renderer for particle systems.
- * Compatible with Pixi.js v8.
  * @extends BaseRenderer
  */
 declare class PixiRenderer extends BaseRenderer {
     /**
      * Creates a new PixiRenderer instance.
-     * @param {PIXI.Container|PIXI.ParticleContainer} element - The PIXI container to render to.
+     * @param {PIXI.Container} element - The PIXI container to render to.
      * @param {string|number} [stroke] - The stroke color for particles.
-     * @param {object} [options] - ParticleContainer options
      */
-    constructor(element: PIXI.Container | PIXI.ParticleContainer, stroke?: string | number, options?: object);
+    constructor(element: PIXI.Container, stroke?: string | number);
     stroke: string | number | undefined;
     color: boolean;
     setColor: boolean;
     blendMode: any;
-    _textureCache: Map<any, any>;
-    _graphicsCache: Map<any, any>;
-    _batchSize: any;
-    _updateQueue: any[];
-    _isDirty: boolean;
-    _tempRotation: number;
-    _tempColor: number;
-    _strokeColor: number;
-    _defaultRadius: any;
-    _defaultColor: any;
-    _batchedUpdates: boolean;
-    _updateScheduled: boolean;
-    /**
-     * Set the PIXI class to use for rendering
-     * Updated for Pixi.js v8 compatibility
-     * @param {object} PIXI - The PIXI library
-     */
-    setPIXI(PIXI: object): void;
+    rendererId: number;
+    pixiPool: EmitterAwarePool;
+    emitterMap: Map<any, any>;
+    setPIXI(PIXI: any): void;
     createFromImage: any;
-    isV8: boolean | undefined;
-    /**
-     * Process all batched updates at once
-     * @private
-     */
-    private _processBatchedUpdates;
-    /**
-     * Get cached texture or create a new one
-     * @param {string} key - Cache key
-     * @param {Function} createFn - Function to create texture if not in cache
-     * @returns {PIXI.Texture} The cached or new texture
-     * @private
-     */
-    private _getOrCreateTexture;
     /**
      * @param particle
      */
@@ -2154,34 +2124,34 @@ declare class PixiRenderer extends BaseRenderer {
      */
     onParticleUpdate(particle: any): void;
     /**
-     * Queue a particle update for batch processing
-     * @param {object} particle - The particle to update
-     * @private
-     */
-    private _queueParticleUpdate;
-    /**
      * @param particle
      */
     onParticleDead(particle: any): void;
     transform(particle: any, target: any): void;
     createBody(body: any, particle: any): any;
     createSprite(body: any): any;
-    /**
-     * Create a circle graphic
-     * Updated for Pixi.js v8 compatibility with caching
-     * @param {object} particle - The particle to render
-     * @returns {PIXI.Graphics} The graphics object
-     */
-    createCircle(particle: object): PIXI.Graphics;
-    /**
-     * Clear texture and graphics caches
-     */
-    clearCaches(): void;
+    createCircle(particle: any): any;
     /**
      * Destroys the renderer and cleans up resources.
      * @param {Array<Particle>} particles - The particles to clean up.
      */
     destroy(particles: Array<Particle>): void;
+}
+
+/**
+ * A specialized pool that ensures particles are never shared between different emitters
+ */
+declare class EmitterAwarePool extends Pool {
+    constructor();
+    emitterPools: Map<any, any>;
+    /**
+     * Get an item from the pool, ensuring it's specific to the emitter
+     */
+    get(target: any, params: any, emitterId: any): any;
+    /**
+     * Return an item to its emitter-specific pool
+     */
+    expire(target: any, emitterId: any): any;
 }
 
 declare class MStack {
