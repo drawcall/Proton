@@ -1849,22 +1849,43 @@ declare class Emitter$1 extends Particle$1 {
     dispatch(event: any, target: any): void;
     emitting(time: any): void;
     /**
-     * Creates a single particle.
-     *
-     * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
-     * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
-     * @returns {Particle} The created particle.
-     *
+     * Ultra-fast particle creation - no optional parameters, minimal overhead
+     * @param {Number} count - Number of particles to create
+     * @private
      */
-    createParticle(initialize?: Object | any[], behaviour?: Object | any[]): Particle$1;
+    private _fastCreateParticles;
+    /**
+     * High-speed loop for creating many particles
+     * @private
+     */
+    private _createParticlesLoop;
+    /**
+     * Bulk initialization for particles - more efficient for large batches
+     * @private
+     */
+    private _initializeParticlesBulk;
+    /**
+     * High-performance batch particle creation for large quantities
+     * @param {Number} length - Number of particles to create
+     * @param {Object|Array} [initialize] - Initialization parameters
+     * @param {Object|Array} [behaviour] - Behavior parameters
+     */
+    createParticlesBatch(length: number, initialize?: Object | any[], behaviour?: Object | any[]): void;
+    /**
+     * Internal method to create a chunk of particles
+     * @private
+     */
+    private _createParticleChunk;
+    /**
+     * Creates a single particle - now optimized for performance
+     * but batch methods should be preferred for multiple particles
+     */
+    createParticle(initialize: any, behaviour: any): any;
     /**
      * Sets up a particle with initialization and behavior.
-     *
-     * @param {Particle} particle - The particle to set up.
-     * @param {Object|Array} [initialize] - Initialization parameters or array of initialization objects.
-     * @param {Object|Array} [behaviour] - Behavior object or array of behavior objects.
+     * @deprecated Use direct methods instead for better performance
      */
-    setupParticle(particle: Particle$1, initialize?: Object | any[], behaviour?: Object | any[]): void;
+    setupParticle(particle: any, initialize: any, behaviour: any): void;
     /**
      * Removes all particles and stops the emitter.
      */
@@ -2089,6 +2110,9 @@ declare class PixiRenderer extends BaseRenderer {
     color: boolean;
     setColor: boolean;
     blendMode: any;
+    rendererId: number;
+    pixiPool: EmitterAwarePool;
+    emitterMap: Map<any, any>;
     setPIXI(PIXI: any): void;
     createFromImage: any;
     /**
@@ -2112,6 +2136,22 @@ declare class PixiRenderer extends BaseRenderer {
      * @param {Array<Particle>} particles - The particles to clean up.
      */
     destroy(particles: Array<Particle>): void;
+}
+
+/**
+ * A specialized pool that ensures particles are never shared between different emitters
+ */
+declare class EmitterAwarePool extends Pool {
+    constructor();
+    emitterPools: Map<any, any>;
+    /**
+     * Get an item from the pool, ensuring it's specific to the emitter
+     */
+    get(target: any, params: any, emitterId: any): any;
+    /**
+     * Return an item to its emitter-specific pool
+     */
+    expire(target: any, emitterId: any): any;
 }
 
 declare class MStack {

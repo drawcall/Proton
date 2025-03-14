@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Proton with Pixi.js v8 Multirender Example</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            width: 100%;
+            height: 100%;
+        }
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        #pixi-canvas, #regular-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #regular-canvas {
+            pointer-events: none;
+        }
+    </style>
+    <!-- Import Pixi.js v8 -->
+    <script src="https://pixijs.download/v8.8.1/pixi.min.js"></script>
+    <!-- Import Proton - Use proton.web.js instead of proton.js -->
+    <script src="../build/proton.web.js"></script>
+</head>
+<body>
+    <div id="canvas-container">
+        <div id="pixi-canvas"></div>
+        <canvas id="regular-canvas"></canvas>
+    </div>
+
+    <script>
+        // Initialize Pixi.js v8 application (async)
+        (async function() {
+            // Create Pixi Application with v8
+            const app = new PIXI.Application();
+            
+            // Initialize the application
+            await app.init({
+                resizeTo: window,
+                background: '#000000',
+                antialias: true,
+            });
+            
+            // Add the view to the DOM
+            document.getElementById('pixi-canvas').appendChild(app.canvas);
+            
+            // Set up regular canvas
+            const regularCanvas = document.getElementById('regular-canvas');
+            regularCanvas.width = window.innerWidth;
+            regularCanvas.height = window.innerHeight;
+            
+            // Create a Proton instance - use Proton directly without window.
+            const proton = new Proton();
+            
+            // Create an emitter for stars/circles (will be rendered with Pixi)
+            const emitterStars = new Proton.Emitter();
+            emitterStars.rate = new Proton.Rate(new Proton.Span(400, 600), new Proton.Span(0.01, 0.05));
+            
+            // Set emitter position to center of screen
+            emitterStars.p.x = app.screen.width / 2;
+            emitterStars.p.y = app.screen.height / 2;
+            
+            // Configure the star particles
+            emitterStars.addInitialize(new Proton.Mass(1));
+            emitterStars.addInitialize(new Proton.Radius(new Proton.Span(10, 30)));
+            emitterStars.addInitialize(new Proton.Life(1, 3));
+            emitterStars.addInitialize(new Proton.Velocity(new Proton.Span(2, 4), new Proton.Span(0, 360), 'polar'));
+            
+            // Add behaviors for the stars
+            emitterStars.addBehaviour(new Proton.Color(['#FF0026', '#FFFF00', '#00FF35', '#00FFFF', '#0000FF']));
+            emitterStars.addBehaviour(new Proton.Alpha(1, 0));
+            emitterStars.addBehaviour(new Proton.Scale(1, 0.5));
+            
+            // Create a second emitter for square particles (will be rendered with Canvas)
+            const emitterSquares = new Proton.Emitter();
+            emitterSquares.rate = new Proton.Rate(new Proton.Span(100, 200), new Proton.Span(0.01, 0.05));
+            
+            // Set second emitter position to center of screen
+            emitterSquares.p.x = app.screen.width / 2;
+            emitterSquares.p.y = app.screen.height / 2;
+            
+            // Configure the square particles
+            emitterSquares.addInitialize(new Proton.Mass(1));
+            emitterSquares.addInitialize(new Proton.Radius(new Proton.Span(5, 15)));
+            emitterSquares.addInitialize(new Proton.Life(1, 3));
+            emitterSquares.addInitialize(new Proton.Velocity(new Proton.Span(1, 3), new Proton.Span(0, 360), 'polar'));
+            
+            // Add behaviors for the squares
+            emitterSquares.addBehaviour(new Proton.Color(['#FFFFFF', '#FFCC00', '#FF9900']));
+            emitterSquares.addBehaviour(new Proton.Alpha(1, 0));
+            emitterSquares.addBehaviour(new Proton.Scale(1, 0.5));
+            emitterSquares.addBehaviour(new Proton.Rotate(new Proton.Span(0, 360), new Proton.Span(-5, 5)));
+            
+            // Add the Pixi renderer to Proton (for stars)
+            const pixiRenderer = new Proton.PixiRenderer(app.stage);
+            pixiRenderer.setColor = true; // Enable coloring of particles
+            proton.addRenderer(pixiRenderer);
+            
+            // Add a Canvas renderer for squares
+            const canvasRenderer = new Proton.CanvasRenderer(regularCanvas);
+            
+            // Override the onParticleCreated method for the Canvas renderer to draw squares
+            canvasRenderer.onParticleCreated = function(particle) {
+                if (particle.emitter === emitterSquares) {
+                    particle.body = {
+                        drawCanvas: function(context, particle) {
+                            context.fillStyle = particle.color;
+                            context.globalAlpha = particle.alpha;
+                            
+                            context.save();
+                            context.translate(particle.p.x, particle.p.y);
+                            context.rotate(particle.rotation * Math.PI / 180);
+                            context.scale(particle.scale, particle.scale);
+                            
+                            const size = particle.radius;
+                            context.fillRect(-size / 2, -size / 2, size, size);
+                            context.restore();
+                        }
+                    };
+                }
+            };
+            
+            // Override the onParticleUpdate method to draw squares
+            canvasRenderer.onParticleUpdate = function(particle) {
+                if (particle.emitter === emitterSquares && particle.body) {
+                    particle.body.drawCanvas(this.context, particle);
+                }
+            };
+            
+            proton.addRenderer(canvasRenderer);
+            
+            // Start the emitters
+            emitterStars.emit();
+            emitterSquares.emit();
+            
+            // Add emitters to Proton
+            proton.addEmitter(emitterStars);
+            proton.addEmitter(emitterSquares);
+            
+            // Create text to display particle count and renderer info
+            const countText = new PIXI.Text({
+                text: 'Particles: 0\nRenderer: ' + app.renderer.type,
+                style: {
+                    fontFamily: 'Arial',
+                    fontSize: 16,
+                    fill: 0xffffff,
+                    align: 'left'
+                }
+            });
+            countText.position.set(10, 10);
+            app.stage.addChild(countText);
+            
+            // Update Proton in animation loop
+            app.ticker.add(() => {
+                proton.update();
+                
+                // Update particle count display and show detailed renderer info
+                const particleCount = proton.getCount();
+                
+                // Map renderer type numbers to names
+                const rendererTypes = {
+                    0: 'Unknown',
+                    1: 'WebGL',
+                    2: 'WebGPU',
+                    3: 'Canvas2D'
+                };
+                
+                // Get detailed renderer information
+                let rendererType = app.renderer.type;
+                let detailedType = rendererTypes[rendererType] || "Unknown";
+                
+                // Add more specific information for WebGL
+                if (rendererType === 1 && app.renderer.gl) {
+                    try {
+                        const version = app.renderer.gl.getParameter(app.renderer.gl.VERSION);
+                        const vendor = app.renderer.gl.getParameter(app.renderer.gl.VENDOR);
+                        detailedType += ` (${version} - ${vendor})`;
+                    } catch (e) {
+                        // Fallback if parameter retrieval fails
+                        if (app.renderer.gl.webGLVersion) {
+                            detailedType += ` ${app.renderer.gl.webGLVersion}.0`;
+                        }
+                    }
+                }
+                
+                // Print additional GPU info for WebGPU if available
+                if (rendererType === 2 && app.renderer.gpu) {
+                    try {
+                        const adapter = app.renderer.gpu.adapter;
+                        if (adapter && adapter.name) {
+                            detailedType += ` (${adapter.name})`;
+                        }
+                    } catch (e) {
+                        // Ignore errors when trying to get adapter info
+                    }
+                }
+                
+                countText.text = `Particles: ${particleCount}\nRenderers: Pixi + Canvas\nPixi Renderer: ${rendererTypes[rendererType]} (${rendererType})`;
+                
+                // Add GPU info if we have it
+                if (detailedType !== rendererTypes[rendererType]) {
+                    countText.text += `\nGPU: ${detailedType}`;
+                }
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                // Update canvas size
+                regularCanvas.width = window.innerWidth;
+                regularCanvas.height = window.innerHeight;
+                
+                // Update emitter positions
+                emitterStars.p.x = app.screen.width / 2;
+                emitterStars.p.y = app.screen.height / 2;
+                emitterSquares.p.x = app.screen.width / 2;
+                emitterSquares.p.y = app.screen.height / 2;
+            });
+        })();
+    </script>
+</body>
+</html> 

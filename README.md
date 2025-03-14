@@ -29,19 +29,15 @@ Check out examples at [http://drawcall.github.io/Proton/](http://drawcall.github
 
 ## Features
 
-- **Easy to use** It takes only a dozen lines of code to create a particle animation effect.
-- **Multiple effects** Use Proton to create flames, fireworks, bullets, explosions, and more.
-- **Any scene** You can use it in frameworks such as `react`, `vue`, `angular`, and `pixi.js`, `Phaser`, etc.
-- **Efficient rendering** Its rendering efficiency is very high, you can render tens of thousands of particles in the page.
-- **Simulated physics** Proton can simulate various physical properties including gravity and Brownian motion.
-- **Several renderers** Proton provides a variety of renderers, of course you can also customize your own renderer
-  - `CanvasRenderer` - Proton's canvas renderer
-  - `DomRenderer` - Proton's dom renderer, supporting hardware acceleration.
-  - `WebGLRenderer` - Proton's webgl renderer.
-  - `PixelRenderer` - Proton's pixel renderer, It can implement pixel animation.
-  - `EaselRenderer` - Easeljs proton renderer.
-  - `EaselRenderer` - Pixi.js proton renderer.
-  - `CustomRenderer` - Use a custom renderer that can be applied to any scene.
+- **Easy to use** - Particles can be emitted from a point, line, rectangle, circle, etc.
+- **Powerful** - 16 different kinds of renderers, also you can easily customize your own renderer.
+- **Three.js support** - Check out [three.proton](https://github.com/drawcall/three.proton/)
+- **Perfect performance** - Push your particles to the max.
+- **Reactive** - Watch and run emitters based on changes to properties.
+- **Customizable** - Use your own update function, initialize function, particle factory, and renderer.
+- **Compatibility** - Support for both Canvas, DOM, WebGL, Pixi.js (up to v8), EaselJS, and custom renderers.
+
+> **Note:** If you need 3D particle effects, please use [three.proton](https://github.com/drawcall/three.proton/).
 
 ## Documentation
 
@@ -112,6 +108,48 @@ proton.addEmitter(emitter);
 const renderer = new CanvasRenderer(canvas);
 proton.addRenderer(renderer);
 ```
+
+### Rendering with Pixi.js v8
+
+Pixi.js v8 introduced several breaking changes to its API, particularly in the Graphics API. Proton Engine 7.2.0+ fully supports Pixi.js v8 with a new, compatible PixiRenderer.
+
+```javascript
+// Create a Pixi.js v8 application (using async initialization)
+const app = new PIXI.Application();
+(async function() {
+  // Initialize the Pixi app
+  await app.init({
+      resizeTo: window,
+      background: '#000',
+      antialias: true
+  });
+  
+  document.body.appendChild(app.canvas);
+  
+  // Create a Proton instance
+  // When using in browser with script tags, make sure to include proton.web.js
+  const proton = new Proton();
+  
+  // Create an emitter
+  const emitter = new Proton.Emitter();
+  // Configure your emitter...
+  
+  // Add the Pixi.js renderer to Proton
+  const renderer = new Proton.PixiRenderer(app.stage);
+  proton.addRenderer(renderer);
+  
+  // Start the emitter
+  emitter.emit();
+  proton.addEmitter(emitter);
+  
+  // Update Proton in the Pixi.js animation loop
+  app.ticker.add(() => {
+    proton.update();
+  });
+})();
+```
+
+Check out a complete example in `example/pixiv8.html`.
 
 ## Remarks
 
