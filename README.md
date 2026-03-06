@@ -27,6 +27,8 @@ Proton is a lightweight and powerful Javascript particle animation library. Use 
 
 Check out examples at [http://drawcall.github.io/Proton/](http://drawcall.github.io/Proton/). The **3D version** of the proton engine is here [here](https://github.com/drawcall/three.proton/). An available **react version** is [here](https://github.com/lindelof/particles-bg).
 
+For guidance on how to use Proton with TypeScript, please refer to [https://github.com/drawcall/Proton/issues/109](https://github.com/drawcall/Proton/issues/109)
+
 ## Features
 
 - **Easy to use** It takes only a dozen lines of code to create a particle animation effect.
